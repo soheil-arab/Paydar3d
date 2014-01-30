@@ -42,7 +42,7 @@ string Decide::decide()
     {
         ss += Attack();
     }
-//    ss +=SK->updatem ( true );
+    ss +=SK->updatem ( true );
     ss = WM->uniquee ( ss );
     return ss;
 }

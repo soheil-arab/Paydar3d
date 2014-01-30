@@ -1195,50 +1195,9 @@ bool WorldModel::seeBall ()
 
 bool WorldModel::seeEnoughFlag()
 {
-    if ( ( ( serverTime - flagLastSeen [ "G1L" ] )  <= 0.06 ) &&
-            ( ( serverTime - flagLastSeen [ "G2L" ] ) <= 0.06 ) &&
-            flagLastSeen [ "G1L" ]  == flagLastSeen [ "G2L" ]  )
-    {
-        return true;
-    }
-
-    if ( ( ( serverTime - flagLastSeen [ "G1R" ] )  <= 0.06 ) &&
-            ( ( serverTime - flagLastSeen [ "G2R" ] ) <= 0.06 ) &&
-            flagLastSeen [ "G1R" ]  == flagLastSeen [ "G2R" ]  )
-    {
-        return true;
-    }
-
-    if ( ( ( serverTime - flagLastSeen [ "G1R" ] )  <= 0.06 ) &&
-            ( ( serverTime - flagLastSeen [ "F1R" ] ) <= 0.06 ) &&
-            flagLastSeen [ "G1R" ]  == flagLastSeen [ "F1R" ]  )
-    {
-        return true;
-    }
-
-    if ( ( ( serverTime - flagLastSeen [ "G2R" ] )  <= 0.06 ) &&
-            ( ( serverTime - flagLastSeen [ "F2R" ] ) <= 0.06 ) &&
-            flagLastSeen [ "G2R" ]  == flagLastSeen [ "F2R" ]  )
-    {
-        return true;
-    }
-
-    if ( ( ( serverTime - flagLastSeen [ "G1L" ] )  <= 0.06 ) &&
-            ( ( serverTime - flagLastSeen [ "F1L" ] ) <= 0.06 ) &&
-            flagLastSeen [ "G1L" ]  == flagLastSeen [ "F1L" ]  )
-    {
-        return true;
-    }
-
-    if ( ( ( serverTime - flagLastSeen [ "G2L" ] )  <= 0.06 ) &&
-            ( ( serverTime - flagLastSeen [ "F2L" ] ) <= 0.06 ) &&
-            flagLastSeen [ "G2L" ]  == flagLastSeen [ "F2L" ]  )
-    {
-        return true;
-    }
-
-
-    return false;
+   if ( getNrOfFlag() > 0 )
+       return true;
+   return false;
 }
 double WorldModel::ZFromLeft()
 {
