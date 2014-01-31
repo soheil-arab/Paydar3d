@@ -37,6 +37,7 @@ private :
   double Turn10R[24][24];
 public :
   Skill(WorldModel*);
+  string beam ( double x , double y , double ang);
   string moveJoint(string,double);
   string moveJointTo(string,double,double);
   string act(double a[][24],int m,int n,double &time,bool &);

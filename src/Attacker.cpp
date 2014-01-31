@@ -41,10 +41,12 @@ string Decide::Attack()
     {
         set = true;
         t = WM->getServerTime();
+        WM->clearBodyRotate();
         return ss.str();
     }
     else if (canBeam() && !beam && (WM->getServerTime() - t) > 1.5)
     {
+//        WM->clearBodyRotate();
         ty++;
         ss << SK->whereBeam(stand,stan);
         if (ty>1)
@@ -91,14 +93,6 @@ string Decide::Attack()
 
         if ( shouldClear ( x,y,s ))
         {
-            if(WM->getMyAngleTo(WM->getBallPos())>0 || startShoot())
-            {
-                s = Left;
-            }
-            else
-            {
-                s = Right;
-            }
             Log.Log ( 2 , "Shoooooooot va gooooooooooooooooooooooal !" );
             ACT->setCurrentAct( K, s , x, y  );
             tFinal=0;
@@ -132,12 +126,21 @@ string Decide::Attack()
     }
     else if(!(WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Right || WM->getPlayMode() == PM_BeforeKickOff ) )
     {
-        Log.Log ( 2 , "Darja Mizanam !" );
-        return SK->finalAction( "darja" ,tFinal);
+        Log.Log ( 2 , "Darja Mizadam !" );
+//        return SK->finalAction( "darja" ,tFinal);
+        return "";
     }
 //    static int ttt = 0 ;
 //    ttt++;
 //    ss << SK->moveJoint( "he1" ,( ttt % 100 < 50 ) ? -0.5 : 0.5  ) << SK->moveJoint( "he2" ,( ttt % 100 < 50 ) ? -0.5 : 0.5  ) ;
+//    if (ttt < 80 )
+//        ss << "";
+//    else if ( ttt < 100 )
+//        ss << SK->moveJoint("rle2" ,  -1) << SK->moveJoint("rle6" , 1) <<
+//              SK->moveJoint("lle2" , -1) << SK->moveJoint("lle6" ,1) ;
+//    else if ( ttt < 140 )
+//      ss << SK->moveJointTo("he1" , -100 , 3) << SK->moveJointTo("he2" , -40 , 3) ;
     //////////////////////////////////////////////////////////////////
+//    cout << WM->getGyro() << endl;
     return ss.str();
 }

@@ -18,9 +18,9 @@ WorldModel::WorldModel()
     Localed=false;
     Sense = false;
     myZ = 0.51 ;
+    myOrien = 0;
+
     bodyRotate.Identity();
-//    bodyRotate.RotateY(Deg2Rad(0.010415886));
-    bodyRotate.RotateZ(Deg2Rad(-20));
 
     headR.Identity();
     /// set Joints Name
@@ -46,6 +46,10 @@ WorldModel::WorldModel()
     names[19] = "rae3";
     names[20] = "lae4";
     names[21] = "rae4";
+}
+
+void WorldModel::clearBodyRotate(){
+    bodyRotate.Identity();
 }
 
 WorldModel::~WorldModel()
@@ -91,6 +95,10 @@ void WorldModel::brinBeMA(){
     headR.RotationZ(Deg2Rad(getJointAngle("he1")));
     headR.RotateY(-Deg2Rad(getJointAngle("he2")));
 
+//    cout << (getJointAngle("he1")) << endl;
+//    cout << (getJointAngle("he2")) << endl;
+//    cout << "===" << endl;
+
     Vector3f rightGyro (gyro.y(),-gyro.x(),gyro.z());
     Vector3f newGyro = bodyRotate.Rotate(rightGyro);
     
@@ -103,6 +111,7 @@ void WorldModel::brinBeMA(){
     Vector3f x = bodyRotate.Transform(Vector3f(1,0,0));
     Vector3f y = bodyRotate.Transform(Vector3f(0,1,0));
     Vector3f z = bodyRotate.Transform(Vector3f(0,0,1));
+
     
     Vector3f newx = x*cos(theta) + (newGyro.Cross(x))*sin(theta) + newGyro * (newGyro.Dot(x))*(1-cos(theta));
     Vector3f newy = y*cos(theta) + (newGyro.Cross(y))*sin(theta) + newGyro * (newGyro.Dot(y))*(1-cos(theta));
@@ -129,9 +138,10 @@ void WorldModel::brinBeMA(){
                     0 , 0 , 0 , 1);
 
 
-//    RVDraw::instance()->drawLine(sensedPos,sensedPos+headx,RED,21);
-//    RVDraw::instance()->drawLine(sensedPos,sensedPos+heady,RED,22);
-//    RVDraw::instance()->drawLine(sensedPos,sensedPos+headz,RED,23);
+//    RVDraw::instance()->drawLine(sensedPos,sensedPos+headx*10,RED,21);
+//    RVDraw::instance()->drawLine(sensedPos,sensedPos+heady*10,RED,22);
+//    RVDraw::instance()->drawLine(sensedPos,sensedPos+headz*10,RED,23);
+
 
     int numberOfFlags = 0 ;
 
@@ -144,7 +154,7 @@ void WorldModel::brinBeMA(){
         }
 
         Vector3f poss = flagGlobal[i->first] - headRotate.Rotate(i->second);
-//        RVDraw::instance()->drawLine(Vector3f(0,0,0),poss,GREEN,numberOfFlags);
+        RVDraw::instance()->drawLine(sensedPos,sensedPos+headRotate.Rotate(i->second),GREEN,numberOfFlags);
 
         myPos += poss;
         numberOfFlags++;
@@ -194,9 +204,6 @@ void WorldModel::brinBeMA(){
             their [i->first].llowerarm = myPos +headRotate.Rotate ( PolarToCartecian(i->second.llowerarm) ) ;
         }
     }
-
-
-
 }
 
 

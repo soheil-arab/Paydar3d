@@ -31,6 +31,7 @@ Parser::Parser(WorldModel *wm)
  * */
 void Parser::Parse(string &msg)
 {
+//    cout << msg << endl;
     for ( int i = 0; i<msg.length(); i++)
         if ( msg[i]=='(' || msg[i]==')')
         {
@@ -392,5 +393,16 @@ void Parser::Parse(string &msg)
         edame >> temp >> x >> y >> z ;
         WM->setSense(true);
         WM->sensedPos = Vector3f(x,y,z);
+    }
+
+    pos = msg.find("myorien");
+    if (pos != string::npos)
+    {
+        stringstream edame(msg.substr(pos));
+        string msg;
+        double ang;
+        edame >> temp >> ang ;
+        WM->setSense(true);
+        WM->myOrien = ang;
     }
 }

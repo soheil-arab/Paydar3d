@@ -105,6 +105,7 @@ public:
   void      setZ(double z);
   int       isOppInCircle ( Circle c,VecPosition&,VecPosition&) ;
   Vector3f  sensedPos;
+  double myOrien;
   int getOurPlayerCount() { return our.size()-2; }
   double getFieldLength(){ return length; }
   double getFieldWidth(){ return width; }
@@ -112,6 +113,7 @@ public:
   void setInitialGyro();
   void RotateHead1 (double val);
   void RotateHead2 (double val);
+  void clearBodyRotate ();
 private:
   Vector3f  ACC;
   bool      canSeeFlags;

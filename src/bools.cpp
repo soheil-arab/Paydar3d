@@ -804,7 +804,7 @@ string Decide::moveToNearBall(double &tFinal)
     
     else if(nb)//besyar nazdik be toop
     {
-        cout <<"sideturn\n";
+//        cout <<"sideturn\n";
         if(ng) //az zaviye had rad shode
         {
             if(WM->getMyAngleToGoal()<0)

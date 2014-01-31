@@ -173,6 +173,14 @@ string Skill::moveJoint(string j, double val)
     message << "(" << j << " " << val*0.87 << ")";
     return message.str();
 }
+/////////////////////////////////////////////////////////////////////
+string Skill::beam(double x, double y, double ang)
+{
+
+    stringstream message;
+    message << "(beam " << x  << " " << y << " " << ang << ")";
+    return message.str();
+}
 ///////////////////////////////////////////////////////////////////
 
 string Skill::moveJointTo(string j, double val, double speed)
@@ -511,13 +519,13 @@ string Skill::whereBeam(bool &stand,double &stan)
             if ( WM->getPlayMode() == PM_BeforeKickOff  || WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Right )
             {
                 if(WM->getServerTime()<20)
-                    ss << "(beam -0.19 0.0  -20)"<<Standing(stand,stan);
+                    ss << beam(-0.19,0.0,WM->getMyAngle());
                 else
-                    ss << "(beam -0.22 0.0  -20)"<<Standing(stand,stan);
+                    ss << beam(-0.22,0.0,WM->getMyAngle());
             }
             else
             {
-                ss << "(beam -1.6 0.0 0)"<<Standing(stand,stan);
+                ss << beam(-1.6,0.0,WM->getMyAngle());
             }
         }
         else
@@ -525,11 +533,11 @@ string Skill::whereBeam(bool &stand,double &stan)
 
             if ( WM->getPlayMode() == PM_KickOff_Right || WM->getPlayMode() == PM_Goal_Left  )
             {
-                ss << "(beam -0.19 0 -20)"<<Standing(stand,stan);
+                ss << beam(-0.19,0,WM->getMyAngle());
             }
             else
             {
-                ss << "(beam -1.6  0.0 0)"<<Standing(stand,stan);
+                ss << beam(-1.6,0.0,WM->getMyAngle());
             }
         }
     }
@@ -539,22 +547,22 @@ string Skill::whereBeam(bool &stand,double &stan)
         {
             if ( WM->getPlayMode( ) == PM_BeforeKickOff   || WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Right )
             {
-                ss << "(beam -0.18 -2.5 0)"<<Standing(stand,stan);
+                ss << beam(-0.18,-2.5,WM->getMyAngle());
             }
             else
             {
-                ss << "(beam -2.6 0.7 0)"<<Standing(stand,stan);
+                ss << beam(-2.6,0.7,WM->getMyAngle());
             }
         }
         else
         {
             if ( WM->getPlayMode() == PM_KickOff_Right || WM->getPlayMode() == PM_Goal_Left  )
             {
-                ss << "(beam -0.18 -2.5 0)"<<Standing(stand,stan);
+                ss << beam(-0.18,-2.5,WM->getMyAngle());
             }
             else
             {
-                ss << "(beam -2.6 0.7 0)"<<Standing(stand,stan);
+                ss << beam(-2.6,0.7,WM->getMyAngle());
             }
         }
     }
@@ -564,22 +572,22 @@ string Skill::whereBeam(bool &stand,double &stan)
         {
             if ( WM->getPlayMode( ) == PM_BeforeKickOff   || WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Right )
             {
-                ss << "(beam -13 3 0)"<<Standing(stand,stan);
+                ss << beam(-13,3,WM->getMyAngle());
             }
             else
             {
-                ss << "(beam -13 3 0)"<<Standing(stand,stan);
+                ss << beam(-13,3,WM->getMyAngle());
             }
         }
         else
         {
             if ( WM->getPlayMode() == PM_KickOff_Right || WM->getPlayMode() == PM_Goal_Left  )
             {
-                ss << "(beam -13 3 0)"<<Standing(stand,stan);
+                ss << beam(-13,3,WM->getMyAngle());
             }
             else
             {
-                ss << "(beam -13 3 0)"<<Standing(stand,stan);
+                ss << beam(-13,3,WM->getMyAngle());
             }
         }
     }
@@ -589,22 +597,22 @@ string Skill::whereBeam(bool &stand,double &stan)
         {
             if (WM->getPlayMode() == PM_BeforeKickOff || WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Right)
             {
-                ss << "(beam -9 4 0)"<<Standing(stand,stan);
+                ss << beam(-9,4,WM->getMyAngle());
             }
             else
             {
-                ss << "(beam -9 4 0)"<<Standing(stand,stan);
+                ss << beam(-9,4,WM->getMyAngle());
             }
         }
         else
         {
             if ( WM->getPlayMode() == PM_KickOff_Right || WM->getPlayMode() == PM_Goal_Left )
             {
-                ss << "(beam -9 4 0)"<<Standing(stand,stan);
+                ss << beam(-9,4,WM->getMyAngle());
             }
             else
             {
-                ss << "(beam -9 4 0)"<<Standing(stand,stan);
+                ss << beam(-9,4,WM->getMyAngle());
             }
         }
     }
@@ -614,22 +622,22 @@ string Skill::whereBeam(bool &stand,double &stan)
         {
             if ( WM->getPlayMode() == PM_BeforeKickOff || WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Right )
             {
-                ss << "(beam -10.0 1.2 0)"<<Standing(stand,stan);
+                ss << beam(-10.0,1.2,WM->getMyAngle());
             }
             else
             {
-                ss << "(beam -10.0 1.2 0)"<<Standing(stand,stan);
+                ss << beam(-10.0,1.2,WM->getMyAngle());
             }
         }
         else
         {
             if ( WM->getPlayMode() == PM_KickOff_Right || WM->getPlayMode() == PM_Goal_Left )
             {
-                ss << "(beam -10 1.2 0)"<<Standing(stand,stan);
+                ss << beam(-10,1.2,WM->getMyAngle());
             }
             else
             {
-                ss << "(beam -10.0 1.2 0)"<<Standing(stand,stan);
+                ss << beam(-10,1.2,WM->getMyAngle());
             }
         }
     }
@@ -639,22 +647,22 @@ string Skill::whereBeam(bool &stand,double &stan)
         {
             if (WM->getPlayMode() == PM_BeforeKickOff || WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Right)
             {
-                ss << "(beam -9 -4 0)"<<Standing(stand,stan);
+                ss << beam(-9,-4,WM->getMyAngle());
             }
             else
             {
-                ss << "(beam -9 -4 0)"<<Standing(stand,stan);
+                ss << beam(-9,-4,WM->getMyAngle());
             }
         }
         else
         {
             if ( WM->getPlayMode() == PM_KickOff_Right || WM->getPlayMode() == PM_Goal_Left )
             {
-                ss << "(beam -9 -4 0)"<<Standing(stand,stan);
+                ss << beam(-9,-4,WM->getMyAngle());
             }
             else
             {
-                ss << "(beam -9 -4 0)"<<Standing(stand,stan);
+                ss << beam(-9,-4,WM->getMyAngle());
             }
         }
     }
@@ -664,22 +672,22 @@ string Skill::whereBeam(bool &stand,double &stan)
         {
             if ( WM->getPlayMode() == PM_BeforeKickOff  || WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Right )
             {
-                ss << "(beam -10.0 -1.2 0)"<<Standing(stand,stan);
+                ss << beam(-10.0,-1.2,WM->getMyAngle());
             }
             else
             {
-                ss << "(beam -10.0 -1.2 0)"<<Standing(stand,stan);
+                ss << beam(-10.0,-1.2,WM->getMyAngle());
             }
         }
         else
         {
             if ( WM->getPlayMode() == PM_KickOff_Right  || WM->getPlayMode() == PM_Goal_Left )
             {
-                ss << "(beam -10.0 -1.6 0)"<<Standing(stand,stan);
+                ss << beam(-10.0,-1.6,WM->getMyAngle());
             }
             else
             {
-                ss << "(beam -10.0 -1.6 0)"<<Standing(stand,stan);
+                ss << beam(-10.0,-1.6,WM->getMyAngle());
             }
         }
     }
@@ -689,22 +697,22 @@ string Skill::whereBeam(bool &stand,double &stan)
         {
             if ( WM->getPlayMode() == PM_BeforeKickOff  || WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Right )
             {
-                ss << "(beam -7 0 0)"<<Standing(stand,stan);
+                ss << beam(-7,0,WM->getMyAngle());
             }
             else
             {
-                ss << "(beam -7 0 0)"<<Standing(stand,stan);
+                ss << beam(-7,0,WM->getMyAngle());
             }
         }
         else
         {
             if ( WM->getPlayMode() == PM_KickOff_Right  || WM->getPlayMode() == PM_Goal_Left )
             {
-                ss << "(beam -7 0 0)"<<Standing(stand,stan);
+                ss << beam(-7,0,WM->getMyAngle());
             }
             else
             {
-                ss << "(beam -7 0 0)"<<Standing(stand,stan);
+                ss << beam(-7,0,WM->getMyAngle());
             }
         }
     }
@@ -714,22 +722,22 @@ string Skill::whereBeam(bool &stand,double &stan)
         {
             if ( WM->getPlayMode() == PM_BeforeKickOff  || WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Right )
             {
-                ss << "(beam -6 2 0)"<<Standing(stand,stan);
+                ss << beam(-6,2,WM->getMyAngle());
             }
             else
             {
-                ss << "(beam -6 2 0)"<<Standing(stand,stan);
+                ss << beam(-6,2,WM->getMyAngle());
             }
         }
         else
         {
             if ( WM->getPlayMode() == PM_KickOff_Right  || WM->getPlayMode() == PM_Goal_Left )
             {
-                ss << "(beam -6 2 0)"<<Standing(stand,stan);
+                ss << beam(-6,2,WM->getMyAngle());
             }
             else
             {
-                ss << "(beam -6 2 0)"<<Standing(stand,stan);
+                ss << beam(-6,2,WM->getMyAngle());
             }
         }
     }
@@ -739,22 +747,22 @@ string Skill::whereBeam(bool &stand,double &stan)
         {
             if ( WM->getPlayMode() == PM_BeforeKickOff  || WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Right )
             {
-                ss << "(beam -13 -3 0)"<<Standing(stand,stan);
+                ss << beam(-13,-3,WM->getMyAngle());
             }
             else
             {
-                ss << "(beam -13 -3 0)"<<Standing(stand,stan);
+                ss << beam(-13,-3,WM->getMyAngle());
             }
         }
         else
         {
             if ( WM->getPlayMode() == PM_KickOff_Right  || WM->getPlayMode() == PM_Goal_Left )
             {
-                ss << "(beam -13 -3 0)"<<Standing(stand,stan);
+                ss << beam(-13,-3,WM->getMyAngle());
             }
             else
             {
-                ss << "(beam -13 -3 0)"<<Standing(stand,stan);
+                ss << beam(-13,-3,WM->getMyAngle());
             }
         }
     }
