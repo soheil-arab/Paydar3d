@@ -46,7 +46,7 @@ public:
   void setOurPlayerPartPos ( int num , string part , Polar pos );
   void setOppPlayerPartPos ( int num , string part , Polar pos );
   void setACC ( Vector3f pos );
-
+  void initLocalize();
   double   getMyAngle();
   double   getMyPhi();
   double   getBallAng();

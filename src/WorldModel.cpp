@@ -84,10 +84,10 @@ bool WorldModel::isServerBeamed()
         {
             continue;
         }
-        if((i->second.dist)-(lastPos-flag[i->first]).Length()>1){
-            lastPos=getMyPos();
-            cout<<"dist"<<i->second.dist<<"lastpos"<<(lastPos-flag[i->first]).Length()<<endl;
+        if(fabs((i->second.dist)-(lastPos-flagGlobal[i->first]).Length())>1){
+            cout<<i->first<<": dist "<<i->second.dist<<"lastpos"<<(lastPos-flagGlobal[i->first]).Length()<<endl;
             cout<<"beamed"<<endl;
+            lastPos=getMyPos();
             return true;
         }
     }
@@ -109,7 +109,9 @@ void WorldModel::RotateHead2(double val){
 }
 
 void WorldModel::brinBeMA(){
-    isServerBeamed();
+    if(isServerBeamed()){
+        initLocalize();
+    }
     initDimentions();
     initFlags();
 
@@ -559,6 +561,156 @@ void WorldModel::setACC( Vector3f pos )
         pos.z() = 0;
     }
     ACC = 0.9*ACC+0.1*pos;
+}
+
+void WorldModel::initLocalize()
+{
+    Vector3f pos ;
+    int co = 0 ;
+    Vector3f sum (0,0,0);
+
+    for (map<string, Polar>::iterator i = flagPolar.begin(); i != flagPolar.end(); i++)
+    {
+        if (flagLastSeen [ i->first ] != serverTime)
+        {
+            continue;
+        }
+        for (map<string, Polar>::iterator j = flagPolar.begin() ; j != flagPolar.end(); j++)
+        {
+            if (flagLastSeen [ j->first ] != serverTime)
+            {
+                continue;
+            }
+            if (  i->first ==  j->first )
+            {
+                continue ;
+            }
+            if ( i->first[2] != j->first[2] )
+            {
+                continue ;
+            }
+
+            if (  false && i->first[0]=='G' && j->first[0] == 'F' && i->first[1] == j->first[1]  )
+            {
+                co ++;
+                Localed = true ;
+                double fz=ZFromLeft();
+
+                double h1 = 0;
+                double h2 = 0.8;
+                double a = i->second.dist;
+                double b = j->second.dist;
+                double d = fabs(flagGlobal[i->first].y() - flagGlobal[j->first].y()) ;
+
+
+                double fy = (d*d+b*b-a*a+(h2-h1)*(h1+h2-2*fz))/(2*d);
+                double fx = sqrt ( b*b-(h1-fz)*(h1-fz) - fy*fy ) ;
+
+
+                if ( j->first[2] == 'L' && getTeamSide() == Left)
+                {
+                    fx *= -1 ;
+                }
+                if ( j->first[2] == 'R' && getTeamSide() == Right)
+                {
+                    fx *= -1 ;
+                }
+                if ( getTeamSide() == Right )
+                {
+                    fy *= -1 ;
+                }
+                if ( j->first[1] == '2' )
+                {
+                    fy *= -1 ;
+                }
+
+
+                pos = flagGlobal [j->first] - Vector3f ( fx, fy , -fz );
+
+                sum += pos;
+            }
+            if ( false && i->first[0]=='G' && j->first[0] == 'G' && i->first[1] == '1' && j->first[1] == '2'   )
+            {
+                co ++;
+                Localed = true ;
+                double fz=ZFromLeft();
+
+                double h1 = 0.8;
+                double h2 = 0.8;
+                double a = i->second.dist;
+                double b = j->second.dist;
+                double d = fabs(flagGlobal[i->first].y() - flagGlobal[j->first].y()) ;
+
+
+                double fy = (d*d+b*b-a*a+(h2-h1)*(h1+h2-2*fz))/(2*d);
+                double fx = sqrt ( b*b-(h1-fz)*(h1-fz) - fy*fy ) ;
+
+                if ( i->first[2] == 'L' && getTeamSide() == Left)
+                {
+                    fx *= -1 ;
+                }
+
+                if ( i->first[2] == 'R' && getTeamSide() == Right)
+                {
+                    fx *= -1 ;
+                }
+                if ( getTeamSide() == Right )
+                {
+                    fy *= -1 ;
+                }
+                if ( j->first[1] == '2' )
+                {
+                    fy *= -1 ;
+                }
+
+                pos = flagGlobal [j->first] - Vector3f ( fx, fy , 0.8 - fz );
+                sum+=pos;
+
+            }
+            if ( i->first[0]=='F' && j->first[0] == 'F' && i->first[1] == '1' && j->first[1] == '2'   )
+            {
+                co ++;
+                Localed = true ;
+                double fz=ZFromLeft();
+
+                double h1 = 0;
+                double h2 = 0;
+                double a = i->second.dist;
+                double b = j->second.dist;
+                double d = fabs(flagGlobal[i->first].y() - flagGlobal[j->first].y()) ;
+
+
+                double fy = (d*d+b*b-a*a+(h2-h1)*(h1+h2-2*fz))/(2*d);
+                double fx = sqrt ( b*b-(h1-fz)*(h1-fz) - fy*fy ) ;
+
+                if ( i->first[2] == 'L' && getTeamSide() == Left)
+                {
+                    fx *= -1 ;
+                }
+
+                if ( i->first[2] == 'R' && getTeamSide() == Right)
+                {
+                    fx *= -1 ;
+                }
+                if ( getTeamSide() == Right )
+                {
+                    fy *= -1 ;
+                }
+                if ( j->first[1] == '2' )
+                {
+                    fy *= -1 ;
+                }
+
+                pos = flagGlobal [j->first] - Vector3f ( fx, fy , - fz );
+                sum+=pos;
+            }
+
+        }
+    }
+    if ( Localed )                                /// if At Least Seen 3 Flags Or More
+    {
+        pos = sum/co;
+    }
 }
 
 void WorldModel::setBallPolarPos(Polar pos)
