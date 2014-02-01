@@ -72,6 +72,30 @@ double WorldModel::getBallLastSeen()
 {
     return ballLastSeen;
 }
+
+//checks that if the agent was beamed by server after goal or a foul
+bool WorldModel::isServerBeamed()
+{
+    static Vector3f lastPos=getMyPos();
+
+    for (map<string, Polar>::iterator i = flagPolar.begin(); i != flagPolar.end(); i++)
+    {
+        if (flagLastSeen [ i->first ] != serverTime)
+        {
+            continue;
+        }
+        if((i->second.dist)-(lastPos-flag[i->first]).Length()>1){
+            lastPos=getMyPos();
+            cout<<"dist"<<i->second.dist<<"lastpos"<<(lastPos-flag[i->first]).Length()<<endl;
+            cout<<"beamed"<<endl;
+            return true;
+        }
+    }
+    lastPos=getMyPos();
+    return false;
+
+}
+
 ///~ Our Team Localization
 
 
@@ -85,19 +109,19 @@ void WorldModel::RotateHead2(double val){
 }
 
 void WorldModel::brinBeMA(){
-
+    isServerBeamed();
     initDimentions();
     initFlags();
 
-//    RotateHead1(getLastJointAngle("he1")-getJointAngle("he1"));
-//    RotateHead2(getLastJointAngle("he2")-getJointAngle("he2"));
+    //    RotateHead1(getLastJointAngle("he1")-getJointAngle("he1"));
+    //    RotateHead2(getLastJointAngle("he2")-getJointAngle("he2"));
 
     headR.RotationZ(Deg2Rad(getJointAngle("he1")));
     headR.RotateY(-Deg2Rad(getJointAngle("he2")));
 
-//    cout << (getJointAngle("he1")) << endl;
-//    cout << (getJointAngle("he2")) << endl;
-//    cout << "===" << endl;
+    //    cout << (getJointAngle("he1")) << endl;
+    //    cout << (getJointAngle("he2")) << endl;
+    //    cout << "===" << endl;
 
     Vector3f rightGyro (gyro.y(),-gyro.x(),gyro.z());
     Vector3f newGyro = bodyRotate.Rotate(rightGyro);
@@ -124,9 +148,9 @@ void WorldModel::brinBeMA(){
                     0 , 0 , 0 , 1);
 
 
-//    RVDraw::instance()->drawLine(sensedPos,sensedPos+newx,GREEN,24);
-//    RVDraw::instance()->drawLine(sensedPos,sensedPos+newy,GREEN,25);
-//    RVDraw::instance()->drawLine(sensedPos,sensedPos+newz,GREEN,26);
+    //    RVDraw::instance()->drawLine(sensedPos,sensedPos+newx,GREEN,24);
+    //    RVDraw::instance()->drawLine(sensedPos,sensedPos+newy,GREEN,25);
+    //    RVDraw::instance()->drawLine(sensedPos,sensedPos+newz,GREEN,26);
 
     Vector3f headx = headR.Rotate(newx);
     Vector3f heady = headR.Rotate(newy);
@@ -138,9 +162,9 @@ void WorldModel::brinBeMA(){
                     0 , 0 , 0 , 1);
 
 
-//    RVDraw::instance()->drawLine(sensedPos,sensedPos+headx*10,RED,21);
-//    RVDraw::instance()->drawLine(sensedPos,sensedPos+heady*10,RED,22);
-//    RVDraw::instance()->drawLine(sensedPos,sensedPos+headz*10,RED,23);
+    //    RVDraw::instance()->drawLine(sensedPos,sensedPos+headx*10,RED,21);
+    //    RVDraw::instance()->drawLine(sensedPos,sensedPos+heady*10,RED,22);
+    //    RVDraw::instance()->drawLine(sensedPos,sensedPos+headz*10,RED,23);
 
 
     int numberOfFlags = 0 ;
@@ -163,8 +187,8 @@ void WorldModel::brinBeMA(){
     /**
       for testing purpose
     */
-//    static int posN = 100 ;
-//    posN++;
+    //    static int posN = 100 ;
+    //    posN++;
 
 
     if ( numberOfFlags ){
@@ -172,11 +196,11 @@ void WorldModel::brinBeMA(){
         myPos/=numberOfFlags;
         setMyPos(myPos);
         setMyAngle(Rad2Deg(gArcTan(newx.y()/newx.x())));
-//        RVDraw::instance()->drawVector3f(myPos,GREEN,posN);
+        //        RVDraw::instance()->drawVector3f(myPos,GREEN,posN);
         if ( ballLastSeen == serverTime )          /// if See Ball In This Cycle Set Its Pos !
         {
             Vector3f ballPos = myPos + headRotate.Rotate(ball);
-//            RVDraw::instance()->drawVector3f(ballPos,RED,++posN);
+            //            RVDraw::instance()->drawVector3f(ballPos,RED,++posN);
             setBallVel(ballPos-getBallPos());
             setBallPos(ballPos);
         }
@@ -210,6 +234,11 @@ void WorldModel::brinBeMA(){
 void WorldModel::Localize()
 {
     brinBeMA();
+
+}
+
+//Vector3f WorldModel::getPosbyTwoFlag()
+//{
 
 //    Localed=false;
 //    Vector3f pos ;
@@ -459,7 +488,8 @@ void WorldModel::Localize()
 //        }
 
 //    }
-}
+//}
+
 // set All Flags Real Position
 void WorldModel::initFlags()
 {
@@ -1202,9 +1232,9 @@ bool WorldModel::seeBall ()
 
 bool WorldModel::seeEnoughFlag()
 {
-   if ( getNrOfFlag() > 0 )
-       return true;
-   return false;
+    if ( getNrOfFlag() > 0 )
+        return true;
+    return false;
 }
 double WorldModel::ZFromLeft()
 {

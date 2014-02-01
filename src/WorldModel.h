@@ -79,6 +79,7 @@ public:
   int      getNrOfThem();
   bool     getSense();
   bool     isFeltDown();
+  bool     isServerBeamed();
   SideT    feltType();
   string   getOurName();
   string   getOppName();
