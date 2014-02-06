@@ -41,7 +41,6 @@ string Decide::Attack()
     {
         set = true;
         t = WM->getServerTime();
-//        WM->clearBodyRotate();
         return ss.str();
     }
     else if (canBeam() && !beam && (WM->getServerTime() - t) > 1.5)
@@ -49,6 +48,7 @@ string Decide::Attack()
 //        WM->clearBodyRotate();
         ty++;
         ss << SK->whereBeam(stand,stan);
+        WM->clearBodyRotate();
         if (ty>1)
         {
             stand=false;

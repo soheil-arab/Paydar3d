@@ -46,6 +46,8 @@ public:
   void setOurPlayerPartPos ( int num , string part , Polar pos );
   void setOppPlayerPartPos ( int num , string part , Polar pos );
   void setACC ( Vector3f pos );
+  void getPosbyTwoFlag();
+
 
   double   getMyAngle();
   double   getMyPhi();
