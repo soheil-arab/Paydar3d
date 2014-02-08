@@ -192,6 +192,8 @@ public:
   f_inline const Matrix &     operator+=(const Matrix &inRHS);
 
   f_inline const Matrix       operator+(const Matrix &inRHS) const;
+  f_inline const Matrix       operator-(const Matrix &inRHS) const;
+
   f_inline const Matrix       operator/(const int &num) const;
   /** Multipies the matrix with a double */
   f_inline  Matrix       zero() ;
@@ -494,6 +496,18 @@ f_inline const Matrix Matrix::operator+(const Matrix & inRHS) const
     for (int j=0; j<4; j++)
       {
         r(i,j) = El(i,j)+inRHS(i,j);
+      }
+  return r;
+}
+
+f_inline const Matrix Matrix::operator-(const Matrix & inRHS) const
+{
+  Matrix r;
+
+  for (int i=0; i<4; i++)
+    for (int j=0; j<4; j++)
+      {
+        r(i,j) = El(i,j)-inRHS(i,j);
       }
   return r;
 }

@@ -107,16 +107,47 @@ void WorldModel::RotateHead2(double val){
     headR.RotateY(Deg2Rad(val));
 }
 
+
+
+
+//this function will rotate an orirentation around an axis with specified angle, the angle should be in radian
+
+Vector3f WorldModel::general_rotation(Vector3f initial,Vector3f axis,double angle)
+{
+    cout<<"angle: "<<angle<<endl;
+    cout<<"axis: "<<axis<<endl;
+    Vector3f normaled_axis(axis.x()/axis.Length(),axis.y()/axis.Length(),axis.z()/axis.Length());
+    double ux=normaled_axis.x();
+    double uy=normaled_axis.y();
+    double uz=normaled_axis.z();
+    Matrix Rotation(cos(angle)+ux*ux*(1-cos(angle)), ux*uy*(1-cos(angle))-uz*sin(angle), ux*uz*(1-cos(angle))+uy*sin(angle), 0,
+                    ux*uy*(1-cos(angle))+uz*sin(angle), cos(angle)+uz*uz*(1-cos(angle)), uy*uz*(1-cos(angle))-ux*sin(angle), 0,
+                    ux*uz*(1-cos(angle))-uy*sin(angle), uy*uz*(1-cos(angle))+ux*sin(angle), cos(angle)+uz*uz*(1-cos(angle)), 0,
+                    0, 0, 0, 1);
+    Vector3f rotated=Rotation.Transform(initial);
+    cout<<"rotated: "<<rotated<<endl;
+    return rotated;
+
+
+}
+
+
+
 void WorldModel::brinBeMA(){
     isServerBeamed();
     initDimentions();
     initFlags();
+    kalman_filter();
+    //    cout<<(int)(getACC().x()*10000)/(float)10000<<" "<<(int)(getACC().y()*10000)/(float)10000<<" "<<(int)(getACC().z()*10000)/(float)10000<<endl;
 
     //    RotateHead1(getLastJointAngle("he1")-getJointAngle("he1"));
     //    RotateHead2(getLastJointAngle("he2")-getJointAngle("he2"));
 
-    headR.RotationZ(Deg2Rad(getJointAngle("he1")));
-    headR.RotateY(-Deg2Rad(getJointAngle("he2")));
+    //    headR.RotationZ(Deg2Rad(getJointAngle("he1")));
+    //    headR.RotateY(-Deg2Rad(getJointAngle("he2")));
+
+//        cout<<"he1: "<<getJointAngle("he1")<<endl;
+//        cout<<"he2: "<<getJointAngle("he2")<<endl;
 
     //    cout << (getJointAngle("he1")) << endl;
     //    cout << (getJointAngle("he2")) << endl;
@@ -147,28 +178,41 @@ void WorldModel::brinBeMA(){
                     0 , 0 , 0 , 1);
 
 
-    //    RVDraw::instance()->drawLine(sensedPos,sensedPos+newx,GREEN,24);
-    //    RVDraw::instance()->drawLine(sensedPos,sensedPos+newy,GREEN,25);
-    //    RVDraw::instance()->drawLine(sensedPos,sensedPos+newz,GREEN,26);
-
-    Vector3f headx = headR.Rotate(newx);
-    Vector3f heady = headR.Rotate(newy);
-    Vector3f headz = headR.Rotate(newz);
-
-    headRotate.Set( headx.x() , heady.x() , headz.x() , 0 ,
-                    headx.y() , heady.y() , headz.y() , 0 ,
-                    headx.z() , heady.z() , headz.z() , 0 ,
-                    0 , 0 , 0 , 1);
+        RVDraw::instance()->drawLine(sensedPos,sensedPos+newx,GREEN,24);
+        RVDraw::instance()->drawLine(sensedPos,sensedPos+newy,GREEN,25);
+        RVDraw::instance()->drawLine(sensedPos,sensedPos+newz,GREEN,26);
 
 
+    Vector3f x_after_he1_rotation=general_rotation(newx,newz,Deg2Rad(getJointAngle("he1")));
+    Vector3f y_after_he1_rotation=general_rotation(newy,newz,Deg2Rad(getJointAngle("he1")));
+    Vector3f z_after_he1_rotation=general_rotation(newz,newz,Deg2Rad(getJointAngle("he1")));
+
+    Vector3f x_after_he2_rotation=general_rotation(x_after_he1_rotation,y_after_he1_rotation,-Deg2Rad(getJointAngle("he2")));
+    Vector3f y_after_he2_rotation=general_rotation(y_after_he1_rotation,y_after_he1_rotation,-Deg2Rad(getJointAngle("he2")));
+    Vector3f z_after_he2_rotation=general_rotation(z_after_he1_rotation,y_after_he1_rotation,-Deg2Rad(getJointAngle("he2")));
+
+    headRotate.Set(x_after_he2_rotation.x(),y_after_he2_rotation.x(),z_after_he2_rotation.x(),0,
+                   x_after_he2_rotation.y(),y_after_he2_rotation.y(),z_after_he2_rotation.y(),0,
+                   x_after_he2_rotation.z(),y_after_he2_rotation.z(),z_after_he2_rotation.z(),0,
+                   0, 0, 0, 1);
+
+
+
+
+<<<<<<< HEAD
         RVDraw::instance()->drawLine(sensedPos,sensedPos+headx*10,RED,21);
         RVDraw::instance()->drawLine(sensedPos,sensedPos+heady*10,RED,22);
         RVDraw::instance()->drawLine(sensedPos,sensedPos+headz*10,RED,23);
+=======
+                       RVDraw::instance()->drawLine(sensedPos,sensedPos+x_after_he2_rotation*10,RED,21);
+                       RVDraw::instance()->drawLine(sensedPos,sensedPos+y_after_he2_rotation*10,YELLO,22);
+                       RVDraw::instance()->drawLine(sensedPos,sensedPos+z_after_he2_rotation*10,BLACK,23);
+>>>>>>> 73e1f0155ae49eda44f587ce07fb368c1986efb9
 
 
-    int numberOfFlags = 0 ;
+                   int numberOfFlags = 0 ;
 
-    Vector3f myPos (0,0,0);
+            Vector3f myPos (0,0,0);
     for (map<string, Vector3f>::iterator i = flag.begin(); i != flag.end(); i++)
     {
         if (flagLastSeen [ i->first ] != serverTime)
@@ -177,7 +221,7 @@ void WorldModel::brinBeMA(){
         }
 
         Vector3f poss = flagGlobal[i->first] - headRotate.Rotate(i->second);
-        RVDraw::instance()->drawLine(sensedPos,sensedPos+headRotate.Rotate(i->second),GREEN,numberOfFlags);
+//        RVDraw::instance()->drawLine(sensedPos,sensedPos+headRotate.Rotate(i->second),GREEN,numberOfFlags);
 
         myPos += poss;
         numberOfFlags++;
@@ -228,6 +272,156 @@ void WorldModel::brinBeMA(){
         }
     }
 }
+
+
+//kalman filter
+void WorldModel::kalman_filter()
+{
+    static Vector3f pos  (-0.19,0,0);
+    static Vector3f speed(0,0,0);
+
+    if(getACC().Length()>9.809)
+    {
+        static Matrix state(getMyPos().x(),getMyPos().y(),getMyPos().z(),0,
+                            0, 0, 0, 0,
+                            0, 0, 0, 0,
+                            0, 0, 0, 0);
+
+        Vector3f Real_Acc(0,0,-9.81);
+        Vector3f rightACC(getACC().y(),getACC().x(),-getACC().z());
+        Vector3f shetab=bodyRotate.Rotate(getACC());
+        Vector3f mofid=shetab-Real_Acc;
+        //        cout << getACC()<< " server" << endl;
+        cout<<"niro "<<getFootPress("lf").f<<"and "<<getFootPress("rf").f<<endl;
+        //        cout<<"vazn "<<shetab.Length()*4.6071<<endl;
+
+        //4.6071:mass
+
+        pos=pos+0.0002*mofid+0.02*speed;
+        speed=speed+0.02*mofid;
+
+        Matrix F(1, 0.02, 0, 0,
+                 0, 1, 0, 0,
+                 0, 0, 0, 0,
+                 0, 0, 0, 0);
+
+        Matrix priori_state_estimate(0,0,0,0,
+                                     0,0,0,0,
+                                     0,0,0,0,
+                                     0,0,0,0);
+
+        Matrix G(0.0002, 0, 0, 0,
+                 0.02, 0, 0, 0,
+                 0, 0, 0, 0,
+                 0, 0, 0, 0);
+
+        Matrix ACC((int)((mofid.z())*10000)/(float)10000,(int)(mofid.y()*10000)/(float)10000,(int)(-mofid.x()*10000)/(float)10000,0,
+                   0, 0, 0, 0,
+                   0, 0, 0, 0,
+                   0, 0, 0, 0);
+
+        static Matrix cov(0,0,0,0,
+                          0,0,0,0,
+                          0,0,0,0,
+                          0,0,0,0);
+
+        Matrix predicted_cov(0,0,0,0,
+                             0,0,0,0,
+                             0,0,0,0,
+                             0,0,0,0);
+
+        Matrix H(1, 0, 0, 0,
+                 0, 0, 0, 0,
+                 0, 0, 0, 0,
+                 0, 0, 0, 0);
+
+
+        //i'm not sure about this covariance!!
+        Matrix cov_of_acc(0.0004, 0, 0, 0,
+                          0, 0.0004, 0, 0,
+                          0, 0, 0, 0.0004,
+                          0, 0, 0, 0);
+
+        Matrix position_by_censors(getMyPos().x(),getMyPos().y(),getMyPos().z(),0,
+                                   0, 0, 0, 0,
+                                   0, 0, 0, 0,
+                                   0, 0, 0, 0);
+
+        //i'm not sure about this covriance!
+        Matrix cov_of_position_by_censors(0.01, 0, 0, 0,
+                                          0, 0.01, 0, 0,
+                                          0, 0, 0.01, 0,
+                                          0, 0, 0, 0);
+
+        Matrix I;
+        I.Identity();
+
+        Matrix domain_of_error(0,0,0,0,
+                               0,0,0,0,
+                               0,0,0,0,
+                               0,0,0,0);
+
+        domain_of_error=position_by_censors - H * priori_state_estimate;
+
+
+
+        Matrix S(0,0,0,0,
+                 0,0,0,0,
+                 0,0,0,0,
+                 0,0,0,0);
+
+        Matrix K(0,0,0,0,
+                 0,0,0,0,
+                 0,0,0,0,
+                 0,0,0,0);
+
+        Matrix H_C=H;
+        H_C.InvertRotationMatrix();
+        Matrix S_C=S;
+        S_C.InvertRotationMatrix();
+        Matrix F_C=F;
+        F_C.InvertRotationMatrix();
+        Matrix G_C=F;
+        G_C.InvertRotationMatrix();
+
+
+        priori_state_estimate = F*state + G*ACC;
+
+
+        predicted_cov = F * cov * (F_C) + G * G_C * cov_of_acc;
+
+        S= H * predicted_cov * H_C + cov_of_position_by_censors;
+
+        K =predicted_cov * H * S_C;
+
+        state = priori_state_estimate + K * H;
+
+        cov= (I - K*H)*predicted_cov;
+
+
+
+//        RVDraw::instance()->drawVector3f(Vector3f(state.Transform(Vector3f(1,0,0)).x(),state.Transform(Vector3f(0,1,0)).x(),state.Transform(Vector3f(0,0,1)).x()),RED,10);
+
+        //        RVDraw::instance()->drawVector3f(pos,RED,10);
+
+    }
+
+
+
+}
+
+
+//
+//void WorldModel::kiiri()
+//{
+//    static Vector3f posss=myPos;
+//    static Vector3f speed(0,0,0);
+//    posss=posss+0.0002*(Vector3f(ACC.x()*bodyRotate.Transform(Vector3f(1,0,0))))+
+//            0.02*(Vector3f(speed.x()*bodyRotate.Transform(Vector3f(1,0,0))));
+//    speed=0.02*(Vector3f(ACC.x()*bodyRotate.Transform(Vector3f(1,0,0))));
+//     RVDraw::instance()->drawVector3f(posss,RED,10);
+//}
+
 
 
 void WorldModel::Localize()
