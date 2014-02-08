@@ -45,6 +45,7 @@ void Parser::Parse(string &msg)
     /*
      * Time & PlayMode Parser
      */
+//    cout<<msg<<endl;
     int pos = msg.find("GS");
     if (pos != string::npos)
     {

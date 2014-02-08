@@ -15,6 +15,10 @@ class WorldModel
 public:
   WorldModel();
   ~WorldModel();
+
+  void kalman_filter();
+  Vector3f general_rotation(Vector3f,Vector3f,double);
+
   void setFlagPos(string, Polar);
   void setBallPolarPos(Polar);
   void setBallAng(double);
