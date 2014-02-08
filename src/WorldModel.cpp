@@ -114,18 +114,18 @@ void WorldModel::RotateHead2(double val){
 
 Vector3f WorldModel::general_rotation(Vector3f initial,Vector3f axis,double angle)
 {
-    cout<<"angle: "<<angle<<endl;
-    cout<<"axis: "<<axis<<endl;
+//    cout<<"angle: "<<angle<<endl;
+//    cout<<"axis: "<<axis<<endl;
     Vector3f normaled_axis(axis.x()/axis.Length(),axis.y()/axis.Length(),axis.z()/axis.Length());
     double ux=normaled_axis.x();
     double uy=normaled_axis.y();
     double uz=normaled_axis.z();
     Matrix Rotation(cos(angle)+ux*ux*(1-cos(angle)), ux*uy*(1-cos(angle))-uz*sin(angle), ux*uz*(1-cos(angle))+uy*sin(angle), 0,
-                    ux*uy*(1-cos(angle))+uz*sin(angle), cos(angle)+uz*uz*(1-cos(angle)), uy*uz*(1-cos(angle))-ux*sin(angle), 0,
+                    ux*uy*(1-cos(angle))+uz*sin(angle), cos(angle)+uy*uy*(1-cos(angle)), uy*uz*(1-cos(angle))-ux*sin(angle), 0,
                     ux*uz*(1-cos(angle))-uy*sin(angle), uy*uz*(1-cos(angle))+ux*sin(angle), cos(angle)+uz*uz*(1-cos(angle)), 0,
                     0, 0, 0, 1);
     Vector3f rotated=Rotation.Transform(initial);
-    cout<<"rotated: "<<rotated<<endl;
+//    cout<<"rotated: "<<rotated<<endl;
     return rotated;
 
 
@@ -178,9 +178,9 @@ void WorldModel::brinBeMA(){
                     0 , 0 , 0 , 1);
 
 
-        RVDraw::instance()->drawLine(sensedPos,sensedPos+newx,GREEN,24);
-        RVDraw::instance()->drawLine(sensedPos,sensedPos+newy,GREEN,25);
-        RVDraw::instance()->drawLine(sensedPos,sensedPos+newz,GREEN,26);
+//        RVDraw::instance()->drawLine(sensedPos,sensedPos+newx,GREEN,24);
+//        RVDraw::instance()->drawLine(sensedPos,sensedPos+newy,GREEN,25);
+//        RVDraw::instance()->drawLine(sensedPos,sensedPos+newz,GREEN,26);
 
 
     Vector3f x_after_he1_rotation=general_rotation(newx,newz,Deg2Rad(getJointAngle("he1")));
@@ -197,11 +197,17 @@ void WorldModel::brinBeMA(){
                    0, 0, 0, 1);
 
 
+    cout<<"he1: "<<(getJointAngle("he1"))<<endl;
+    cout<<"we : "<<Rad2Deg(acos(newx.Dot(x_after_he1_rotation)))<<endl;
 
 
-           RVDraw::instance()->drawLine(sensedPos,sensedPos+x_after_he2_rotation*10,RED,21);
-           RVDraw::instance()->drawLine(sensedPos,sensedPos+y_after_he2_rotation*10,YELLO,22);
-           RVDraw::instance()->drawLine(sensedPos,sensedPos+z_after_he2_rotation*10,BLACK,23);
+    cout<<"he2: "<<(getJointAngle("he2"))<<endl;
+    cout<<"we : "<<Rad2Deg(acos(x_after_he2_rotation.Dot(x_after_he1_rotation)))<<endl;
+
+
+//           RVDraw::instance()->drawLine(sensedPos,sensedPos+x_after_he2_rotation*10,RED,21);
+//           RVDraw::instance()->drawLine(sensedPos,sensedPos+y_after_he2_rotation*10,BLACK,22);
+//           RVDraw::instance()->drawLine(sensedPos,sensedPos+z_after_he2_rotation*10,GREEN,23);
 
 
                    int numberOfFlags = 0 ;
@@ -286,8 +292,8 @@ void WorldModel::kalman_filter()
         Vector3f shetab=bodyRotate.Rotate(getACC());
         Vector3f mofid=shetab-Real_Acc;
         //        cout << getACC()<< " server" << endl;
-        cout<<"niro "<<getFootPress("lf").f<<"and "<<getFootPress("rf").f<<endl;
-        //        cout<<"vazn "<<shetab.Length()*4.6071<<endl;
+//        cout<<"niro "<<getFootPress("lf").f<<"and "<<getFootPress("rf").f<<endl;
+//                cout<<"vazn "<<shetab.Length()*4.6071<<endl;
 
         //4.6071:mass
 
