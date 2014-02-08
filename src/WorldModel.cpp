@@ -199,15 +199,9 @@ void WorldModel::brinBeMA(){
 
 
 
-<<<<<<< HEAD
-        RVDraw::instance()->drawLine(sensedPos,sensedPos+headx*10,RED,21);
-        RVDraw::instance()->drawLine(sensedPos,sensedPos+heady*10,RED,22);
-        RVDraw::instance()->drawLine(sensedPos,sensedPos+headz*10,RED,23);
-=======
-                       RVDraw::instance()->drawLine(sensedPos,sensedPos+x_after_he2_rotation*10,RED,21);
-                       RVDraw::instance()->drawLine(sensedPos,sensedPos+y_after_he2_rotation*10,YELLO,22);
-                       RVDraw::instance()->drawLine(sensedPos,sensedPos+z_after_he2_rotation*10,BLACK,23);
->>>>>>> 73e1f0155ae49eda44f587ce07fb368c1986efb9
+           RVDraw::instance()->drawLine(sensedPos,sensedPos+x_after_he2_rotation*10,RED,21);
+           RVDraw::instance()->drawLine(sensedPos,sensedPos+y_after_he2_rotation*10,YELLO,22);
+           RVDraw::instance()->drawLine(sensedPos,sensedPos+z_after_he2_rotation*10,BLACK,23);
 
 
                    int numberOfFlags = 0 ;
@@ -426,8 +420,8 @@ void WorldModel::kalman_filter()
 
 void WorldModel::Localize()
 {
-//    brinBeMA();
-    getPosbyTwoFlag();
+    brinBeMA();
+//    getPosbyTwoFlag();
 }
 
 void WorldModel::getPosbyTwoFlag()
