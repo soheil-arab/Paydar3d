@@ -161,9 +161,9 @@ void WorldModel::brinBeMA(){
                     0 , 0 , 0 , 1);
 
 
-    //    RVDraw::instance()->drawLine(sensedPos,sensedPos+headx*10,RED,21);
-    //    RVDraw::instance()->drawLine(sensedPos,sensedPos+heady*10,RED,22);
-    //    RVDraw::instance()->drawLine(sensedPos,sensedPos+headz*10,RED,23);
+        RVDraw::instance()->drawLine(sensedPos,sensedPos+headx*10,RED,21);
+        RVDraw::instance()->drawLine(sensedPos,sensedPos+heady*10,RED,22);
+        RVDraw::instance()->drawLine(sensedPos,sensedPos+headz*10,RED,23);
 
 
     int numberOfFlags = 0 ;
@@ -232,262 +232,269 @@ void WorldModel::brinBeMA(){
 
 void WorldModel::Localize()
 {
-    brinBeMA();
-
+//    brinBeMA();
+    getPosbyTwoFlag();
 }
 
-//Vector3f WorldModel::getPosbyTwoFlag()
-//{
+void WorldModel::getPosbyTwoFlag()
+{
 
-//    Localed=false;
-//    Vector3f pos ;
-//    int co = 0 ;
-//    Vector3f sum (0,0,0);
+    initDimentions();
+    initFlags();
+    Localed=false;
+    Vector3f pos ;
+    int co = 0 ;
+    Vector3f sum (0,0,0);
 
-//    for (map<string, Polar>::iterator i = flagPolar.begin(); i != flagPolar.end(); i++)
-//    {
-//        if (flagLastSeen [ i->first ] != serverTime)
-//        {
-//            continue;
-//        }
-//        for (map<string, Polar>::iterator j = flagPolar.begin() ; j != flagPolar.end(); j++)
-//        {
-//            if (flagLastSeen [ j->first ] != serverTime)
-//            {
-//                continue;
-//            }
-//            if (  i->first ==  j->first )
-//            {
-//                continue ;
-//            }
-//            if ( i->first[2] != j->first[2] )
-//            {
-//                continue ;
-//            }
+    for (map<string, Polar>::iterator i = flagPolar.begin(); i != flagPolar.end(); i++)
+    {
+        if (flagLastSeen [ i->first ] != serverTime)
+        {
+            continue;
+        }
+        for (map<string, Polar>::iterator j = flagPolar.begin() ; j != flagPolar.end(); j++)
+        {
+            if (flagLastSeen [ j->first ] != serverTime)
+            {
+                continue;
+            }
+            if (  i->first ==  j->first )
+            {
+                continue ;
+            }
+            if ( i->first[2] != j->first[2] )
+            {
+                continue ;
+            }
 
-//            if (  false && i->first[0]=='G' && j->first[0] == 'F' && i->first[1] == j->first[1]  )
-//            {
-//                co ++;
-//                Localed = true ;
-//                double fz=ZFromLeft();
+            if (   i->first[0]=='G' && j->first[0] == 'F' && i->first[1] == j->first[1]  )
+            {
+                co ++;
+                Localed = true ;
+                double fz=ZFromLeft();
 
-//                double h1 = 0;
-//                double h2 = 0.8;
-//                double a = i->second.dist;
-//                double b = j->second.dist;
-//                double d = fabs(flagGlobal[i->first].y() - flagGlobal[j->first].y()) ;
-
-
-//                double fy = (d*d+b*b-a*a+(h2-h1)*(h1+h2-2*fz))/(2*d);
-//                double fx = sqrt ( b*b-(h1-fz)*(h1-fz) - fy*fy ) ;
+                double h1 = 0;
+                double h2 = 0.8;
+                double a = i->second.dist;
+                double b = j->second.dist;
+                double d = fabs(flagGlobal[i->first].y() - flagGlobal[j->first].y()) ;
 
 
-//                if ( j->first[2] == 'L' && getTeamSide() == Left)
-//                {
-//                    fx *= -1 ;
-//                }
-//                if ( j->first[2] == 'R' && getTeamSide() == Right)
-//                {
-//                    fx *= -1 ;
-//                }
-//                if ( getTeamSide() == Right )
-//                {
-//                    fy *= -1 ;
-//                }
-//                if ( j->first[1] == '2' )
-//                {
-//                    fy *= -1 ;
-//                }
+                double fy = (d*d+b*b-a*a+(h2-h1)*(h1+h2-2*fz))/(2*d);
+                double fx = sqrt ( b*b-(h1-fz)*(h1-fz) - fy*fy ) ;
 
 
-//                pos = flagGlobal [j->first] - Vector3f ( fx, fy , -fz );
-
-//                sum += pos;
-
-//                double theta = VecPosition::normalizeAngle ( CartecianToPolar ( flagGlobal[j->first] - pos ) .theta - j->second.theta  ) ;
-//                double phi   = VecPosition::normalizeAngle ( CartecianToPolar ( flagGlobal[j->first] - pos ) .phi - j->second.phi ) ;
-
-//                setMyAngle ( theta - getJointAngle ("he1") ) ;
-//                setMyPhi   ( phi   - getJointAngle ("he2") ) ;
-
-//                Matrix x ;
-
-//                Vector3f I , J , K ;
-
-//                x.RotationY (  Deg2Rad ( phi )  ) ;
-//                x.RotateZ ( Deg2Rad ( -theta ) ) ;
-
-//                I = x.Rotate ( Vector3f ( 1 , 0 , 0 ) ) ;
-//                J = x.Rotate ( Vector3f ( 0 , 1 , 0 ) ) ;
-//                K = x.Rotate ( Vector3f ( 0 , 0 , 1 ) ) ;
-
-//                R.Set ( I.x() , I.y() , I.z() , 0 ,
-//                        J.x() , J.y() , J.z() , 0 ,
-//                        K.x() , K.y() , K.z() , 0 ,
-//                        0     , 0     , 0     , 1 ) ;
-//            }
-//            if ( false && i->first[0]=='G' && j->first[0] == 'G' && i->first[1] == '1' && j->first[1] == '2'   )
-//            {
-//                co ++;
-//                Localed = true ;
-//                double fz=ZFromLeft();
-
-//                double h1 = 0.8;
-//                double h2 = 0.8;
-//                double a = i->second.dist;
-//                double b = j->second.dist;
-//                double d = fabs(flagGlobal[i->first].y() - flagGlobal[j->first].y()) ;
+                if ( j->first[2] == 'L' && getTeamSide() == Left)
+                {
+                    fx *= -1 ;
+                }
+                if ( j->first[2] == 'R' && getTeamSide() == Right)
+                {
+                    fx *= -1 ;
+                }
+                if ( getTeamSide() == Right )
+                {
+                    fy *= -1 ;
+                }
+                if ( j->first[1] == '2' )
+                {
+                    fy *= -1 ;
+                }
 
 
-//                double fy = (d*d+b*b-a*a+(h2-h1)*(h1+h2-2*fz))/(2*d);
-//                double fx = sqrt ( b*b-(h1-fz)*(h1-fz) - fy*fy ) ;
+                pos = flagGlobal [j->first] - Vector3f ( fx, fy , -fz );
 
-//                if ( i->first[2] == 'L' && getTeamSide() == Left)
-//                {
-//                    fx *= -1 ;
-//                }
+                sum += pos;
 
-//                if ( i->first[2] == 'R' && getTeamSide() == Right)
-//                {
-//                    fx *= -1 ;
-//                }
-//                if ( getTeamSide() == Right )
-//                {
-//                    fy *= -1 ;
-//                }
-//                if ( j->first[1] == '2' )
-//                {
-//                    fy *= -1 ;
-//                }
+                double theta = VecPosition::normalizeAngle ( CartecianToPolar ( flagGlobal[j->first] - pos ) .theta - j->second.theta  ) ;
+                double phi   = VecPosition::normalizeAngle ( CartecianToPolar ( flagGlobal[j->first] - pos ) .phi - j->second.phi ) ;
 
+                setMyAngle ( theta - getJointAngle ("he1") ) ;
+                setMyPhi   ( phi   - getJointAngle ("he2") ) ;
 
-//                pos = flagGlobal [j->first] - Vector3f ( fx, fy , 0.8 - fz );
+                Matrix x ;
 
-//                sum+=pos;
+                Vector3f I , J , K ;
 
-//                double theta = VecPosition::normalizeAngle(  CartecianToPolar ( flagGlobal[i->first] - pos ) .theta - i->second.theta  ) ;
-//                double phi   = VecPosition::normalizeAngle(  CartecianToPolar ( flagGlobal[i->first] - pos ) .phi - i->second.phi ) ;
+                x.RotationY (  Deg2Rad ( phi )  ) ;
+                x.RotateZ ( Deg2Rad ( -theta ) ) ;
 
-//                setMyAngle ( theta - getJointAngle ("he1") ) ;
-//                setMyPhi   ( phi   - getJointAngle ("he2") ) ;
+                I = x.Rotate ( Vector3f ( 1 , 0 , 0 ) ) ;
+                J = x.Rotate ( Vector3f ( 0 , 1 , 0 ) ) ;
+                K = x.Rotate ( Vector3f ( 0 , 0 , 1 ) ) ;
 
-//                Matrix x ;
+                R.Set ( I.x() , I.y() , I.z() , 0 ,
+                        J.x() , J.y() , J.z() , 0 ,
+                        K.x() , K.y() , K.z() , 0 ,
+                        0     , 0     , 0     , 1 ) ;
+            }
+            if (  i->first[0]=='G' && j->first[0] == 'G' && i->first[1] == '1' && j->first[1] == '2'   )
+            {
+                co ++;
+                Localed = true ;
+                double fz=ZFromLeft();
 
-//                Vector3f I , J , K ;
-
-//                x.RotationY (  Deg2Rad ( phi )  ) ;
-//                x.RotateZ ( Deg2Rad ( -theta ) ) ;
-
-//                I = x.Rotate ( Vector3f ( 1 , 0 , 0 ) ) ;
-//                J = x.Rotate ( Vector3f ( 0 , 1 , 0 ) ) ;
-//                K = x.Rotate ( Vector3f ( 0 , 0 , 1 ) ) ;
-
-//                R.Set ( I.x() , I.y() , I.z() , 0 ,
-//                        J.x() , J.y() , J.z() , 0 ,
-//                        K.x() , K.y() , K.z() , 0 ,
-//                        0     , 0     , 0     , 1 ) ;
-//            }
-//            if ( i->first[0]=='F' && j->first[0] == 'F' && i->first[1] == '1' && j->first[1] == '2'   )
-//            {
-//                co ++;
-//                Localed = true ;
-//                double fz=ZFromLeft();
-
-//                double h1 = 0;
-//                double h2 = 0;
-//                double a = i->second.dist;
-//                double b = j->second.dist;
-//                double d = fabs(flagGlobal[i->first].y() - flagGlobal[j->first].y()) ;
+                double h1 = 0.8;
+                double h2 = 0.8;
+                double a = i->second.dist;
+                double b = j->second.dist;
+                double d = fabs(flagGlobal[i->first].y() - flagGlobal[j->first].y()) ;
 
 
-//                double fy = (d*d+b*b-a*a+(h2-h1)*(h1+h2-2*fz))/(2*d);
-//                double fx = sqrt ( b*b-(h1-fz)*(h1-fz) - fy*fy ) ;
+                double fy = (d*d+b*b-a*a+(h2-h1)*(h1+h2-2*fz))/(2*d);
+                double fx = sqrt ( b*b-(h1-fz)*(h1-fz) - fy*fy ) ;
 
-//                if ( i->first[2] == 'L' && getTeamSide() == Left)
-//                {
-//                    fx *= -1 ;
-//                }
+                if ( i->first[2] == 'L' && getTeamSide() == Left)
+                {
+                    fx *= -1 ;
+                }
 
-//                if ( i->first[2] == 'R' && getTeamSide() == Right)
-//                {
-//                    fx *= -1 ;
-//                }
-//                if ( getTeamSide() == Right )
-//                {
-//                    fy *= -1 ;
-//                }
-//                if ( j->first[1] == '2' )
-//                {
-//                    fy *= -1 ;
-//                }
+                if ( i->first[2] == 'R' && getTeamSide() == Right)
+                {
+                    fx *= -1 ;
+                }
+                if ( getTeamSide() == Right )
+                {
+                    fy *= -1 ;
+                }
+                if ( j->first[1] == '2' )
+                {
+                    fy *= -1 ;
+                }
 
 
-//                pos = flagGlobal [j->first] - Vector3f ( fx, fy , - fz );
+                pos = flagGlobal [j->first] - Vector3f ( fx, fy , 0.8 - fz );
 
-//                sum+=pos;
+                sum+=pos;
 
-//                double theta = VecPosition::normalizeAngle(  CartecianToPolar ( flagGlobal[i->first] - pos ) .theta - i->second.theta  ) ;
-//                double phi   = VecPosition::normalizeAngle(  CartecianToPolar ( flagGlobal[i->first] - pos ) .phi - i->second.phi ) ;
+                double theta = VecPosition::normalizeAngle(  CartecianToPolar ( flagGlobal[i->first] - pos ) .theta - i->second.theta  ) ;
+                double phi   = VecPosition::normalizeAngle(  CartecianToPolar ( flagGlobal[i->first] - pos ) .phi - i->second.phi ) ;
 
-//                setMyAngle ( theta - getJointAngle ("he1") ) ;
-//                setMyPhi   ( phi   - getJointAngle ("he2") ) ;
+                setMyAngle ( theta - getJointAngle ("he1") ) ;
+                setMyPhi   ( phi   - getJointAngle ("he2") ) ;
 
-//                Matrix x ;
+                Matrix x ;
 
-//                Vector3f I , J , K ;
+                Vector3f I , J , K ;
 
-//                x.RotationY (  Deg2Rad ( phi )  ) ;
-//                x.RotateZ ( Deg2Rad ( -theta ) ) ;
+                x.RotationY (  Deg2Rad ( phi )  ) ;
+                x.RotateZ ( Deg2Rad ( -theta ) ) ;
 
-//                I = x.Rotate ( Vector3f ( 1 , 0 , 0 ) ) ;
-//                J = x.Rotate ( Vector3f ( 0 , 1 , 0 ) ) ;
-//                K = x.Rotate ( Vector3f ( 0 , 0 , 1 ) ) ;
+                I = x.Rotate ( Vector3f ( 1 , 0 , 0 ) ) ;
+                J = x.Rotate ( Vector3f ( 0 , 1 , 0 ) ) ;
+                K = x.Rotate ( Vector3f ( 0 , 0 , 1 ) ) ;
 
-//                R.Set ( I.x() , I.y() , I.z() , 0 ,
-//                        J.x() , J.y() , J.z() , 0 ,
-//                        K.x() , K.y() , K.z() , 0 ,
-//                        0     , 0     , 0     , 1 ) ;
-//            }
+                R.Set ( I.x() , I.y() , I.z() , 0 ,
+                        J.x() , J.y() , J.z() , 0 ,
+                        K.x() , K.y() , K.z() , 0 ,
+                        0     , 0     , 0     , 1 ) ;
+            }
+            if ( i->first[0]=='F' && j->first[0] == 'F' && i->first[1] == '1' && j->first[1] == '2'   )
+            {
+                co ++;
+                Localed = true ;
+                double fz=ZFromLeft();
 
-//        }
-//    }
-//    if ( Localed )                                /// if At Least Seen 3 Flags Or More
-//    {
-//        pos = sum/co;
-//        setMyPos( pos );        	          /// set My Pos
-//        if ( ballLastSeen == serverTime )          /// if See Ball In This Cycle Set Its Pos !
-//        {
-//            Vector3f temp = translate ( ball );
-//            setBallVel ( temp - getBallPos() ) ;  /// set Velocity of Ball
-//            setBallPos ( temp );                  /// set Ball Pos
-//            setBallAng(gRadToDeg(atan2(getBallVel().y(), getBallVel().x())));
-//        }
+                double h1 = 0;
+                double h2 = 0;
+                double a = i->second.dist;
+                double b = j->second.dist;
+                double d = fabs(flagGlobal[i->first].y() - flagGlobal[j->first].y()) ;
 
-//        ///~  Calculate Players Diffrent Body Pos
 
-//        for ( map<int,RelPlayerInfo>::iterator i = ourRel.begin() ; i != ourRel.end() ; i++ )
-//        {
-//            if ( i->first != getMyNum () )
-//            {
-//                our [i->first].head = translate ( PolarToCartecian(i->second.head) ) ;
-//            }
-//            our [i->first].lfoot = translate ( PolarToCartecian(i->second.lfoot) ) ;
-//            our [i->first].rfoot = translate ( PolarToCartecian(i->second.rfoot) ) ;
-//            our [i->first].rlowerarm = translate ( PolarToCartecian(i->second.rlowerarm) ) ;
-//            our [i->first].llowerarm = translate ( PolarToCartecian(i->second.llowerarm) ) ;
-//        }
+                double fy = (d*d+b*b-a*a+(h2-h1)*(h1+h2-2*fz))/(2*d);
+                double fx = sqrt ( b*b-(h1-fz)*(h1-fz) - fy*fy ) ;
 
-//        for ( map<int,RelPlayerInfo>::iterator i = theirRel.begin() ; i != theirRel.end() ; i++ )
-//        {
-//            their [i->first].head = translate ( PolarToCartecian(i->second.head) ) ;
-//            their [i->first].lfoot = translate ( PolarToCartecian(i->second.lfoot) ) ;
-//            their [i->first].rfoot = translate ( PolarToCartecian(i->second.rfoot) ) ;
-//            their [i->first].rlowerarm = translate ( PolarToCartecian(i->second.rlowerarm) ) ;
-//            their [i->first].llowerarm = translate ( PolarToCartecian(i->second.llowerarm) ) ;
-//        }
+                if ( i->first[2] == 'L' && getTeamSide() == Left)
+                {
+                    fx *= -1 ;
+                }
 
-//    }
-//}
+                if ( i->first[2] == 'R' && getTeamSide() == Right)
+                {
+                    fx *= -1 ;
+                }
+                if ( getTeamSide() == Right )
+                {
+                    fy *= -1 ;
+                }
+                if ( j->first[1] == '2' )
+                {
+                    fy *= -1 ;
+                }
+
+
+                pos = flagGlobal [j->first] - Vector3f ( fx, fy , - fz );
+
+                sum+=pos;
+
+                double theta = VecPosition::normalizeAngle(  CartecianToPolar ( flagGlobal[i->first] - pos ) .theta - i->second.theta  ) ;
+                double phi   = VecPosition::normalizeAngle(  CartecianToPolar ( flagGlobal[i->first] - pos ) .phi - i->second.phi ) ;
+
+                setMyAngle ( theta - getJointAngle ("he1") ) ;
+                setMyPhi   ( phi   - getJointAngle ("he2") ) ;
+
+                Matrix x ;
+
+                Vector3f I , J , K ;
+
+                x.RotationY (  Deg2Rad ( phi )  ) ;
+                x.RotateZ ( Deg2Rad ( -theta ) ) ;
+
+                I = x.Rotate ( Vector3f ( 1 , 0 , 0 ) ) ;
+                J = x.Rotate ( Vector3f ( 0 , 1 , 0 ) ) ;
+                K = x.Rotate ( Vector3f ( 0 , 0 , 1 ) ) ;
+
+                R.Set ( I.x() , I.y() , I.z() , 0 ,
+                        J.x() , J.y() , J.z() , 0 ,
+                        K.x() , K.y() , K.z() , 0 ,
+                        0     , 0     , 0     , 1 ) ;
+            }
+
+        }
+    }
+    if ( Localed )                                /// if At Least Seen 3 Flags Or More
+    {
+        pos = sum/co;
+        int pppp=14;
+//        RVDraw::instance()->drawLine(pos,pos2,BLACK,pppp++);
+        RVDraw::instance()->drawLine(Vector3f(0,0,0),pos,BLACK,pppp++);
+        setMyPos( pos );        	          /// set My Pos
+
+        if ( ballLastSeen == serverTime )          /// if See Ball In This Cycle Set Its Pos !
+        {
+            Vector3f temp = translate ( ball );
+            setBallVel ( temp - getBallPos() ) ;  /// set Velocity of Ball
+            setBallPos ( temp );                  /// set Ball Pos
+            RVDraw::instance()->drawVector3f(temp,BLUE,pppp++);
+            setBallAng(gRadToDeg(atan2(getBallVel().y(), getBallVel().x())));
+        }
+
+        ///~  Calculate Players Diffrent Body Pos
+
+        for ( map<int,RelPlayerInfo>::iterator i = ourRel.begin() ; i != ourRel.end() ; i++ )
+        {
+            if ( i->first != getMyNum () )
+            {
+                our [i->first].head = translate ( PolarToCartecian(i->second.head) ) ;
+            }
+            our [i->first].lfoot = translate ( PolarToCartecian(i->second.lfoot) ) ;
+            our [i->first].rfoot = translate ( PolarToCartecian(i->second.rfoot) ) ;
+            our [i->first].rlowerarm = translate ( PolarToCartecian(i->second.rlowerarm) ) ;
+            our [i->first].llowerarm = translate ( PolarToCartecian(i->second.llowerarm) ) ;
+        }
+
+        for ( map<int,RelPlayerInfo>::iterator i = theirRel.begin() ; i != theirRel.end() ; i++ )
+        {
+            their [i->first].head = translate ( PolarToCartecian(i->second.head) ) ;
+            their [i->first].lfoot = translate ( PolarToCartecian(i->second.lfoot) ) ;
+            their [i->first].rfoot = translate ( PolarToCartecian(i->second.rfoot) ) ;
+            their [i->first].rlowerarm = translate ( PolarToCartecian(i->second.rlowerarm) ) ;
+            their [i->first].llowerarm = translate ( PolarToCartecian(i->second.llowerarm) ) ;
+        }
+
+    }
+}
 
 // set All Flags Real Position
 void WorldModel::initFlags()
