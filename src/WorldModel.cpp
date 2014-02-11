@@ -11,6 +11,7 @@
 #include <algorithm>
 #include "Geom.h"
 #include "rvdraw.h"
+
 WorldModel::WorldModel()
 {
     ballLastSeen = -1;
@@ -22,6 +23,7 @@ WorldModel::WorldModel()
     myOrien = 0;
 
     bodyRotate.Identity();
+    speed=Vector3f(0,0,0);
 
     headR.Identity();
     /// set Joints Name
@@ -57,6 +59,34 @@ WorldModel::~WorldModel()
 {
 
 }
+
+
+///localize with lines and flags
+Vector3f WorldModel::localize_with_lines(map<line, double> lines_we_see,map<string, Polar> flagPolar)
+{
+
+}
+
+
+///set seen lines,the lines are in head rotation coordination and should be convert to global if needed
+void WorldModel::setSeenLines(line l)
+{
+    lines_we_see.insert(lines_we_see.end(),l);
+//    cout<<l.begin<<"and"<<l.end<<endl;
+//    cout<<"begin "<<sensedPos+bodyRotate.Rotate(l.begin)<<endl;
+    RVDraw::instance()->drawVector3f(sensedPos+headRotate.Rotate(PolarToCartecian(l.begin)),RED,10);
+    RVDraw::instance()->drawVector3f(sensedPos+headRotate.Rotate(PolarToCartecian(l.end)),BLACK,10);
+}
+
+
+
+
+//vector<line> WorldModel::getLines_WeSawLastCycle()
+//{
+
+//}
+
+
 
 /// set Seen Flags Polar Pos
 void WorldModel::setFlagPos(string name, Polar pos)
@@ -114,8 +144,8 @@ void WorldModel::RotateHead2(double val){
 
 Vector3f WorldModel::general_rotation(Vector3f initial,Vector3f axis,double angle)
 {
-//    cout<<"angle: "<<angle<<endl;
-//    cout<<"axis: "<<axis<<endl;
+    //    cout<<"angle: "<<angle<<endl;
+    //    cout<<"axis: "<<axis<<endl;
     Vector3f normaled_axis(axis.x()/axis.Length(),axis.y()/axis.Length(),axis.z()/axis.Length());
     double ux=normaled_axis.x();
     double uy=normaled_axis.y();
@@ -125,7 +155,7 @@ Vector3f WorldModel::general_rotation(Vector3f initial,Vector3f axis,double angl
                     ux*uz*(1-cos(angle))-uy*sin(angle), uy*uz*(1-cos(angle))+ux*sin(angle), cos(angle)+uz*uz*(1-cos(angle)), 0,
                     0, 0, 0, 1);
     Vector3f rotated=Rotation.Transform(initial);
-//    cout<<"rotated: "<<rotated<<endl;
+    //    cout<<"rotated: "<<rotated<<endl;
     return rotated;
 
 
@@ -146,8 +176,8 @@ void WorldModel::brinBeMA(){
     //    headR.RotationZ(Deg2Rad(getJointAngle("he1")));
     //    headR.RotateY(-Deg2Rad(getJointAngle("he2")));
 
-//        cout<<"he1: "<<getJointAngle("he1")<<endl;
-//        cout<<"he2: "<<getJointAngle("he2")<<endl;
+    //        cout<<"he1: "<<getJointAngle("he1")<<endl;
+    //        cout<<"he2: "<<getJointAngle("he2")<<endl;
 
     //    cout << (getJointAngle("he1")) << endl;
     //    cout << (getJointAngle("he2")) << endl;
@@ -178,9 +208,9 @@ void WorldModel::brinBeMA(){
                     0 , 0 , 0 , 1);
 
 
-//        RVDraw::instance()->drawLine(sensedPos,sensedPos+newx,GREEN,24);
-//        RVDraw::instance()->drawLine(sensedPos,sensedPos+newy,GREEN,25);
-//        RVDraw::instance()->drawLine(sensedPos,sensedPos+newz,GREEN,26);
+    //        RVDraw::instance()->drawLine(sensedPos,sensedPos+newx,GREEN,24);
+    //        RVDraw::instance()->drawLine(sensedPos,sensedPos+newy,GREEN,25);
+    //        RVDraw::instance()->drawLine(sensedPos,sensedPos+newz,GREEN,26);
 
 
     Vector3f x_after_he1_rotation=general_rotation(newx,newz,Deg2Rad(getJointAngle("he1")));
@@ -197,22 +227,26 @@ void WorldModel::brinBeMA(){
                    0, 0, 0, 1);
 
 
-    cout<<"he1: "<<(getJointAngle("he1"))<<endl;
-    cout<<"we : "<<Rad2Deg(acos(newx.Dot(x_after_he1_rotation)))<<endl;
+    //    cout<<"he1: "<<(getJointAngle("he1"))<<endl;
+    //    cout<<"we : "<<Rad2Deg(acos(newx.Dot(x_after_he1_rotation)))<<endl;
 
 
-    cout<<"he2: "<<(getJointAngle("he2"))<<endl;
-    cout<<"we : "<<Rad2Deg(acos(x_after_he2_rotation.Dot(x_after_he1_rotation)))<<endl;
+    //    cout<<"he2: "<<(getJointAngle("he2"))<<endl;
+    //    cout<<"we : "<<Rad2Deg(acos(x_after_he2_rotation.Dot(x_after_he1_rotation)))<<endl;
 
 
-//           RVDraw::instance()->drawLine(sensedPos,sensedPos+x_after_he2_rotation*10,RED,21);
-//           RVDraw::instance()->drawLine(sensedPos,sensedPos+y_after_he2_rotation*10,BLACK,22);
-//           RVDraw::instance()->drawLine(sensedPos,sensedPos+z_after_he2_rotation*10,GREEN,23);
+    //           RVDraw::instance()->drawLine(sensedPos,sensedPos+x_after_he2_rotation*10,RED,21);
+    //           RVDraw::instance()->drawLine(sensedPos,sensedPos+y_after_he2_rotation*10,BLACK,22);
+    //           RVDraw::instance()->drawLine(sensedPos,sensedPos+z_after_he2_rotation*10,GREEN,23);
 
 
-                   int numberOfFlags = 0 ;
+    int numberOfFlags = 0 ;
 
-            Vector3f myPos (0,0,0);
+
+    //averaging********
+
+    Vector3f mylastPos(0,0,0);
+    Vector3f myPos (0,0,0);
     for (map<string, Vector3f>::iterator i = flag.begin(); i != flag.end(); i++)
     {
         if (flagLastSeen [ i->first ] != serverTime)
@@ -221,7 +255,7 @@ void WorldModel::brinBeMA(){
         }
 
         Vector3f poss = flagGlobal[i->first] - headRotate.Rotate(i->second);
-//        RVDraw::instance()->drawLine(sensedPos,sensedPos+headRotate.Rotate(i->second),GREEN,numberOfFlags);
+        //        RVDraw::instance()->drawLine(sensedPos,sensedPos+headRotate.Rotate(i->second),GREEN,numberOfFlags);
 
         myPos += poss;
         numberOfFlags++;
@@ -237,6 +271,19 @@ void WorldModel::brinBeMA(){
     if ( numberOfFlags ){
         Localed= true;
         myPos/=numberOfFlags;
+        //        if(myPos.z()<=0.04)
+        //        {
+        //            cout<<"kamtar shod "<<endl;
+        //            myPos.z()=0.042;
+        //        }
+        //        cout<<"mypos: "<<myPos<<endl;
+        //
+        mylastPos=getMyPos();
+        //        myPos=((mylastPos+getSpeed()*0.02)*12+myPos*8)/20;
+        myPos=((mylastPos)*8+myPos*12)/20;
+
+        setSpeed((myPos-mylastPos)*50);
+
         setMyPos(myPos);
         setMyAngle(Rad2Deg(gArcTan(newx.y()/newx.x())));
         //        RVDraw::instance()->drawVector3f(myPos,GREEN,posN);
@@ -246,6 +293,13 @@ void WorldModel::brinBeMA(){
             //            RVDraw::instance()->drawVector3f(ballPos,RED,++posN);
             setBallVel(ballPos-getBallPos());
             setBallPos(ballPos);
+            if(ballPos.z()<=0)
+            {
+//                cout<<"goh shod "<<serverTime<<endl;
+                ballPos.Set(Vector3f(ballPos.x(),ballPos.y(),0.042));
+            }
+//            else
+//                cout<<"oooo "<<endl;
         }
 
         RVDraw::instance()->drawVector3f(getMyPos(),GREEN,5);
@@ -292,8 +346,8 @@ void WorldModel::kalman_filter()
         Vector3f shetab=bodyRotate.Rotate(getACC());
         Vector3f mofid=shetab-Real_Acc;
         //        cout << getACC()<< " server" << endl;
-//        cout<<"niro "<<getFootPress("lf").f<<"and "<<getFootPress("rf").f<<endl;
-//                cout<<"vazn "<<shetab.Length()*4.6071<<endl;
+        //        cout<<"niro "<<getFootPress("lf").f<<"and "<<getFootPress("rf").f<<endl;
+        //                cout<<"vazn "<<shetab.Length()*4.6071<<endl;
 
         //4.6071:mass
 
@@ -400,7 +454,7 @@ void WorldModel::kalman_filter()
 
 
 
-//        RVDraw::instance()->drawVector3f(Vector3f(state.Transform(Vector3f(1,0,0)).x(),state.Transform(Vector3f(0,1,0)).x(),state.Transform(Vector3f(0,0,1)).x()),RED,10);
+        //        RVDraw::instance()->drawVector3f(Vector3f(state.Transform(Vector3f(1,0,0)).x(),state.Transform(Vector3f(0,1,0)).x(),state.Transform(Vector3f(0,0,1)).x()),RED,10);
 
         //        RVDraw::instance()->drawVector3f(pos,RED,10);
 
@@ -427,7 +481,19 @@ void WorldModel::kalman_filter()
 void WorldModel::Localize()
 {
     brinBeMA();
-//    getPosbyTwoFlag();
+    //    getPosbyTwoFlag();
+}
+
+//this function will set the speed which is an approximation of the exact speed
+void WorldModel::setSpeed(Vector3f this_cycle_speed)
+{
+    speed=(this_cycle_speed*3+getSpeed())/4;
+}
+
+
+Vector3f WorldModel::getSpeed()
+{
+    return speed;
 }
 
 void WorldModel::getPosbyTwoFlag()
@@ -651,7 +717,7 @@ void WorldModel::getPosbyTwoFlag()
     {
         pos = sum/co;
         int pppp=14;
-//        RVDraw::instance()->drawLine(pos,pos2,BLACK,pppp++);
+        //        RVDraw::instance()->drawLine(pos,pos2,BLACK,pppp++);
         RVDraw::instance()->drawLine(Vector3f(0,0,0),pos,BLACK,pppp++);
         setMyPos( pos );        	          /// set My Pos
 

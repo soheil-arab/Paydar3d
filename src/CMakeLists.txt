@@ -18,6 +18,7 @@ WorldModel.cpp
 #ConnectionManager.cpp
 Logger.cpp
 connection.cpp
+line.cpp
 )
 
 set(robotoos_HEAD
@@ -37,6 +38,7 @@ WorldModel.h
 #ConnectionManager.h
 Logger.h
 connection.h
+line.h
 )
 
 set(robotoos_SRCS
