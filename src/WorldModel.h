@@ -114,6 +114,8 @@ public:
   double   ZFromRight () ;
   void      setZ(double z);
   int       isOppInCircle ( Circle c,VecPosition&,VecPosition&) ;
+  void getPosbyTwoFlag();
+
   Vector3f  sensedPos;
   double myOrien;
   int getOurPlayerCount() { return our.size()-2; }
@@ -129,6 +131,7 @@ public:
 
 private:
   Vector3f  ACC;
+  Vector3f mylastPos;
   bool      canSeeFlags;
   int       num;
   double    myZ;
