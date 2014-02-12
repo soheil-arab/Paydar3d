@@ -25,6 +25,7 @@ public:
   string Middle();
   bool canShoot(double &dx, double &dy,string &side);
   bool shouldClear(double&, double&,SideT&);
+  bool shouldShoot(double&, double&,SideT&);
   bool canBackShoot(string &);
   bool shouldTurn90(string &);
   bool shouldTurn(double&);

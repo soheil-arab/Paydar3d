@@ -116,7 +116,7 @@ Vector3f WorldModel::general_rotation(Vector3f initial,Vector3f axis,double angl
 {
 //    cout<<"angle: "<<angle<<endl;
 //    cout<<"axis: "<<axis<<endl;
-    Vector3f normaled_axis(axis.x()/axis.Length(),axis.y()/axis.Length(),axis.z()/axis.Length());
+    Vector3f normaled_axis = axis.Normalized();
     double ux=normaled_axis.x();
     double uy=normaled_axis.y();
     double uz=normaled_axis.z();
@@ -138,6 +138,8 @@ void WorldModel::brinBeMA(){
     initDimentions();
     initFlags();
     kalman_filter();
+
+    static Vector3f lastNotZero(0,0,0) ;
     //    cout<<(int)(getACC().x()*10000)/(float)10000<<" "<<(int)(getACC().y()*10000)/(float)10000<<" "<<(int)(getACC().z()*10000)/(float)10000<<endl;
 
     //    RotateHead1(getLastJointAngle("he1")-getJointAngle("he1"));
@@ -158,9 +160,14 @@ void WorldModel::brinBeMA(){
     
     double theta = Deg2Rad( newGyro.Length() * 0.02);
     
-    if ( newGyro.Length() > 0.2 )
-        newGyro = newGyro / newGyro.Length();
 
+    if ( newGyro.Length() > 0.04 )
+    {
+        newGyro = newGyro / newGyro.Length();
+    }  else if ( lastNotZero.Length() > 0.04 ){
+        newGyro = lastNotZero / lastNotZero.Length();
+     }
+     lastNotZero = newGyro ;
 
     Vector3f x = bodyRotate.Transform(Vector3f(1,0,0));
     Vector3f y = bodyRotate.Transform(Vector3f(0,1,0));
@@ -197,12 +204,12 @@ void WorldModel::brinBeMA(){
                    0, 0, 0, 1);
 
 
-    cout<<"he1: "<<(getJointAngle("he1"))<<endl;
-    cout<<"we : "<<Rad2Deg(acos(newx.Dot(x_after_he1_rotation)))<<endl;
+//    cout<<"he1: "<<(getJointAngle("he1"))<<endl;
+//    cout<<"we : "<<Rad2Deg(acos(newx.Dot(x_after_he1_rotation)))<<endl;
 
 
-    cout<<"he2: "<<(getJointAngle("he2"))<<endl;
-    cout<<"we : "<<Rad2Deg(acos(x_after_he2_rotation.Dot(x_after_he1_rotation)))<<endl;
+//    cout<<"he2: "<<(getJointAngle("he2"))<<endl;
+//    cout<<"we : "<<Rad2Deg(acos(x_after_he2_rotation.Dot(x_after_he1_rotation)))<<endl;
 
 
 //           RVDraw::instance()->drawLine(sensedPos,sensedPos+x_after_he2_rotation*10,RED,21);

@@ -74,7 +74,7 @@ public :
   bool   IK_ALL ( VecPosition Hip , VecPosition RAnkle , double &rle3 , double &rle4 , double &rle5 , double &lle3 , double &lle4 , double &lle5 , double P=5);
   string shootR (bool&,bool&,double&);
   string shootL (bool&,bool&,double&);
-  bool   isPossible ( double l4 );
+  bool   isPossible ( double);
   string Walking ( bool set = false);
   string finalAction(string,double&,double maxV=1.2);
   void   speedControler(string,double,double&,double&,double&,double);

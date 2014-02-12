@@ -81,6 +81,8 @@ bool Decide::shouldClear(double &dx, double &dy,SideT &side)
     VecPosition me(myPos.x(), myPos.y());
     VecPosition ball(ballPos.x(), ballPos.y());
     double myAngle = WM->getMyAngle();
+
+
     double angleToBall = fabs(WM->getMyAngleToBall());
     VecPosition start=VecPosition::givePosition(me,VecPosition::normalizeAngle(WM->getMyAngle()),+0.14);
     VecPosition end=VecPosition::givePosition(start,VecPosition::normalizeAngle(WM->getMyAngle()),+0.09);
@@ -88,16 +90,15 @@ bool Decide::shouldClear(double &dx, double &dy,SideT &side)
     Rect P_A(VecPosition(15.1,1.1),VecPosition(13.2,-1.1));
     Rect O_P_A(VecPosition(-15,1.1),VecPosition(-13.2,-1.1));
     VecPosition p1,p2;
-    string tname = WM->getOppName();
-    transform ( tname.begin(), tname.end(), tname.begin(), ptr_fun(::tolower) );
-    //cerr << tname << endl;
-    //if( tname.find("kar") != string::npos && tname.find("s2")!= string::npos && fabs(ball.getX())<4)
-        //return false;
+
     if ( angleToBall < 0 )
         side = Right;
     else
         side = Left;
-    if (fabs(myAngle) < 70  && me.getDistanceTo(ball) < 0.20 && me.getDistanceTo(ball) > 0.16 && angleToBall < 20 && con && ball.getX()<13 && !WM->isOppInCircle(Circle(ball,2.5),p1,p2) && !shback() && fabs(WM->getMyAngleToGoal())<30)
+    if (fabs(myAngle) < 70  && me.getDistanceTo(ball) < 0.20 && me.getDistanceTo(ball) > 0.16 && angleToBall < 20 &&
+            con && ball.getX()<13
+            &&
+            !WM->isOppInCircle(Circle(ball,2.5),p1,p2) && !shback() && fabs(WM->getMyAngleToGoal())<30)
     {
         return true;
     }
@@ -105,6 +106,9 @@ bool Decide::shouldClear(double &dx, double &dy,SideT &side)
         return true;
     return false;
 }
+
+
+
 bool Decide::startShoot(){
     if(WM->getMyNum()==9 && WM->getTeamSide()==Left && (WM->getPlayMode()==PM_BeforeKickOff || WM->getPlayMode()==PM_KickOff_Left || WM->getPlayMode()==PM_Goal_Left) && WM->getMyPos().x()<-0.15)
         return true;

@@ -88,9 +88,10 @@ string Decide::Attack()
         tFinal=0;
         return SK->sefr(did,tt,false);
     }
+
+
     else if (shouldPlay() && closest==WM->getMyNum() && WM->getMyNum() !=10 && WM->getMyNum()!=11)
     {
-
         if ( shouldClear ( x,y,s ))
         {
             Log.Log ( 2 , "Shoooooooot va gooooooooooooooooooooooal !" );
@@ -130,17 +131,18 @@ string Decide::Attack()
 //        return SK->finalAction( "darja" ,tFinal);
         return "";
     }
-//    static int ttt = 0 ;
-//    ttt++;
-//    ss << SK->moveJoint( "he1" ,( ttt % 100 < 50 ) ? -0.5 : 0.5  ) << SK->moveJoint( "he2" ,( ttt % 100 < 50 ) ? -0.5 : 0.5  ) ;
-//    if (ttt < 80 )
-//        ss << "";
-//    else if ( ttt < 100 )
-//        ss << SK->moveJoint("rle2" ,  -1) << SK->moveJoint("rle6" , 1) <<
-//              SK->moveJoint("lle2" , -1) << SK->moveJoint("lle6" ,1) ;
-//    else if ( ttt < 140 )
-//      ss << SK->moveJointTo("he1" , -100 , 3) << SK->moveJointTo("he2" , -40 , 3) ;
-    //////////////////////////////////////////////////////////////////
-//    cout << WM->getGyro() << endl;
     return ss.str();
+////    static int ttt = 0 ;
+////    ttt++;
+////    ss << SK->moveJoint( "he1" ,( ttt % 100 < 50 ) ? -0.5 : 0.5  ) << SK->moveJoint( "he2" ,( ttt % 100 < 50 ) ? -0.5 : 0.5  ) ;
+////    if (ttt < 80 )
+////        ss << "";
+////    else if ( ttt < 100 )
+////        ss << SK->moveJoint("rle2" ,  -1) << SK->moveJoint("rle6" , 1) <<
+////              SK->moveJoint("lle2" , -1) << SK->moveJoint("lle6" ,1) ;
+////    else if ( ttt < 140 )
+////      ss << SK->moveJointTo("he1" , -100 , 3) << SK->moveJointTo("he2" , -40 , 3) ;
+//    //////////////////////////////////////////////////////////////////
+////    cout << WM->getGyro() << endl;
+//    return ss.str();
 }

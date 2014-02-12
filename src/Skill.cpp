@@ -168,17 +168,8 @@ Skill::Skill(WorldModel*wm)
 
 string Skill::moveJoint(string j, double val)
 {
-
     stringstream message;
     message << "(" << j << " " << val*0.87 << ")";
-    return message.str();
-}
-/////////////////////////////////////////////////////////////////////
-string Skill::beam(double x, double y, double ang)
-{
-
-    stringstream message;
-    message << "(beam " << x  << " " << y << " " << ang << ")";
     return message.str();
 }
 ///////////////////////////////////////////////////////////////////
@@ -519,13 +510,13 @@ string Skill::whereBeam(bool &stand,double &stan)
             if ( WM->getPlayMode() == PM_BeforeKickOff  || WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Right )
             {
                 if(WM->getServerTime()<20)
-                    ss << beam(-0.19,0.0,0);
+                    ss << "(beam -0.19 0.0  -20)"<<Standing(stand,stan);
                 else
-                    ss << beam(-0.22,0.0,0);
+                    ss << "(beam -0.22 0.0  -20)"<<Standing(stand,stan);
             }
             else
             {
-                ss << beam(-1.6,0.0,0);
+                ss << "(beam -1.6 0.0 0)"<<Standing(stand,stan);
             }
         }
         else
@@ -533,11 +524,11 @@ string Skill::whereBeam(bool &stand,double &stan)
 
             if ( WM->getPlayMode() == PM_KickOff_Right || WM->getPlayMode() == PM_Goal_Left  )
             {
-                ss << beam(-0.19,0,0);
+                ss << "(beam -0.19 0 -20)"<<Standing(stand,stan);
             }
             else
             {
-                ss << beam(-1.6,0.0,0);
+                ss << "(beam -1.6  0.0 0)"<<Standing(stand,stan);
             }
         }
     }
@@ -547,22 +538,22 @@ string Skill::whereBeam(bool &stand,double &stan)
         {
             if ( WM->getPlayMode( ) == PM_BeforeKickOff   || WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Right )
             {
-                ss << beam(-0.18,-2.5,0);
+                ss << "(beam -0.18 -2.5 0)"<<Standing(stand,stan);
             }
             else
             {
-                ss << beam(-2.6,0.7,0);
+                ss << "(beam -2.6 0.7 0)"<<Standing(stand,stan);
             }
         }
         else
         {
             if ( WM->getPlayMode() == PM_KickOff_Right || WM->getPlayMode() == PM_Goal_Left  )
             {
-                ss << beam(-0.18,-2.5,0);
+                ss << "(beam -0.18 -2.5 0)"<<Standing(stand,stan);
             }
             else
             {
-                ss << beam(-2.6,0.7,0);
+                ss << "(beam -2.6 0.7 0)"<<Standing(stand,stan);
             }
         }
     }
@@ -572,22 +563,22 @@ string Skill::whereBeam(bool &stand,double &stan)
         {
             if ( WM->getPlayMode( ) == PM_BeforeKickOff   || WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Right )
             {
-                ss << beam(-13,3,0);
+                ss << "(beam -13 3 0)"<<Standing(stand,stan);
             }
             else
             {
-                ss << beam(-13,3,0);
+                ss << "(beam -13 3 0)"<<Standing(stand,stan);
             }
         }
         else
         {
             if ( WM->getPlayMode() == PM_KickOff_Right || WM->getPlayMode() == PM_Goal_Left  )
             {
-                ss << beam(-13,3,0);
+                ss << "(beam -13 3 0)"<<Standing(stand,stan);
             }
             else
             {
-                ss << beam(-13,3,0);
+                ss << "(beam -13 3 0)"<<Standing(stand,stan);
             }
         }
     }
@@ -597,22 +588,22 @@ string Skill::whereBeam(bool &stand,double &stan)
         {
             if (WM->getPlayMode() == PM_BeforeKickOff || WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Right)
             {
-                ss << beam(-9,4,0);
+                ss << "(beam -9 4 0)"<<Standing(stand,stan);
             }
             else
             {
-                ss << beam(-9,4,0);
+                ss << "(beam -9 4 0)"<<Standing(stand,stan);
             }
         }
         else
         {
             if ( WM->getPlayMode() == PM_KickOff_Right || WM->getPlayMode() == PM_Goal_Left )
             {
-                ss << beam(-9,4,0);
+                ss << "(beam -9 4 0)"<<Standing(stand,stan);
             }
             else
             {
-                ss << beam(-9,4,0);
+                ss << "(beam -9 4 0)"<<Standing(stand,stan);
             }
         }
     }
@@ -622,22 +613,22 @@ string Skill::whereBeam(bool &stand,double &stan)
         {
             if ( WM->getPlayMode() == PM_BeforeKickOff || WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Right )
             {
-                ss << beam(-10.0,1.2,0);
+                ss << "(beam -10.0 1.2 0)"<<Standing(stand,stan);
             }
             else
             {
-                ss << beam(-10.0,1.2,0);
+                ss << "(beam -10.0 1.2 0)"<<Standing(stand,stan);
             }
         }
         else
         {
             if ( WM->getPlayMode() == PM_KickOff_Right || WM->getPlayMode() == PM_Goal_Left )
             {
-                ss << beam(-10,1.2,0);
+                ss << "(beam -10 1.2 0)"<<Standing(stand,stan);
             }
             else
             {
-                ss << beam(-10,1.2,0);
+                ss << "(beam -10.0 1.2 0)"<<Standing(stand,stan);
             }
         }
     }
@@ -647,22 +638,22 @@ string Skill::whereBeam(bool &stand,double &stan)
         {
             if (WM->getPlayMode() == PM_BeforeKickOff || WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Right)
             {
-                ss << beam(-9,-4,0);
+                ss << "(beam -9 -4 0)"<<Standing(stand,stan);
             }
             else
             {
-                ss << beam(-9,-4,0);
+                ss << "(beam -9 -4 0)"<<Standing(stand,stan);
             }
         }
         else
         {
             if ( WM->getPlayMode() == PM_KickOff_Right || WM->getPlayMode() == PM_Goal_Left )
             {
-                ss << beam(-9,-4,0);
+                ss << "(beam -9 -4 0)"<<Standing(stand,stan);
             }
             else
             {
-                ss << beam(-9,-4,0);
+                ss << "(beam -9 -4 0)"<<Standing(stand,stan);
             }
         }
     }
@@ -672,22 +663,22 @@ string Skill::whereBeam(bool &stand,double &stan)
         {
             if ( WM->getPlayMode() == PM_BeforeKickOff  || WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Right )
             {
-                ss << beam(-10.0,-1.2,0);
+                ss << "(beam -10.0 -1.2 0)"<<Standing(stand,stan);
             }
             else
             {
-                ss << beam(-10.0,-1.2,0);
+                ss << "(beam -10.0 -1.2 0)"<<Standing(stand,stan);
             }
         }
         else
         {
             if ( WM->getPlayMode() == PM_KickOff_Right  || WM->getPlayMode() == PM_Goal_Left )
             {
-                ss << beam(-10.0,-1.6,0);
+                ss << "(beam -10.0 -1.6 0)"<<Standing(stand,stan);
             }
             else
             {
-                ss << beam(-10.0,-1.6,0);
+                ss << "(beam -10.0 -1.6 0)"<<Standing(stand,stan);
             }
         }
     }
@@ -697,22 +688,22 @@ string Skill::whereBeam(bool &stand,double &stan)
         {
             if ( WM->getPlayMode() == PM_BeforeKickOff  || WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Right )
             {
-                ss << beam(-7,0,0);
+                ss << "(beam -7 0 0)"<<Standing(stand,stan);
             }
             else
             {
-                ss << beam(-7,0,0);
+                ss << "(beam -7 0 0)"<<Standing(stand,stan);
             }
         }
         else
         {
             if ( WM->getPlayMode() == PM_KickOff_Right  || WM->getPlayMode() == PM_Goal_Left )
             {
-                ss << beam(-7,0,0);
+                ss << "(beam -7 0 0)"<<Standing(stand,stan);
             }
             else
             {
-                ss << beam(-7,0,0);
+                ss << "(beam -7 0 0)"<<Standing(stand,stan);
             }
         }
     }
@@ -722,22 +713,22 @@ string Skill::whereBeam(bool &stand,double &stan)
         {
             if ( WM->getPlayMode() == PM_BeforeKickOff  || WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Right )
             {
-                ss << beam(-6,2,0);
+                ss << "(beam -6 2 0)"<<Standing(stand,stan);
             }
             else
             {
-                ss << beam(-6,2,0);
+                ss << "(beam -6 2 0)"<<Standing(stand,stan);
             }
         }
         else
         {
             if ( WM->getPlayMode() == PM_KickOff_Right  || WM->getPlayMode() == PM_Goal_Left )
             {
-                ss << beam(-6,2,0);
+                ss << "(beam -6 2 0)"<<Standing(stand,stan);
             }
             else
             {
-                ss << beam(-6,2,0);
+                ss << "(beam -6 2 0)"<<Standing(stand,stan);
             }
         }
     }
@@ -747,22 +738,22 @@ string Skill::whereBeam(bool &stand,double &stan)
         {
             if ( WM->getPlayMode() == PM_BeforeKickOff  || WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Right )
             {
-                ss << beam(-13,-3,0);
+                ss << "(beam -13 -3 0)"<<Standing(stand,stan);
             }
             else
             {
-                ss << beam(-13,-3,0);
+                ss << "(beam -13 -3 0)"<<Standing(stand,stan);
             }
         }
         else
         {
             if ( WM->getPlayMode() == PM_KickOff_Right  || WM->getPlayMode() == PM_Goal_Left )
             {
-                ss << beam(-13,-3,0);
+                ss << "(beam -13 -3 0)"<<Standing(stand,stan);
             }
             else
             {
-                ss << beam(-13,-3,0);
+                ss << "(beam -13 -3 0)"<<Standing(stand,stan);
             }
         }
     }
@@ -1771,238 +1762,3 @@ void Skill::speedControler(string type,double t,double &dd,double &bb,double &sd
         sd=2;
     }
 }
-
-//////////////////////////////////////////////////////////////////////////////////
-
-void Skill::getAnklePos (   double P0[3]
-                  , double A1  , double A2 , double A3  , double A4  ) {
-  
-  static int I0_0;
-
-  static int I0_1;
-
-  static double R0_11;
-
-  static double R0_13;
-
-  static double R0_16;
-
-  static double R0_18;
-
-  static double R0_20;
-
-  static double R0_28;
-
-  static double R0_31;
-
-  static double R0_34;
-
-  static double R0_38;
-
-  static double R0_48;
-
-  static double R0_60;
-
-  static double R0_65;
-
-  static double R0_86;
-
-  static double R0_89;
-
-
-  R0_13 = (double) 0.035;
-  I0_0 = (int) 1;
-  R0_18 = (double) 1.;
-  R0_11 = (double) 0.03;
-  R0_38 = (double) 0.045;
-  I0_1 = (int) -1;
-  R0_89 = (double) 0.5;
-  R0_86 = (double) 0.7071067811865475;
-  R0_34 = (double) 0.01;
-  R0_60 = (double) 0.005;
-  R0_20 = (double) -0.01;
-  R0_16 = (double) 0.;
-  R0_65 = (double) -0.04;
-  R0_28 = (double) -0.055;
-  R0_31 = (double) 0.04;
-  R0_48 = (double) -0.125;
-
-  double R0_0;
-  double R0_1;
-  double R0_2;
-  double R0_3;
-  double R0_4;
-  double R0_5;
-  double R0_6;
-  double R0_7;
-  double R0_8;
-  double R0_9;
-  double R0_10;
-  double R0_12;
-  double R0_14;
-  double R0_15;
-  double R0_17;
-  double R0_19;
-  double R0_21;
-  double R0_22;
-  double R0_23;
-  double R0_24;
-  double R0_25;
-  double R0_26;
-  double R0_27;
-  double R0_29;
-  double R0_30;
-  double R0_32;
-  double R0_33;
-  double R0_35;
-  double R0_36;
-  double R0_37;
-  double R0_39;
-  double R0_40;
-  double R0_41;
-  double R0_42;
-  double R0_43;
-  double R0_44;
-  double R0_45;
-  double R0_46;
-  double R0_47;
-  double R0_49;
-  double R0_50;
-  double R0_51;
-  double R0_52;
-  double R0_53;
-  double R0_54;
-  double R0_55;
-  double R0_56;
-  double R0_57;
-  double R0_58;
-  double R0_59;
-  double R0_61;
-  double R0_62;
-  double R0_63;
-  double R0_64;
-  double R0_66;
-  double R0_67;
-  double R0_68;
-  double R0_69;
-  double R0_70;
-  double R0_71;
-  double R0_72;
-  double R0_73;
-  double R0_74;
-  double R0_75;
-  double R0_76;
-  double R0_77;
-  double R0_78;
-  double R0_79;
-  double R0_80;
-  double R0_81;
-  double R0_82;
-  double R0_83;
-  double R0_84;
-  double R0_85;
-  double R0_87;
-  double R0_88;
-  double R0_90;
-  double R0_91;
-  double R0_92;
-  double R0_93;
-  double R0_94;
-
-  R0_0 = A1;
-  R0_1 = A2;
-  R0_2 = A3;
-  R0_3 = A4;
-  R0_4 = cos(R0_2);
-  R0_5 = sin(R0_3);
-  R0_6 = R0_3 + R0_2;
-  R0_7 = cos(R0_3);
-  R0_8 = cos(R0_6);
-  R0_9 = sin(R0_6);
-  R0_10 = sin(R0_2);
-  R0_12 = R0_11 * R0_8;
-  R0_14 = R0_13 * R0_9;
-  R0_15 = -R0_14;
-  R0_17 = R0_16 + R0_12 + R0_15;
-  R0_19 = R0_18 * R0_17;
-  R0_21 = R0_20 + R0_19;
-  R0_22 = R0_13 * R0_8;
-  R0_23 = -R0_22;
-  R0_24 = R0_11 * R0_9;
-  R0_25 = -R0_24;
-  R0_26 = R0_16 + R0_23 + R0_25;
-  R0_27 = R0_18 * R0_26;
-  R0_29 = R0_28 + R0_27;
-  R0_30 = cos(R0_0);
-  R0_32 = R0_31 * R0_4;
-  R0_33 = -R0_32;
-  R0_35 = R0_34 * R0_10;
-  R0_36 = R0_31 + R0_33 + R0_35;
-  R0_37 = R0_18 * R0_36;
-  R0_39 = R0_38 * R0_7;
-  R0_40 = -R0_39;
-  R0_41 = R0_34 * R0_5;
-  R0_42 = R0_38 + R0_40 + R0_41;
-  R0_43 = R0_18 * R0_42;
-  R0_44 = R0_18 * R0_5 * R0_21;
-  R0_45 = R0_18 * R0_7 * R0_29;
-  R0_46 = R0_16 + R0_43 + R0_44 + R0_45;
-  R0_47 = R0_18 * R0_46;
-  R0_49 = R0_48 + R0_47;
-  R0_50 = R0_18 * R0_4 * R0_49;
-  R0_51 = R0_34 * R0_7;
-  R0_52 = R0_38 * R0_5;
-  R0_53 = R0_20 + R0_51 + R0_52;
-  R0_54 = R0_18 * R0_53;
-  R0_55 = R0_18 * R0_7 * R0_21;
-  R0_56 = R0_18 * R0_5 * R0_29;
-  R0_57 = -R0_56;
-  R0_58 = R0_16 + R0_54 + R0_55 + R0_57;
-  R0_59 = R0_18 * R0_58;
-  R0_61 = R0_60 + R0_59;
-  R0_62 = R0_18 * R0_10 * R0_61;
-  R0_63 = R0_16 + R0_37 + R0_50 + R0_62;
-  R0_64 = R0_18 * R0_63;
-  R0_66 = R0_65 + R0_64;
-  R0_67 = sin(R0_0);
-  R0_68 = cos(R0_1);
-  R0_69 = R0_68 * R0_66;
-  R0_70 = R0_16 + R0_69;
-  R0_71 = sin(R0_1);
-  R0_72 = R0_71 * R0_66;
-  R0_73 = R0_16 + R0_72;
-  R0_74 = R0_34 * R0_4;
-  R0_75 = R0_31 * R0_10;
-  R0_76 = R0_20 + R0_74 + R0_75;
-  R0_77 = R0_18 * R0_76;
-  R0_78 = R0_18 * R0_10 * R0_49;
-  R0_79 = -R0_78;
-  R0_80 = R0_18 * R0_4 * R0_61;
-  R0_81 = R0_16 + R0_77 + R0_79 + R0_80;
-  R0_82 = R0_18 * R0_81;
-  R0_83 = R0_34 + R0_82;
-  R0_84 = (double) I0_0;
-  R0_84 = R0_84 + R0_30;
-  R0_85 = (double) I0_1;
-  R0_85 = R0_85 + R0_30;
-  R0_87 = R0_86 * R0_67 * R0_83;
-  R0_88 = -R0_87;
-  R0_90 = R0_89 * R0_85 * R0_70;
-  R0_91 = R0_89 * R0_84 * R0_73;
-  R0_92 = R0_16 + R0_90 + R0_91 + R0_88;
-  R0_90 = R0_18 * R0_92;
-  R0_92 = R0_86 * R0_67 * R0_70;
-  R0_91 = R0_86 * R0_67 * R0_73;
-  R0_93 = R0_18 * R0_30 * R0_83;
-  R0_94 = R0_16 + R0_92 + R0_91 + R0_93;
-  R0_92 = R0_18 * R0_94;
-  R0_94 = R0_89 * R0_84 * R0_70;
-  R0_91 = R0_89 * R0_85 * R0_73;
-  R0_93 = R0_16 + R0_94 + R0_91 + R0_88;
-  R0_94 = R0_18 * R0_93;
-
-  P0[0] = R0_90;
-  P0[1] = R0_92;
-  P0[2] = R0_94;
-}
-
