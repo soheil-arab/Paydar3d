@@ -207,6 +207,8 @@ void WorldModel::brinBeMA(){
                     newx.z() , newy.z() , newz.z() , 0 ,
                     0 , 0 , 0 , 1);
 
+    setMyAngle(atan2Deg(newx.y(),newx.x()));
+
 
 //        RVDraw::instance()->drawLine(sensedPos,sensedPos+newx,GREEN,24);
 //        RVDraw::instance()->drawLine(sensedPos,sensedPos+newy,GREEN,25);
