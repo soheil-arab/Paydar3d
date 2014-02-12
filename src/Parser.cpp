@@ -1,4 +1,5 @@
 #include "Parser.h"
+#include "rvdraw.h"
 
 Parser::Parser(WorldModel *wm)
 {
@@ -31,7 +32,7 @@ Parser::Parser(WorldModel *wm)
  * */
 void Parser::Parse(string &msg)
 {
-//    cout << msg << endl;
+    cout << msg << endl;
     for ( int i = 0; i<msg.length(); i++)
         if ( msg[i]=='(' || msg[i]==')')
         {
@@ -45,7 +46,7 @@ void Parser::Parse(string &msg)
     /*
      * Time & PlayMode Parser
      */
-//    cout<<msg<<endl;
+    //    cout<<msg<<endl;
     int pos = msg.find("GS");
     if (pos != string::npos)
     {
@@ -82,6 +83,9 @@ void Parser::Parse(string &msg)
 
         }
     }
+
+
+
     /*
      * Time Parse
      */
@@ -92,6 +96,36 @@ void Parser::Parse(string &msg)
         edame >> temp >> temp >> time;
         WM->setServerTime(time);
     }
+
+
+    //kossher parsing
+    //    bool not_found=false;
+    //    while(!not_found)
+    //    {
+    pos=msg.find("L");
+    while(pos !=string::npos)
+    {
+        stringstream edame(msg.substr(pos));
+        double x1,y1,z1,x2,y2,z2;
+        edame>>temp>>temp>>x1>>y1>>z1>>temp>>x2>>y2>>z2;
+        line l(Vector3f(x1,y1,z1),Vector3f(x2,y2,z2),WM->serverTime);
+        cout<<l.begin<<"and "<<l.end<<endl;
+        WM->setSeenLines(l);
+        //       RVDraw::instance()->drawVector3f(x1*cosDeg());
+        pos=msg.find("L",pos+1);
+
+
+    }
+
+    //        else{
+    //            not_found=true;
+    //        }
+
+    //    }
+
+
+
+
     /*
      * Goal Flags Parse
      */
@@ -377,9 +411,9 @@ void Parser::Parse(string &msg)
         }
         //cout << "LL " << msg1 << " " <<  msg1.size() << endl;
         //if (msg1.size() == 1)
-            //;
+        //;
         //else
-            //msg1="0";
+        //msg1="0";
         //cout << "LL " << msg1 << " " << msg1.size() << endl;
 
 

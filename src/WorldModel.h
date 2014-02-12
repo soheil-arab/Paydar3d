@@ -9,6 +9,7 @@
 #include <cmath>
 #include "Math.h"
 #include "Logger.h"
+#include "line.h"
 using namespace std;
 class WorldModel
 {
@@ -18,6 +19,9 @@ public:
 
   void kalman_filter();
   Vector3f general_rotation(Vector3f,Vector3f,double);
+  void setSpeed(Vector3f);
+  Vector3f getSpeed();
+
 
   void setFlagPos(string, Polar);
   void setBallPolarPos(Polar);
@@ -50,7 +54,6 @@ public:
   void setOurPlayerPartPos ( int num , string part , Polar pos );
   void setOppPlayerPartPos ( int num , string part , Polar pos );
   void setACC ( Vector3f pos );
-  void getPosbyTwoFlag();
 
 
   double   getMyAngle();
@@ -121,6 +124,9 @@ public:
   void RotateHead1 (double val);
   void RotateHead2 (double val);
   void clearBodyRotate ();
+  void setSeenLines(line);
+  double    serverTime, Time;
+
 private:
   Vector3f  ACC;
   bool      canSeeFlags;
@@ -128,7 +134,6 @@ private:
   double    myZ;
   double    ballLastSeen, ballPrevLastSeen;
   double    timeLastHear;
-  double    serverTime, Time;
   double    myAngle,myPhi;
   double    ballAng;
   bool      Sense;
@@ -161,5 +166,14 @@ private:
   Matrix bodyRotate;
   Matrix headRotate;
   Matrix headR ;
+  Vector3f speed;
+
+  vector<line> lines_we_see;
+  Vector3f localize_with_lines(map<line,double> ,map<string,Polar> );
+
+
+
+
+
 };
 #endif
