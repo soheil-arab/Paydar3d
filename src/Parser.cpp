@@ -32,7 +32,7 @@ Parser::Parser(WorldModel *wm)
  * */
 void Parser::Parse(string &msg)
 {
-    cout << msg << endl;
+//    cout << msg << endl;
     for ( int i = 0; i<msg.length(); i++)
         if ( msg[i]=='(' || msg[i]==')')
         {
@@ -109,7 +109,7 @@ void Parser::Parse(string &msg)
         double x1,y1,z1,x2,y2,z2;
         edame>>temp>>temp>>x1>>y1>>z1>>temp>>x2>>y2>>z2;
         line l(Vector3f(x1,y1,z1),Vector3f(x2,y2,z2),WM->serverTime);
-        cout<<l.begin<<"and "<<l.end<<endl;
+//        cout<<l.begin<<"and "<<l.end<<endl;
         WM->setSeenLines(l);
         //       RVDraw::instance()->drawVector3f(x1*cosDeg());
         pos=msg.find("L",pos+1);

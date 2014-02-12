@@ -72,8 +72,8 @@ Vector3f WorldModel::localize_with_lines(map<line, double> lines_we_see,map<stri
 void WorldModel::setSeenLines(line l)
 {
     lines_we_see.insert(lines_we_see.end(),l);
-    cout<<l.begin<<" and "<<l.end<<endl;
-    cout<<"begin "<<sensedPos+bodyRotate.Rotate(l.begin)<<endl;
+//    cout<<l.begin<<" and "<<l.end<<endl;
+//    cout<<"begin "<<sensedPos+bodyRotate.Rotate(l.begin)<<endl;
     RVDraw::instance()->drawVector3f(sensedPos+headRotate.Rotate(PolarToCartecian(l.begin)),RED,10);
     RVDraw::instance()->drawVector3f(sensedPos+headRotate.Rotate(PolarToCartecian(l.end)),BLACK,10);
 }
@@ -208,6 +208,7 @@ void WorldModel::brinBeMA(){
                     0 , 0 , 0 , 1);
 
     setMyAngle(atan2Deg(newx.y(),newx.x()));
+    cout << atan2Deg(newx.y(),newx.x()) << endl;
 
 
 //        RVDraw::instance()->drawLine(sensedPos,sensedPos+newx,GREEN,24);
@@ -229,12 +230,12 @@ void WorldModel::brinBeMA(){
                    0, 0, 0, 1);
 
 
-    cout<<"he1: "<<(getJointAngle("he1"))<<endl;
-    cout<<"we : "<<Rad2Deg(acos(newx.Dot(x_after_he1_rotation)))<<endl;
+//    cout<<"he1: "<<(getJointAngle("he1"))<<endl;
+//    cout<<"we : "<<Rad2Deg(acos(newx.Dot(x_after_he1_rotation)))<<endl;
 
 
-    cout<<"he2: "<<(getJointAngle("he2"))<<endl;
-    cout<<"we : "<<Rad2Deg(acos(x_after_he2_rotation.Dot(x_after_he1_rotation)))<<endl;
+//    cout<<"he2: "<<(getJointAngle("he2"))<<endl;
+//    cout<<"we : "<<Rad2Deg(acos(x_after_he2_rotation.Dot(x_after_he1_rotation)))<<endl;
 
 
 //           RVDraw::instance()->drawLine(sensedPos,sensedPos+x_after_he2_rotation*10,RED,21);
