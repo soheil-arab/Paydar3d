@@ -208,7 +208,7 @@ void WorldModel::brinBeMA(){
                     0 , 0 , 0 , 1);
 
     setMyAngle(atan2Deg(newx.y(),newx.x()));
-    cout << atan2Deg(newx.y(),newx.x()) << endl;
+//    cout << atan2Deg(newx.y(),newx.x()) << endl;
 
 
 //        RVDraw::instance()->drawLine(sensedPos,sensedPos+newx,GREEN,24);
