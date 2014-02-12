@@ -19,6 +19,7 @@ WorldModel.cpp
 Logger.cpp
 connection.cpp
 line.cpp
+Localize.cpp
 )
 
 set(robotoos_HEAD
@@ -39,6 +40,7 @@ WorldModel.h
 Logger.h
 connection.h
 line.h
+Localize.h
 )
 
 set(robotoos_SRCS

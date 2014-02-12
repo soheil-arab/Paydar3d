@@ -9,7 +9,7 @@ Decide::Decide(WorldModel *wm)
     beamed = false;
     ACT = new Act(WM, SK);
     //Log.AddLevel (1); // Goalie Debug
-    Log.AddLevel (2); // Attacker Debug
+//    Log.AddLevel (2); // Attacker Debug
     //Log.AddLevel (3); // Deffender Debug
     //Log.AddLevel (4); // Middle Debug
     //Log.AddLevel (5); // Bools Debug
@@ -42,7 +42,7 @@ string Decide::decide()
     {
         ss += Attack();
     }
-//    ss +=SK->updatem ( true );
+    ss +=SK->updatem ( true );
     ss = WM->uniquee ( ss );
     return ss;
 }

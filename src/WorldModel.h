@@ -54,6 +54,11 @@ public:
   void setOurPlayerPartPos ( int num , string part , Polar pos );
   void setOppPlayerPartPos ( int num , string part , Polar pos );
   void setACC ( Vector3f pos );
+  vector<line> getLastSeenLines();
+  map<string,Vector3f> getFlagGlobal();
+
+
+
 
 
   double   getMyAngle();
@@ -116,6 +121,8 @@ public:
   int       isOppInCircle ( Circle c,VecPosition&,VecPosition&) ;
   void getPosbyTwoFlag();
 
+  vector<line> lines_we_see;
+
   Vector3f  sensedPos;
   double myOrien;
   int getOurPlayerCount() { return our.size()-2; }
@@ -128,8 +135,12 @@ public:
   void clearBodyRotate ();
   void setSeenLines(line);
   double    serverTime, Time;
+  map<string,Vector3f> getFlag();
 
-private:
+
+
+
+  //duplicated
   Vector3f  ACC;
   Vector3f mylastPos;
   bool      canSeeFlags;
@@ -171,9 +182,52 @@ private:
   Matrix headR ;
   Vector3f speed;
 
-  vector<line> lines_we_see;
   Vector3f localize_with_lines(map<line,double> ,map<string,Polar> );
 
+
+private:
+//  Vector3f  ACC;
+//  Vector3f mylastPos;
+//  bool      canSeeFlags;
+//  int       num;
+//  double    myZ;
+//  double    ballLastSeen, ballPrevLastSeen;
+//  double    timeLastHear;
+//  double    myAngle,myPhi;
+//  double    ballAng;
+//  bool      Sense;
+//  string    side, oppName, ourName;
+//  PlayMode  playMode ;
+//  string    lastHear;
+//  string    names[22];
+//  Polar     ballPolar;
+//  Vector3f  gyro;
+//  Vector3f  ballPos;
+//  Vector3f  ballVel;
+//  Vector3f  ball;
+//  map<string, Polar> flagPolar;
+//  map<string, Vector3f> flag;
+//  map<string, double> flagLastSeen;
+//  map<string, Vector3f> flagGlobal;
+//  map<string, double> joint;
+//  map<string, double> lastJoint;
+//  map<int, Polar> mates, opps;
+//  map<string, FootRes> footPress;
+//  Matrix    R;
+//  double    width, length, goalWidth;
+//  map<int, RelPlayerInfo> ourRel;
+//  map<int, RelPlayerInfo> theirRel;
+//  map<int, GloPlayerInfo> our;
+//  map<int, GloPlayerInfo> their;
+//  bool      Localed;
+//  double    rfTime  ;
+//  double    lfTime  ;
+//  Matrix bodyRotate;
+//  Matrix headRotate;
+//  Matrix headR ;
+//  Vector3f speed;
+
+//  Vector3f localize_with_lines(map<line,double> ,map<string,Polar> );
 
 
 

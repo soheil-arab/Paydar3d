@@ -10,7 +10,7 @@ line::line(Vector3f p1,Vector3f p2,double time)
 {
     begin=p1;
     end=p2;
-    double time_we_saw_it=time;
+    time_we_saw_it=time;
 
 }
 

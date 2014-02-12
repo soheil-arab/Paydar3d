@@ -1,3 +1,6 @@
+#ifndef LINE_H
+#define LINE_H
+
 #include "Geom.h"
 #include "rvdraw.h"
 #include "cmath"
@@ -14,10 +17,9 @@ class line{
 
 
 
-
-
-
-
         Vector3f begin;
         Vector3f end;
+        double time_we_saw_it;
 };
+
+#endif

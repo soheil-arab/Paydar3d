@@ -10,6 +10,8 @@
 ///==========================================
 ///|| Robotoos3D Base By Mohammad Razeghi  ||
 ///||       razeghi71@gmail.com            ||
+///     And Mr IrFun Tvakoli
+///         erfan.tavakoli71@gmail.com
 ///==========================================
 ///==========================================
 /*     Members :
@@ -24,6 +26,7 @@
 #include <cstdio>
 #include <string>
 #include <unistd.h>
+#include "Localize.h"
 
 using namespace std;
 
@@ -41,6 +44,10 @@ int main(int argc, char *argv[])
         Decide     *DC = new Decide(WM);
         /// ~ Parser To Parse Server Strings
         Parser     *P  = new Parser(WM);
+
+        /// ~ Localizer class
+        Localize *localize = new Localize(WM);
+
         ///~  Default Team Name is Robotoos3D
         WM->setOurName("PaYdar3D");
         ///~ Default Player is Attacker (Number 3)
@@ -108,11 +115,14 @@ int main(int argc, char *argv[])
             ///~ Then Parse it and Save Information in WorldModel
             P->Parse(get);
             ///~ Calcualate ObjectS Pos , Angle , Velocity and ...
+//            localize->doLocalize()
             WM->Localize();
+            localize->test();
             ///~ Decide What To Do
             dec = DC->decide();
             ///~ And Send It To Server
             sockClient->send(dec) ;
+
         }
         ///~ Close Connection
 

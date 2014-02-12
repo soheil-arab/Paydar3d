@@ -114,7 +114,6 @@ void Parser::Parse(string &msg)
         //       RVDraw::instance()->drawVector3f(x1*cosDeg());
         pos=msg.find("L",pos+1);
 
-
     }
 
     //        else{
