@@ -40,3 +40,11 @@ double Localize::Distance_Point_Line(Vector3f point_polar,line l)
     return begin_to_point.Length()*sin(angle_rad);
 
 }
+
+Vector3f Localize::calcPlaneNormal(vector<Vector3f> planePoints)
+{
+
+
+}
+
+
