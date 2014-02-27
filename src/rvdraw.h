@@ -455,6 +455,12 @@ public:
         drawLine(float(iPos1.x()), float(iPos1.y()), float(iPos1.z()), float(iPos2.x()), float(iPos2.y()), float(iPos2.z()), iSize,rgb[0], rgb[1], rgb[2], &lin);
         swapBuffers(&lin);
     }
+#include "Geom.h"
+
+    void drawLine(VecPosition iPos1, VecPosition iPos2, Color iCo, int iNumber, double iSize=2)
+    {
+        drawLine(Vector3f(iPos1.getX(),iPos1.getY(),0),Vector3f(iPos2.getX(),iPos2.getY(),0),iCo,iNumber,iSize);
+    }
     void drawCircle(Vector3f iPos, double iRadius, Color iCo, int iNumber, double iSize=1)
     {
         string circ("circle.");

@@ -17,7 +17,7 @@ void Localize::test()
 {
     if(WM->getLastSeenLines().size()>0 && WM->getFlag().size()>0){
     line l=WM->getLastSeenLines().at(0);
-    cout<<(l.begin)<<"end: "<<(l.end)<<" the point "<<Distance_Point_Line(Vector3f(0,0,0),l)<<endl;
+//    sideTurnRcout<<(l.begin)<<"end: "<<(l.end)<<" the point "<<Distance_Point_Line(Vector3f(0,0,0),l)<<endl;
     }
 
 }

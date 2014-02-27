@@ -83,7 +83,6 @@ bool Decide::shouldClear(double &dx, double &dy,SideT &side)
     double myAngle = WM->getMyAngle();
 
 
-    double angleToBall = fabs(WM->getMyAngleToBall());
     VecPosition start=VecPosition::givePosition(me,VecPosition::normalizeAngle(WM->getMyAngle()),+0.14);
     VecPosition end=VecPosition::givePosition(start,VecPosition::normalizeAngle(WM->getMyAngle()),+0.09);
     bool con=isInCone(45,start,end,ball);
@@ -91,11 +90,12 @@ bool Decide::shouldClear(double &dx, double &dy,SideT &side)
     Rect O_P_A(VecPosition(-15,1.1),VecPosition(-13.2,-1.1));
     VecPosition p1,p2;
 
-    if ( angleToBall < 0 )
+    if ( WM->getMyAngleToBall()  < 0 )
         side = Right;
     else
         side = Left;
-    if (fabs(myAngle) < 70  && me.getDistanceTo(ball) < 0.20 && me.getDistanceTo(ball) > 0.16 && angleToBall < 20 &&
+
+    if (fabs(myAngle) < 70  && me.getDistanceTo(ball) < 0.20 && me.getDistanceTo(ball) > 0.16 && fabs(WM->getMyAngleToBall())  < 20 &&
             con && ball.getX()<13
             &&
             !WM->isOppInCircle(Circle(ball,2.5),p1,p2) && !shback() && fabs(WM->getMyAngleToGoal())<30)
@@ -515,10 +515,16 @@ string Decide::moveToPosP(bool nearball,VecPosition endpos,double &tFinal){
         if(fabs(WM->getMyAngleTo(endPos))>45)
         {
             if(WM->getMyAngleTo(endPos)<0)
+            {
+                Log.Log(2,"turnR");
                 return SK->finalAction("turnR",tFinal);
-            else 
-                return SK->finalAction("turnL",tFinal);
-        }
+
+            }
+                else{
+                    Log.Log(2,"turnL");
+                    return SK->finalAction("turnL",tFinal);
+                }
+            }
         else if(frontcon)
         {
             
