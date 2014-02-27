@@ -10,6 +10,8 @@ public:
     Localize(WorldModel*);
     double Distance_Polar_Point_Line(Vector3f point_polar,line l);
     double Distance_Cartesian_Point_Line(Vector3f point_polar,line l);
+    Vector3f calcPlaneNormal(vector<Vector3f> planePoints);
+
     void test();
     WorldModel *WM;
     map<string,line> line_global;
