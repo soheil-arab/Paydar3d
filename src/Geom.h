@@ -284,5 +284,16 @@ public:
   VecPosition getPosRightBottom (                                   );
 };
 
+class Triangle{
+    VecPosition p1 , p2 , p3 ;
+    float sign(VecPosition p1, VecPosition p2, VecPosition p3)
+    {
+      return (p1.getX() - p3.getX()) * (p2.getY() - p3.getY()) - (p2.getX() - p3.getX()) * (p1.getY() - p3.getY());
+    }
+public :
+    Triangle (VecPosition p11 , VecPosition p22, VecPosition p33 ) :  p1(p11) , p2(p22) , p3(p33){}
+    bool isInside (VecPosition pos);
+    static Triangle makeTriangleFromThreeLines(Line l1,Line l2,Line l3);
+};
 
 #endif
