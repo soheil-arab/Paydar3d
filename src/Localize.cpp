@@ -20,7 +20,7 @@ Localize::Localize(WorldModel *wm)
      *             |              PRN                  PRS               |
      *             |               |                    |                |
      *             |               |                    |                |
-     *             |               ---------PRL----------                |
+     *             |               ---------PR----------                 |
      *             |                                                     |
      *             |                                                     |
      *             |                                                     |
@@ -31,7 +31,21 @@ Localize::Localize(WorldModel *wm)
      *             |                                                     |
      *             |                                                     |
      *             |                                                     |
-     *             ------------------------------------------------------
+     *             -------------------------M-----------------------------
+     *             |                                                     |
+     *             |                                                     |
+     *             |                                                     |
+     *             |                                                     |
+     *             |                                                     |
+     *             |                                                     |
+     *             |                                                     |
+     *             |                                                     |
+     *             |               ---------PL----------                 |
+     *             |               |                    |                |
+     *             |               PLN                  PLS              |
+     *             |               |                    |                |
+     *             |               |                    |                |
+     *              -----------------------FL-----------------------------
      */
 
     //defining the global position of the lines
@@ -40,21 +54,62 @@ Localize::Localize(WorldModel *wm)
     line_global["FN"]=line(Vector3f(15,-10,0),Vector3f(-15,-10,0));
     line_global["FS"]=line(Vector3f(15,10,0),Vector3f(-15,10,0));
     line_global["PRN"]=line(Vector3f(15,-1.95,0),Vector3f(13.2,-1.95,0));
-    line_global["PRL"]=line(Vector3f(13.2,-1.95,0),Vector3f(13.2,1.95,0));
+    line_global["PR"]=line(Vector3f(13.2,-1.95,0),Vector3f(13.2,1.95,0));
     line_global["PRS"]=line(Vector3f(13.2,1.95,0),Vector3f(15,1.95,0));
+    line_global["PLN"]=line(Vector3f(-15,-1.95,0),Vector3f(-13.2,-1.95,0));
+    line_global["PL"]=line(Vector3f(-13.2,-1.95,0),Vector3f(-13.2,1.95,0));
+    line_global["PLS"]=line(Vector3f(-15,1.95,0),Vector3f(-13.2,1.95,0));
+
+    flag_names.push_back("G1L");
+    flag_names.push_back("G2L");
+    flag_names.push_back("G1R");
+    flag_names.push_back("G2R");
+    flag_names.push_back("F1L");
+    flag_names.push_back("F2L");
+    flag_names.push_back("F1R");
+    flag_names.push_back("F2R");
+
+      line_names.push_back("FL");
+    line_names.push_back("FR");
+
+    line_names.push_back("FN");
+    line_names.push_back("FS");
+    line_names.push_back("PRN");
+    line_names.push_back("PR");
+    line_names.push_back("PRS");
+    line_names.push_back("PLN");
+    line_names.push_back("PL");
+    line_names.push_back("PLS");
+
+
+
+
 
 }
 
+
+
 void Localize::test()
 {
-    if(WM->getLastSeenLines().size()>0 && WM->getFlag().size()>0){
-    line l=WM->getLastSeenLines().at(0);
-//    sideTurnRcout<<(l.begin)<<"end: "<<(l.end)<<" the point "<<Distance_Point_Line(Vector3f(0,0,0),l)<<endl;
+    if(WM->getLastSeenLines().size()>0)
+    {
+
+        for(vector<line>::iterator l=WM->getLastSeenLines().begin();l!=WM->getLastSeenLines().end();l++)
+        {
+            cout<<"num of lines : "<<WM->getLastSeenLines().size()<<endl;
+            Vector3f beg = l->getBegin();
+            Vector3f end = l->getEnd();
+            beg = PolarToCartecian(beg);
+            end = PolarToCartecian(end);
+            line lcart=line(beg,end);
+            cout<<"beg : " << beg << "end : " <<end <<"---> "<<line_recognitation(lcart)<<endl;
+        }
     }
 
-//    cout<<WM->getFlagGlobal()["F1R"]<<"soheile kalle kiri"<< endl;
-//    cout<<WM->getFlagGlobal()["G2L"]<<"soheili kalle tokhmi"<<endl;
-//    cout<<Distance_Cartesian_Point_Line(WM->getFlagGlobal()["F1R"],line_global["PRL"])<<endl;
+
+    //    cout<<WM->getFlagGlobal()["F1R"]<<"soheile kalle kiri"<< endl;
+    //    cout<<WM->getFlagGlobal()["G2L"]<<"soheili kalle tokhmi"<<endl;
+    //    cout<<Distance_Cartesian_Point_Line(WM->getFlagGlobal()["F1R"],line_global["PRL"])<<endl;
 }
 
 /*
@@ -91,44 +146,45 @@ double Localize::Distance_Cartesian_Point_Line(Vector3f point_polar,line l)
 }
 
 
-Vector3f Localize::calcPlaneNormal(vector<Vector3f> planePoints)
-{
-    if (planePoints.size() < 3) {
-        return Vector3f(0,0,0) ;
-    }
 
-    double** vec = new double*[planePoints.size()];
-    double x = 0, y = 0, z = 0;
-    for(int i=0;i<planePoints.size();i++){
-        vec[i] = new double[3];
-        x += planePoints.at(i).x();
-        y += planePoints.at(i).y();
-        z += planePoints.at(i).z();
-    }
 
-    Vector3f cntPoint(x / planePoints.size(), y / planePoints.size(), z / planePoints.size());
+//Vector3f Localize::calcPlaneNormal(vector<Vector3f> planePoints)
+//{
+//    if (planePoints.size() < 3) {
+//        return ;
+//    }
 
-    for(int i=0;i<planePoints.size();i++){
-        vec[i][0] = planePoints.at(i).x() - cntPoint.x();
-        vec[i][1] = planePoints.at(i).y() - cntPoint.y();
-        vec[i][2] = planePoints.at(i).z() - cntPoint.z();
-    }
+//    double** vec = new double*[planePoints.size()];
+//    for(int i=0;i<planePoints.size();i++){
+//        vec[i] = new double[3];
+//        x += planePoints.at(i).x();
+//        y += planePoints.at(i).y();
+//        z += planePoints.at(i).z();
+//    }
+//    double x = 0, y = 0, z = 0;
 
-    // Compute SVD & Plane Normal
-    SVD svd(vec,planePoints.size(), 3);
-    double** V = svd.getV();
-    Vector3f res(V[0][2], V[1][2], V[2][2]);
+//    Vector3f cntPoint(x / points.size(), y / points.size(), z / points.size());
 
-    cntPoint.Normalize();
+//    for(int i=0;i<planePoints.size();i++){
+//        vec[i][0] = planePoints.at(i).x() - cntPoint.x();
+//        vec[i][1] = planePoints.at(i).y() - cntPoint.y();
+//        vec[i][2] = planePoints.at(i).z() - cntPoint.z();
+//    }
 
-    if (cntPoint.Dot(res) > 0) {
-        res*=-1;
-    }
+//    // Compute SVD & Plane Normal
+//    SVD svd(vec,planePoints.size(), 3);
+//    double** V = svd.getV();
+//    Vector3f res = new Vector3f(V[0][2], V[1][2], V[2][2]);
 
-    return res;
+//    cntPoint.Normalize();
 
-}
+//    if (centroid3d.dot(res) > 0) {
+//        res*=-1;
+//    }
 
+//    return res;
+
+//}
 
 
 
@@ -147,6 +203,7 @@ string Localize::line_recognitation(line line_to_detect)
             cout<<"flag seen"<<endl;
             for(vector<string> ::iterator j=line_names.begin();j!=line_names.end();j++)
             {
+
 
 
                 if(fabs(Distance_Cartesian_Point_Line(WM->flag[*i],line_to_detect) - Distance_Cartesian_Point_Line(WM->flagGlobal[*i],line_global[*j]))<0.5)
@@ -170,9 +227,6 @@ string Localize::line_recognitation(line line_to_detect)
 
     return result;
 }
-
-
-
 
 
 

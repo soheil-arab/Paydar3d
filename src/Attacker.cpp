@@ -142,14 +142,14 @@ string Decide::Attack()
 
 //        cout << finalPos1.getDistanceTo(finalPos2) << endl;
         Triangle tri(ball,finalPos1,finalPos2);
-//        RVDraw::instance()->drawLine(oppositeTirak,finalPos1,RED,5);
-//        RVDraw::instance()->drawLine(thisTirak,finalPos2,RED,6);
-//        RVDraw::instance()->drawLine(finalPos1,finalPos2,RED,7);
-//        RVDraw::instance()->drawCircle(ballPos,c.getRadius(),GREEN,8);
+        RVDraw::instance()->drawLine(oppositeTirak,finalPos1,RED,5);
+        RVDraw::instance()->drawLine(thisTirak,finalPos2,RED,6);
+        RVDraw::instance()->drawLine(finalPos1,finalPos2,RED,7);
+        RVDraw::instance()->drawCircle(ballPos,c.getRadius(),GREEN,8);
 
         if ( fabs(WM->getMyAngleToBall()) > max(8,min(25,me.getDistanceTo(ball)*20)) )
         {
-//            cout << "Turn : " <<  WM->getMyAngleToBall() << endl;
+            cout << "Turn : " <<  WM->getMyAngleToBall() << endl;
             if (WM->getMyAngleToBall() > 0)
             {
                 if ( c.isInside(me) )
@@ -167,7 +167,7 @@ string Decide::Attack()
             }
          }
         else if ( c.isInside( me ) && !tri.isInside(me) && fabs(meGoal.getY()) > 0.9){
-//            cout <<  "side turning " << endl;
+            cout <<  "side turning " << endl;
                 if (WM->getMyAngleToGoal() > 0)
                     return SK->finalAction("sideTurnL",tFinal);
                 else
