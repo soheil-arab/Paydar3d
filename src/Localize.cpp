@@ -20,7 +20,7 @@ Localize::Localize(WorldModel *wm)
      *             |              PRN                  PRS               |
      *             |               |                    |                |
      *             |               |                    |                |
-     *             |               ---------PRL----------                |
+     *             |               ---------PR----------                 |
      *             |                                                     |
      *             |                                                     |
      *             |                                                     |
@@ -31,7 +31,21 @@ Localize::Localize(WorldModel *wm)
      *             |                                                     |
      *             |                                                     |
      *             |                                                     |
-     *             ------------------------------------------------------
+     *             -------------------------M-----------------------------
+     *             |                                                     |
+     *             |                                                     |
+     *             |                                                     |
+     *             |                                                     |
+     *             |                                                     |
+     *             |                                                     |
+     *             |                                                     |
+     *             |                                                     |
+     *             |               ---------PL----------                 |
+     *             |               |                    |                |
+     *             |               PLN                  PLS              |
+     *             |               |                    |                |
+     *             |               |                    |                |
+     *              -----------------------FL-----------------------------
      */
 
     //defining the global position of the lines
@@ -40,17 +54,17 @@ Localize::Localize(WorldModel *wm)
     line_global["FN"]=line(Vector3f(15,-10,0),Vector3f(-15,-10,0));
     line_global["FS"]=line(Vector3f(15,10,0),Vector3f(-15,10,0));
     line_global["PRN"]=line(Vector3f(15,-1.95,0),Vector3f(13.2,-1.95,0));
-    line_global["PRL"]=line(Vector3f(13.2,-1.95,0),Vector3f(13.2,1.95,0));
+    line_global["PR"]=line(Vector3f(13.2,-1.95,0),Vector3f(13.2,1.95,0));
     line_global["PRS"]=line(Vector3f(13.2,1.95,0),Vector3f(15,1.95,0));
+    line_global["PLN"]=line(Vector3f(-15,-1.95,0),Vector3f(-13.2,-1.95,0));
+    line_global["PL"]=line(Vector3f(-13.2,-1.95,0),Vector3f(-13.2,1.95,0));
+    line_global["PLS"]=line(Vector3f(-15,1.95,0),Vector3f(-13.2,1.95,0));
 
 }
 
 void Localize::test()
 {
-    if(WM->getLastSeenLines().size()>0 && WM->getFlag().size()>0){
-    line l=WM->getLastSeenLines().at(0);
-    cout<<(l.begin)<<"end: "<<(l.end)<<" the point "<<Distance_Point_Line(Vector3f(0,0,0),l)<<endl;
-    }
+
 
 //    cout<<WM->getFlagGlobal()["F1R"]<<"soheile kalle kiri"<< endl;
 //    cout<<WM->getFlagGlobal()["G2L"]<<"soheili kalle tokhmi"<<endl;
@@ -89,8 +103,6 @@ double Localize::Distance_Cartesian_Point_Line(Vector3f point_polar,line l)
     return begin_to_point.Length()*sin(angle_rad);
 
 }
-
-
 
 
 
