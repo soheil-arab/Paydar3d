@@ -41,11 +41,6 @@ string Act::doCurrentAct()
         return ACS->fix();
     }
 
-    //if (curr==Di)
-    //{
-      //  return ACS->dive(s,done,t);
-
-    //}
     else if ( curr == K )
     {
         bool a;

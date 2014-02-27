@@ -18,6 +18,7 @@ string Decide::Attack()
     ballPos = WM->getBallPos();
     VecPosition me(myPos.x(), myPos.y());
     VecPosition ball(ballPos.x(), ballPos.y());
+    VecPosition goal(15,0);
     static bool beam = false;
     static bool set = false;
     static int  ty=0;
@@ -92,29 +93,96 @@ string Decide::Attack()
 
     else if (shouldPlay() && closest==WM->getMyNum() && WM->getMyNum() !=10 && WM->getMyNum()!=11)
     {
-        if ( shouldClear ( x,y,s ))
+        cout << "=-=-=-=-=-=--=-=--=-=-=-=-" << endl;
+        if (shouldClear ( x,y,s ))
         {
-            Log.Log ( 2 , "Shoooooooot va gooooooooooooooooooooooal !" );
-            ACT->setCurrentAct( K, s , x, y  );
+            ACT->setCurrentAct(K, s, x, y);
             tFinal=0;
         }
-        ////isballkickable//////////
-        else{
-            Log.Log ( 2 , "ball is kickable !" );
-            return moveToPosP(true,ball-VecPosition(0.2,0),tFinal);
 
+        VecPosition dest = VecPosition::givePosition(ball,(goal-ball).getDirection(),0.1);
+        VecPosition oppositeTirak ,thisTirak;
+        if ( ball.getY() > 0 ){
+            oppositeTirak.setY(-1.05);
+            thisTirak.setY(1.05);
+        }else{
+            oppositeTirak.setY(1.05);
+            thisTirak.setY(-1.05);
         }
+
+        thisTirak.setY(thisTirak.getY()+sign(thisTirak.getY())*(ball.getDistanceTo(goal)-1.9)*8.0/15.0);
+        oppositeTirak.setY(oppositeTirak.getY()+sign(oppositeTirak.getY())*(ball.getDistanceTo(goal)-1.9)*8.5/15.0);
+
+        oppositeTirak.setX(15);
+        thisTirak.setX(15);
+
+        Line l1 = Line::makeLineFromTwoPoints(ball,oppositeTirak);
+        Line l2 = Line::makeLineFromTwoPoints(ball,thisTirak);
+        Line meBall = Line::makeLineFromTwoPoints(ball,me);
+        Line goalLine = Line::makeLineFromTwoPoints(thisTirak,oppositeTirak);
+
+        VecPosition meGoal = meBall.getIntersection(goalLine);
+
+        Circle c(dest,0.6);
+
+        VecPosition i11,i12,i21,i22,finalPos1,finalPos2;
+
+        l1.getCircleIntersectionPoints(c,&i11,&i12);
+        l2.getCircleIntersectionPoints(c,&i21,&i22);
+
+        if (i11.getDistanceTo(oppositeTirak) > i12.getDistanceTo(oppositeTirak))
+            finalPos1 = i11;
+        else
+            finalPos1 = i12;
+
+        if (i21.getDistanceTo(thisTirak) > i22.getDistanceTo(thisTirak))
+            finalPos2 = i21;
+        else
+            finalPos2 = i22;
+
+//        cout << finalPos1.getDistanceTo(finalPos2) << endl;
+        Triangle tri(ball,finalPos1,finalPos2);
+//        RVDraw::instance()->drawLine(oppositeTirak,finalPos1,RED,5);
+//        RVDraw::instance()->drawLine(thisTirak,finalPos2,RED,6);
+//        RVDraw::instance()->drawLine(finalPos1,finalPos2,RED,7);
+//        RVDraw::instance()->drawCircle(ballPos,c.getRadius(),GREEN,8);
+
+        if ( fabs(WM->getMyAngleToBall()) > max(8,min(25,me.getDistanceTo(ball)*20)) )
+        {
+//            cout << "Turn : " <<  WM->getMyAngleToBall() << endl;
+            if (WM->getMyAngleToBall() > 0)
+            {
+                if ( c.isInside(me) )
+                    return SK->finalAction("turnL" ,tFinal);
+                else
+                    return SK->finalAction("walkAngleL",tFinal);
+
+            }
+            else{
+                if ( c.isInside(me) )
+                    return SK->finalAction("turnR" ,tFinal);
+                else
+                    return SK->finalAction("walkAngleR",tFinal);
+
+            }
+         }
+        else if ( c.isInside( me ) && !tri.isInside(me) && fabs(meGoal.getY()) > 0.9){
+//            cout <<  "side turning " << endl;
+                if (WM->getMyAngleToGoal() > 0)
+                    return SK->finalAction("sideTurnL",tFinal);
+                else
+                    return SK->finalAction("sideTurnR",tFinal);
+        }
+        else
+            return SK->finalAction("walk",tFinal);
     }
     else if(me.getDistanceTo(attackpositioning())>0.1 && shouldPlay2()  && WM->getMyNum() !=10 && WM->getMyNum()!=11){
         Vector3f vec(attackpositioning().getX(),attackpositioning().getY(),0);
-        if(WM->getMyNum()==11)
-            RVDraw::instance()->drawVector3f(vec,BLUE,234423);
         return moveToPosP(false,attackpositioning(),tFinal);
     }
     else if(fabs(WM->getMyAngleTo(WM->getBallPos()))>15 && shouldPlay2())
     {
-        cout <<"manam hastam\n";
-        if(WM->getMyAngleTo(myPos+Vector3f(1,0,0))>0)
+        if(WM->getMyAngleTo(WM->getBallPos())>0)
         {
             Log.Log ( 2 , "Turn Left !" );
             return SK->finalAction("turnL",tFinal);
@@ -132,17 +200,5 @@ string Decide::Attack()
         return "";
     }
     return ss.str();
-////    static int ttt = 0 ;
-////    ttt++;
-////    ss << SK->moveJoint( "he1" ,( ttt % 100 < 50 ) ? -0.5 : 0.5  ) << SK->moveJoint( "he2" ,( ttt % 100 < 50 ) ? -0.5 : 0.5  ) ;
-////    if (ttt < 80 )
-////        ss << "";
-////    else if ( ttt < 100 )
-////        ss << SK->moveJoint("rle2" ,  -1) << SK->moveJoint("rle6" , 1) <<
-////              SK->moveJoint("lle2" , -1) << SK->moveJoint("lle6" ,1) ;
-////    else if ( ttt < 140 )
-////      ss << SK->moveJointTo("he1" , -100 , 3) << SK->moveJointTo("he2" , -40 , 3) ;
-//    //////////////////////////////////////////////////////////////////
-////    cout << WM->getGyro() << endl;
-//    return ss.str();
+
 }

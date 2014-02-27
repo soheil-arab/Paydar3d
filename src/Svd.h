@@ -10,6 +10,9 @@ public:
     SVD();
     SVD(double** A, int rows, int cols);
     double hypot(double a, double b);
+    double** getV();
+    double*  getS();
+    double** getU();
 private:
     /*
      * Arrays for internal storage of U and V.

@@ -1,4 +1,4 @@
-#include "svd.h"
+#include "Svd.h"
 
 SVD::SVD()
 {
@@ -21,8 +21,12 @@ SVD::SVD(double** A, int rows, int cols)
       */
     int nu = min(m, n);
     s = new double[min(m + 1, n)];
-    U = new double[m][nu];
-    V = new double[n][n];
+    U = new double*[m];
+    V = new double*[n];
+    for(int i=0 ; i<m ; i++)
+        U[i]=new double[nu];
+    for(int i=0 ; i<n ; i++)
+        V[i]=new double[n];
     double *e = new double[n];
     double *work = new double[m];
     bool wantu = true;
@@ -322,10 +326,10 @@ SVD::SVD(double** A, int rows, int cols)
 
             // Calculate the shift.
 
-            double scale = Math.max(
-                        Math.max(Math.max(
-                                     Math.max(Math.abs(s[p - 1]), Math.abs(s[p - 2])),
-                        Math.abs(e[p - 2])), Math.abs(s[k])), Math.abs(e[k]));
+            double scale = max(
+                        max(max(
+                                max(fabs(s[p - 1]), fabs(s[p - 2])),
+                        fabs(e[p - 2])), fabs(s[k])), fabs(e[k]));
             double sp = s[p - 1] / scale;
             double spm1 = s[p - 2] / scale;
             double epm1 = e[p - 2] / scale;
@@ -335,7 +339,7 @@ SVD::SVD(double** A, int rows, int cols)
             double c = (sp * epm1) * (sp * epm1);
             double shift = 0.0;
             if ((b != 0.0) | (c != 0.0)) {
-                shift = Math.sqrt(b * b + c);
+                shift = sqrt(b * b + c);
                 if (b < 0.0) {
                     shift = -shift;
                 }
@@ -443,13 +447,13 @@ double SVD::hypot(double a, double b)
 
         r = b / a;
 
-        r = Math.abs(a) * Math.sqrt(1 + r * r);
+        r = fabs(a) * sqrt(1 + r * r);
 
     } else if (b != 0) {
 
         r = a / b;
 
-        r = Math.abs(b) * Math.sqrt(1 + r * r);
+        r = fabs(b) * sqrt(1 + r * r);
 
     } else {
 
@@ -459,4 +463,19 @@ double SVD::hypot(double a, double b)
 
     return r;
 
+}
+
+double **SVD::getV()
+{
+    return V;
+}
+
+double *SVD::getS()
+{
+    return s;
+}
+
+double **SVD::getU()
+{
+    return U;
 }

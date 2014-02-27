@@ -329,8 +329,8 @@ void WorldModel::brinBeMA(){
             //                cout<<"oooo "<<endl;
         }
 
-        RVDraw::instance()->drawVector3f(getMyPos(),GREEN,5);
-        RVDraw::instance()->drawVector3f(getBallPos(),GREEN,7);
+//        RVDraw::instance()->drawVector3f(getMyPos(),GREEN,5);
+//        RVDraw::instance()->drawVector3f(getBallPos(),GREEN,7);
         for ( map<int,RelPlayerInfo>::iterator i = ourRel.begin() ; i != ourRel.end() ; i++ )
         {
             if ( i->first != getMyNum() )
@@ -365,7 +365,7 @@ void WorldModel::brinBeMA(){
         {
             line l=getLastSeenLines()[size-i-1];
             if(l.time_we_saw_it==serverTime ){
-                RVDraw::instance()->drawLine(sensedPos+headRotate.Rotate(PolarToCartecian(l.begin)),sensedPos+headRotate.Rotate(PolarToCartecian(l.end)),RED,2*size+i);
+//                RVDraw::instance()->drawLine(sensedPos+headRotate.Rotate(PolarToCartecian(l.begin)),sensedPos+headRotate.Rotate(PolarToCartecian(l.end)),RED,2*size+i);
 
             }
         }

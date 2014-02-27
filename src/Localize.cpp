@@ -194,6 +194,14 @@ string Localize::line_recognitation(line line_to_detect)
     double min=1000;
     string result="";
 
+    double** vec = new double*[planePoints.size()];
+    for(int i=0;i<planePoints.size();i++){
+        vec[i] = new double[3];
+        x += planePoints.at(i).x();
+        y += planePoints.at(i).y();
+        z += planePoints.at(i).z();
+    }
+    double x = 0, y = 0, z = 0;
 
     for(vector<string>::iterator i=flag_names.begin();i!=flag_names.end();i++){
 
@@ -204,6 +212,7 @@ string Localize::line_recognitation(line line_to_detect)
             for(vector<string> ::iterator j=line_names.begin();j!=line_names.end();j++)
             {
 
+    cntPoint.Normalize();
 
 
                 if(fabs(Distance_Cartesian_Point_Line(WM->flag[*i],line_to_detect) - Distance_Cartesian_Point_Line(WM->flagGlobal[*i],line_global[*j]))<0.5)
@@ -227,6 +236,7 @@ string Localize::line_recognitation(line line_to_detect)
 
     return result;
 }
+
 
 
 

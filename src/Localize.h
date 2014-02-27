@@ -1,6 +1,7 @@
 #ifndef LOCALIZE_H
 #define LOCALIZE_H
 #include "WorldModel.h"
+#include "Svd.h"
 //#include "line.h"
 #include "Math.h"
 
