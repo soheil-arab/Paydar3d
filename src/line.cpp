@@ -14,6 +14,11 @@ line::line(Vector3f p1,Vector3f p2,double time)
 
 }
 
+line::line(Vector3f p1,Vector3f p2)
+{
+    begin=p1;
+    end=p2;
+}
 
 
 

@@ -10,7 +10,9 @@
 using namespace std;
 class line{
     public:
+        line(){};
         line(Vector3f,Vector3f,double);
+        line(Vector3f p1,Vector3f p2);
         Vector3f getBegin();
         Vector3f getEnd();
         string toString();
