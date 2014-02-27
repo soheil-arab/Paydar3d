@@ -133,4 +133,48 @@ Vector3f Localize::calcPlaneNormal(vector<Vector3f> planePoints)
 
 
 
+string Localize::line_recognitation(line line_to_detect)
+{
+    double min=1000;
+    string result="";
+
+
+    for(vector<string>::iterator i=flag_names.begin();i!=flag_names.end();i++){
+
+        if(WM->getFlagLastSeen(*i)==WM->serverTime)
+        {
+
+            cout<<"flag seen"<<endl;
+            for(vector<string> ::iterator j=line_names.begin();j!=line_names.end();j++)
+            {
+
+
+                if(fabs(Distance_Cartesian_Point_Line(WM->flag[*i],line_to_detect) - Distance_Cartesian_Point_Line(WM->flagGlobal[*i],line_global[*j]))<0.5)
+                {
+
+                    cout<<"flag name is:"<<*i<<endl;
+                    cout<<"line name is:"<<*j<<endl;
+                    cout<<Distance_Cartesian_Point_Line(WM->flag[*i],line_to_detect)<<"local distance"<<endl;
+
+                    cout<<Distance_Cartesian_Point_Line(WM->flagGlobal[*i],line_global[*j])<<"global distance"<<endl;
+                    cout<<"fabse kiri"<<fabs(Distance_Cartesian_Point_Line(WM->flag[*i],line_to_detect) - Distance_Cartesian_Point_Line(WM->flagGlobal[*i],line_global[*j]))<<endl;
+
+                    result = *j;
+                    return result;
+//                    cout<<"flag name:"<<*i<<"coordinate: "WM->flag[*i]<<"line name:"<<*j<<endl;
+//                    cout<<"min: "<<min<<endl;
+                }
+            }
+        }
+    }
+
+    return result;
+}
+
+
+
+
+
+
+
 
