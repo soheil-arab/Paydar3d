@@ -122,7 +122,7 @@ string Decide::Attack()
 
         VecPosition meGoal = meBall.getIntersection(goalLine);
 
-        Circle c(dest,0.7);
+        Circle c(dest,0.6);
 
         VecPosition i11,i12,i21,i22,finalPos1,finalPos2;
 
@@ -141,14 +141,14 @@ string Decide::Attack()
 
 //        cout << finalPos1.getDistanceTo(finalPos2) << endl;
         Triangle tri(ball,finalPos1,finalPos2);
-//        RVDraw::instance()->drawLine(ball,finalPos1,RED,5);
-//        RVDraw::instance()->drawLine(ball,finalPos2,RED,6);
-//        RVDraw::instance()->drawLine(finalPos1,finalPos2,RED,7);
-//        RVDraw::instance()->drawCircle(ballPos,c.getRadius(),GREEN,8);
+        RVDraw::instance()->drawLine(ball,finalPos1,RED,5);
+        RVDraw::instance()->drawLine(ball,finalPos2,RED,6);
+        RVDraw::instance()->drawLine(finalPos1,finalPos2,RED,7);
+        RVDraw::instance()->drawCircle(ballPos,c.getRadius(),GREEN,8);
 
-        if ( fabs(WM->getMyAngleToBall()) > max(7,min(20,me.getDistanceTo(ball)*20)) )
+        if ( fabs(WM->getMyAngleToBall()) > max(8,min(20,me.getDistanceTo(ball)*20)) )
         {
-            cout <<  WM->getMyAngleToBall() << endl;
+            cout << "Turn : " <<  WM->getMyAngleToBall() << endl;
             if (WM->getMyAngleToBall() > 0)
                 return SK->finalAction("turnL" ,tFinal);
             else
