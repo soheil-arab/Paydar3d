@@ -48,13 +48,13 @@ Localize::Localize(WorldModel *wm)
 void Localize::test()
 {
     if(WM->getLastSeenLines().size()>0 && WM->getFlag().size()>0){
-    line l=WM->getLastSeenLines().at(0);
-//    sideTurnRcout<<(l.begin)<<"end: "<<(l.end)<<" the point "<<Distance_Point_Line(Vector3f(0,0,0),l)<<endl;
+        line l=WM->getLastSeenLines().at(0);
+        //    sideTurnRcout<<(l.begin)<<"end: "<<(l.end)<<" the point "<<Distance_Point_Line(Vector3f(0,0,0),l)<<endl;
     }
 
-//    cout<<WM->getFlagGlobal()["F1R"]<<"soheile kalle kiri"<< endl;
-//    cout<<WM->getFlagGlobal()["G2L"]<<"soheili kalle tokhmi"<<endl;
-//    cout<<Distance_Cartesian_Point_Line(WM->getFlagGlobal()["F1R"],line_global["PRL"])<<endl;
+    //    cout<<WM->getFlagGlobal()["F1R"]<<"soheile kalle kiri"<< endl;
+    //    cout<<WM->getFlagGlobal()["G2L"]<<"soheili kalle tokhmi"<<endl;
+    //    cout<<Distance_Cartesian_Point_Line(WM->getFlagGlobal()["F1R"],line_global["PRL"])<<endl;
 }
 
 /*
@@ -127,6 +127,34 @@ Vector3f Localize::calcPlaneNormal(vector<Vector3f> planePoints)
 
     return res;
 
+}
+
+Matrix Localize::calcGlobalCoordinate(Vector3f norm)
+{
+    for (map<string, Polar>::iterator i = WM->flagPolar.begin(); i != WM->flagPolar.end(); i++)
+    {
+        if (WM->flagLastSeen [ i->first ] != WM->getServerTime())
+        {
+            continue;
+        }
+        for (map<string, Polar>::iterator j = WM->flagPolar.begin() ; j != WM->flagPolar.end(); j++)
+        {
+            if (WM->flagLastSeen [ j->first ] != WM->getServerTime())
+            {
+                continue;
+            }
+            if (  i->first ==  j->first )
+            {
+                continue ;
+            }
+            if ( i->first[2] != j->first[2] )
+            {
+                continue ;
+            }
+
+
+        }
+    }
 }
 
 
