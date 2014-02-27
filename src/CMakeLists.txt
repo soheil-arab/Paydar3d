@@ -14,6 +14,7 @@ Parser.cpp
 Parser.h
 Skill.cpp
 Skill.h
+Svd.cpp
 WorldModel.cpp
 #ConnectionManager.cpp
 Logger.cpp
@@ -31,6 +32,7 @@ gmath.h
 Math.h
 matrix.h
 salt.h
+Svd.h
 tvector.h
 rvdraw.h
 Types.h

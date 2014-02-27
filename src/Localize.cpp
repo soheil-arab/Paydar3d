@@ -94,19 +94,19 @@ double Localize::Distance_Cartesian_Point_Line(Vector3f point_polar,line l)
 Vector3f Localize::calcPlaneNormal(vector<Vector3f> planePoints)
 {
     if (planePoints.size() < 3) {
-        return ;
+        return Vector3f(0,0,0) ;
     }
 
     double** vec = new double*[planePoints.size()];
+    double x = 0, y = 0, z = 0;
     for(int i=0;i<planePoints.size();i++){
         vec[i] = new double[3];
         x += planePoints.at(i).x();
         y += planePoints.at(i).y();
         z += planePoints.at(i).z();
     }
-    double x = 0, y = 0, z = 0;
 
-    Vector3f cntPoint(x / points.size(), y / points.size(), z / points.size());
+    Vector3f cntPoint(x / planePoints.size(), y / planePoints.size(), z / planePoints.size());
 
     for(int i=0;i<planePoints.size();i++){
         vec[i][0] = planePoints.at(i).x() - cntPoint.x();
@@ -117,11 +117,11 @@ Vector3f Localize::calcPlaneNormal(vector<Vector3f> planePoints)
     // Compute SVD & Plane Normal
     SVD svd(vec,planePoints.size(), 3);
     double** V = svd.getV();
-    Vector3f res = new Vector3f(V[0][2], V[1][2], V[2][2]);
+    Vector3f res(V[0][2], V[1][2], V[2][2]);
 
     cntPoint.Normalize();
 
-    if (centroid3d.dot(res) > 0) {
+    if (cntPoint.Dot(res) > 0) {
         res*=-1;
     }
 
