@@ -104,12 +104,12 @@ string Decide::goalie()
     }
     else
     {
-        if (shouldClear ( x,y,s ) )
-        {
-            tFinal=0;
-            ACT->setCurrentAct(K,s,x,y);
-        }
-        else if (shouldPlay() && (r1.isInside(ball) || me.getDistanceTo(ball)<0.4) && WM->getClosestOurToBall()==WM->getMyNum())
+//        if (shouldClear ( x,y,s ) )
+//        {
+//            tFinal=0;
+//            ACT->setCurrentAct(K,s,x,y);
+//        }
+        if (shouldPlay() && (r1.isInside(ball) || me.getDistanceTo(ball)<0.4) && WM->getClosestOurToBall()==WM->getMyNum())
         {
             return moveToPosP(true,ball-VecPosition(0.2,0),tFinal);
         }

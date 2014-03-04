@@ -1021,17 +1021,17 @@ string Skill::shootR (bool &canshoot,bool &done,double &tFinal)
         /// Shoot 1
         ne=false;
     }
-    if(fabs(WM->getMyAngleToGoal())>5 && sw && !(WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Right) && me.getX()>-1 )
-    {
-        if(WM->getMyAngleToGoal()>0)
-        {
-            return finalAction("turnL",tFinal);
-        }
-        else
-        {
-            return finalAction("turnR",tFinal);
-        }
-    }
+//    if(fabs(WM->getMyAngleToGoal())>5 && sw && !(WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Right) && me.getX()>-1 )
+//    {
+//        if(WM->getMyAngleToGoal()>0)
+//        {
+//            return finalAction("turnL",tFinal);
+//        }
+//        else
+//        {
+//            return finalAction("turnR",tFinal);
+//        }
+//    }
     id++;
     sw=false;
 
@@ -1145,17 +1145,17 @@ string Skill::shootL (bool &canshoot,bool &done,double &tFinal)
     {
         ne=false;
     }
-    if(fabs(WM->getMyAngleTo(Vector3f(9,0,0)))>5 && sw && !(WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Right) && me.getX()>-1)
-    {
-        if(WM->getMyAngleTo(Vector3f(9,0,0))>0)
-        {
-            return finalAction("turnL",tFinal);
-        }
-        else
-        {
-            return finalAction("turnR",tFinal);
-        }
-    }
+//    if(fabs(WM->getMyAngleTo(Vector3f(9,0,0)))>5 && sw && !(WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Right) && me.getX()>-1)
+//    {
+//        if(WM->getMyAngleTo(Vector3f(9,0,0))>0)
+//        {
+//            return finalAction("turnL",tFinal);
+//        }
+//        else
+//        {
+//            return finalAction("turnR",tFinal);
+//        }
+//    }
     sw=false;
     id++;
 

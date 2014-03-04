@@ -86,12 +86,12 @@ string Decide::Middle()
     }
     else if (shouldPlay() && parseBallPos()==WM->getMyNum())
     {
-        if (shouldClear ( x,y,s ))
-        {
-            ACT->setCurrentAct(K, s , x, y);
-        }
+//        if (shouldClear ( x,y,s ))
+//        {
+//            ACT->setCurrentAct(K, s , x, y);
+//        }
     ///////decide///////////////////////
-        else
+//        else
             return moveToPosP(true,ball-VecPosition(0.2,0),tFinal);
     }
     ////////////positioning///////////

@@ -91,20 +91,20 @@ Localize::Localize(WorldModel *wm)
 
 void Localize::test()
 {
-    if(WM->getLastSeenLines().size()>0)
-    {
+//    if(WM->getLastSeenLines().size()>0)
+//    {
 
-        for(vector<line>::iterator l=WM->getLastSeenLines().begin();l!=WM->getLastSeenLines().end();l++)
-        {
-            cout<<"num of lines : "<<WM->getLastSeenLines().size()<<endl;
-            Vector3f beg = l->getBegin();
-            Vector3f end = l->getEnd();
-            beg = PolarToCartecian(beg);
-            end = PolarToCartecian(end);
-            line lcart=line(beg,end);
-            cout<<"beg : " << beg << "end : " <<end <<"---> "<<line_recognitation(lcart)<<endl;
-        }
-    }
+//        for(vector<line>::iterator l=WM->getLastSeenLines().begin();l!=WM->getLastSeenLines().end();l++)
+//        {
+//            cout<<"num of lines : "<<WM->getLastSeenLines().size()<<endl;
+//            Vector3f beg = l->getBegin();
+//            Vector3f end = l->getEnd();
+//            beg = PolarToCartecian(beg);
+//            end = PolarToCartecian(end);
+//            line lcart=line(beg,end);
+//            cout<<"beg : " << beg << "end : " <<end <<"---> "<<line_recognitation(lcart)<<endl;
+//        }
+//    }
 
 
     //    cout<<WM->getFlagGlobal()["F1R"]<<"soheile kalle kiri"<< endl;
@@ -200,7 +200,7 @@ string Localize::line_recognitation(line line_to_detect)
         if(WM->getFlagLastSeen(*i)==WM->serverTime)
         {
 
-            cout<<"flag seen"<<endl;
+//            cout<<"flag seen"<<endl;
             for(vector<string> ::iterator j=line_names.begin();j!=line_names.end();j++)
             {
 
@@ -209,12 +209,12 @@ string Localize::line_recognitation(line line_to_detect)
                 if(fabs(Distance_Cartesian_Point_Line(WM->flag[*i],line_to_detect) - Distance_Cartesian_Point_Line(WM->flagGlobal[*i],line_global[*j]))<0.5)
                 {
 
-                    cout<<"flag name is:"<<*i<<endl;
-                    cout<<"line name is:"<<*j<<endl;
-                    cout<<Distance_Cartesian_Point_Line(WM->flag[*i],line_to_detect)<<"local distance"<<endl;
+//                    cout<<"flag name is:"<<*i<<endl;
+//                    cout<<"line name is:"<<*j<<endl;
+//                    cout<<Distance_Cartesian_Point_Line(WM->flag[*i],line_to_detect)<<"local distance"<<endl;
 
-                    cout<<Distance_Cartesian_Point_Line(WM->flagGlobal[*i],line_global[*j])<<"global distance"<<endl;
-                    cout<<"fabse kiri"<<fabs(Distance_Cartesian_Point_Line(WM->flag[*i],line_to_detect) - Distance_Cartesian_Point_Line(WM->flagGlobal[*i],line_global[*j]))<<endl;
+//                    cout<<Distance_Cartesian_Point_Line(WM->flagGlobal[*i],line_global[*j])<<"global distance"<<endl;
+//                    cout<<"fabse kiri"<<fabs(Distance_Cartesian_Point_Line(WM->flag[*i],line_to_detect) - Distance_Cartesian_Point_Line(WM->flagGlobal[*i],line_global[*j]))<<endl;
 
                     result = *j;
                     return result;

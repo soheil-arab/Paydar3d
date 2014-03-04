@@ -93,11 +93,11 @@ string Decide::Deffend()
     }
     else if (shouldPlay() && parseBallPos()==WM->getMyNum())
     {
-        if (shouldClear ( x,y,s ))
-        {
-            ACT->setCurrentAct(K, s, x, y);
-            tFinal=0;
-        }
+//        if (shouldClear ( x,y,s ))
+//        {
+//            ACT->setCurrentAct(K, s, x, y);
+//            tFinal=0;
+//        }
         ////////decide/////////
         return moveToPosP(true,ball-VecPosition(0.2,0),tFinal);
 

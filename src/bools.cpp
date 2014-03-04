@@ -74,7 +74,7 @@ double Decide::goaliepositioning()
 
 
 
-bool Decide::shouldClear(double &dx, double &dy,SideT &side)
+bool Decide::shouldClear(double &dx, double &dy,SideT &side,Triangle t)
 {
     myPos = WM->getMyPos();
     ballPos = WM->getBallPos();
@@ -90,6 +90,10 @@ bool Decide::shouldClear(double &dx, double &dy,SideT &side)
     Rect O_P_A(VecPosition(-15,1.1),VecPosition(-13.2,-1.1));
     VecPosition p1,p2;
 
+    if ( me.getX() >  2 && !t.isInside(me))
+    {
+        return false;
+    }
     if ( WM->getMyAngleToBall()  < 0 )
         side = Right;
     else

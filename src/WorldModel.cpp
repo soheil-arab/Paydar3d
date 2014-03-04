@@ -282,7 +282,7 @@ void WorldModel::brinBeMA(){
         }
 
         Vector3f poss = flagGlobal[i->first] - headRotate.Rotate(i->second);
-        RVDraw::instance()->drawLine(sensedPos,sensedPos+headRotate.Rotate(i->second),GREEN,numberOfFlags);
+//        RVDraw::instance()->drawLine(sensedPos,sensedPos+headRotate.Rotate(i->second),GREEN,numberOfFlags);
 
         myPos += poss;
         numberOfFlags++;
