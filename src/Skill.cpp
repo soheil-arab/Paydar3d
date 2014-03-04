@@ -1165,7 +1165,6 @@ string Skill::shootL (bool &canshoot,bool &done,double &tFinal)
         return ss.str();
     }
 
-
     t+=0.02;
     if(t<0.3)
     {

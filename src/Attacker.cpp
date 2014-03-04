@@ -79,7 +79,7 @@ string Decide::Attack()
     {
         ss << ACT->doCurrentAct();
         tFinal=0;
-        cout << "Doing Current Act" << endl;
+        Log.Log(2,"Doing Current Act");
         return ss.str();
     }
     else if ((shouldStandUp(com, s)))
@@ -89,10 +89,10 @@ string Decide::Attack()
     }
     else if(!did && !shouldPlay2())
     {
+        Log.Log(2,"Sefring");
         tFinal=0;
         return SK->sefr(did,tt,false);
     }
-
 
     else if (shouldPlay() && closest==WM->getMyNum() && WM->getMyNum() !=10 && WM->getMyNum()!=11)
     {
@@ -119,7 +119,7 @@ string Decide::Attack()
 
         VecPosition meGoal = meBall.getIntersection(goalLine);
 
-        Circle c(dest,0.5);
+        Circle c(dest,0.3);
 
         VecPosition i11,i12,i21,i22,finalPos1,finalPos2;
 
@@ -136,6 +136,8 @@ string Decide::Attack()
         else
             finalPos2 = i22;
 
+
+
 //        cout << finalPos1.getDistanceTo(finalPos2) << endl;
         Triangle tri(ball,finalPos1,finalPos2);
         RVDraw::instance()->drawLine(oppositeTirak,finalPos1,RED,5);
@@ -144,7 +146,8 @@ string Decide::Attack()
         RVDraw::instance()->drawCircle(ballPos,c.getRadius(),GREEN,8);
         RVDraw::instance()->drawLine(me,ball,YELLO,9);
         RVDraw::instance()->drawLine(me,VecPosition::givePosition(me,WM->getMyAngle(),1),BLUE,10);
-        double thresh = max(7,min(25,me.getDistanceTo(ball)*20));
+
+        double thresh = max(7,min(20 ,me.getDistanceTo(ball)*20));
 
         if (shouldClear ( x,y,s,tri ))
         {
@@ -156,6 +159,7 @@ string Decide::Attack()
         {
             if ( c.isInside(me) )
             {
+                Log.Log(2,"Turning");
                 if ( WM->getMyAngleToBall() > 0 )
                     return SK->finalAction("turnL" ,tFinal);
                 else
@@ -163,25 +167,33 @@ string Decide::Attack()
             }
             double backAng = VecPosition::normalizeAngle( WM->getMyAngleToBall()+180 );
 
-            cout << thresh <<"   " << backAng << endl;
+            cout << "threshold" << thresh <<" angle to ball :  " << WM->getMyAngleToBall() <<" my angle : " << WM->getMyAngle() << endl;
 
             if ( fabs(backAng)  < 8 )
             {
+                Log.Log(2,"BackWalking");
                 return SK->finalAction("bwalk",tFinal);
             }
            else if ( VecPosition::normalizeAngle( backAng )  < 20  && VecPosition::normalizeAngle( backAng)  > 0){
+                Log.Log(2,"BackWalking In AngleL");
                 return SK->finalAction("bwalkAngleL",tFinal);
             }
-            else if ( VecPosition::normalizeAngle( backAng )  > -20  && VecPosition::normalizeAngle( backAng )  < 0 ){
+            else if ( VecPosition::normalizeAngle( backAng )  > -20  && VecPosition::normalizeAngle( backAng )  < 0 )
+            {
+                Log.Log(2,"BackWalking In AngleR");
                 return SK->finalAction("bwalkAngleR",tFinal);
             }
-            else if (WM->getMyAngleToBall() > 0)
-                    return SK->finalAction("walkAngleL",tFinal);
-            else
-                    return SK->finalAction("walkAngleR",tFinal);
+            else if (WM->getMyAngleToBall() > 0){
+                Log.Log(2,"Walking Angle L");
+                return SK->finalAction("walkAngleL",tFinal,1);
+            }
+            else{
+                    Log.Log(2,"Walking Angle R");
+                    return SK->finalAction("walkAngleR",tFinal,1);
+            }
          }
         else if ( c.isInside( me ) && !tri.isInside(me) && fabs(meGoal.getY()) > 0.9){
-            cout <<  "side turning " << endl;
+            Log.Log(2,"Side Turn");
                 if (WM->getMyAngleToGoal() > 0)
                     return SK->finalAction("sideTurnL",tFinal);
                 else
@@ -189,33 +201,33 @@ string Decide::Attack()
         }
         else
         {
-            cout <<"walk" << endl;
-            return SK->finalAction("walk",tFinal,1.5);
+            Log.Log(2,"Walk");
+            return SK->finalAction("walk",tFinal,1);
         }
     }
-//    else if(me.getDistanceTo(attackpositioning())>0.1 && shouldPlay2()  && WM->getMyNum() !=10 && WM->getMyNum()!=11){
-//        Vector3f vec(attackpositioning().getX(),attackpositioning().getY(),0);
-//        return moveToPosP(false,attackpositioning(),tFinal);
-//    }
-//    else if(fabs(WM->getMyAngleTo(WM->getBallPos()))>15 && shouldPlay2())
-//    {
-//        if(WM->getMyAngleTo(WM->getBallPos())>0)
-//        {
-//            Log.Log ( 2 , "Turn Left !" );
-//            return SK->finalAction("turnL",tFinal);
-//        }
-//        else
-//        {
-//            Log.Log ( 2 , "Turn Right !" );
-//            return SK->finalAction("turnR",tFinal);
-//        }
-//    }
-//    else if(!(WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Right || WM->getPlayMode() == PM_BeforeKickOff ) )
-//    {
-//        Log.Log ( 2 , "Darja Mizadam !" );
-//        return SK->finalAction( "darja" ,tFinal);
-//        return "";
-//    }
+    else if(me.getDistanceTo(attackpositioning())>0.1 && shouldPlay2()  && WM->getMyNum() !=10 && WM->getMyNum()!=11){
+        Vector3f vec(attackpositioning().getX(),attackpositioning().getY(),0);
+        return moveToPosP(false,attackpositioning(),tFinal);
+    }
+    else if(fabs(WM->getMyAngleTo(WM->getBallPos()))>15 && shouldPlay2())
+    {
+        if(WM->getMyAngleTo(WM->getBallPos())>0)
+        {
+            Log.Log ( 2 , "Turn Left !" );
+            return SK->finalAction("turnL",tFinal);
+        }
+        else
+        {
+            Log.Log ( 2 , "Turn Right !" );
+            return SK->finalAction("turnR",tFinal);
+        }
+    }
+    else if(!(WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Right || WM->getPlayMode() == PM_BeforeKickOff ) )
+    {
+        Log.Log ( 2 , "Darja Mizadam !" );
+        return SK->finalAction( "darja" ,tFinal);
+        return "";
+    }
     return ss.str();
 
 }
