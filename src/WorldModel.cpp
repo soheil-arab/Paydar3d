@@ -751,7 +751,7 @@ void WorldModel::getPosbyTwoFlag()
         pos = sum/co;
         int pppp=14;
         //        RVDraw::instance()->drawLine(pos,pos2,BLACK,pppp++);
-        RVDraw::instance()->drawLine(Vector3f(0,0,0),pos,BLACK,pppp++);
+//        RVDraw::instance()->drawLine(Vector3f(0,0,0),pos,BLACK,pppp++);
         setMyPos( pos );        	          /// set My Pos
 
         if ( ballLastSeen == serverTime )          /// if See Ball In This Cycle Set Its Pos !
@@ -759,7 +759,7 @@ void WorldModel::getPosbyTwoFlag()
             Vector3f temp = translate ( ball );
             setBallVel ( temp - getBallPos() ) ;  /// set Velocity of Ball
             setBallPos ( temp );                  /// set Ball Pos
-            RVDraw::instance()->drawVector3f(temp,BLUE,pppp++);
+//            RVDraw::instance()->drawVector3f(temp,BLUE,pppp++);
             setBallAng(gRadToDeg(atan2(getBallVel().y(), getBallVel().x())));
         }
 

@@ -143,7 +143,7 @@ int main(int argc, char *argv[])
     }
     catch (exception &e)
     {
-        cout << e.what() << endl;       /// if any exception happend Handle it & Print Error
+//        cout << e.what() << endl;       /// if any exception happend Handle it & Print Error
     }
     return 0;
 }

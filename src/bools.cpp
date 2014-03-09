@@ -99,7 +99,7 @@ bool Decide::shouldClear(double &dx, double &dy,SideT &side,Triangle t)
     else
         side = Left;
 
-    if (fabs(myAngle) < 70  && me.getDistanceTo(ball) < 0.20 && me.getDistanceTo(ball) > 0.16 && fabs(WM->getMyAngleToBall())  < 20 &&
+    if (fabs(myAngle) < 70  && me.getDistanceTo(ball) < 0.16 && me.getDistanceTo(ball) > 0.10 && fabs(WM->getMyAngleToBall())  < 20 &&
             con && ball.getX()<13
             &&
             !WM->isOppInCircle(Circle(ball,2.5),p1,p2) && !shback() && fabs(WM->getMyAngleToGoal())<30)

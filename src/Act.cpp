@@ -46,14 +46,14 @@ string Act::doCurrentAct()
         bool a;
         string cmd;
         VecPosition ball(WM->getBallPos().x(),WM->getBallPos().y());
-        if( s == Right )
-        {
-            return ACS->shootR (a, done,ang) ;
-        }
-        else
-        {
+//        if( s == Right )
+//        {
+//            return ACS->shootR (a, done,ang) ;
+//        }
+//        else
+//        {
             return ACS->shootL (a, done,ang) ;
-        }
+//        }
         return cmd;
     }
     else if (curr==SUB)

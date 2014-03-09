@@ -14,7 +14,6 @@
 #include "rvdraw.h"
 string Decide::Attack()
 {
-    return SK->WalkLib();
     stringstream ss("");
     myPos = WM->getMyPos();
     ballPos = WM->getBallPos();
@@ -95,8 +94,12 @@ string Decide::Attack()
         return SK->sefr(did,tt,false);
     }
 
+
     else if (shouldPlay() && closest==WM->getMyNum() && WM->getMyNum() !=10 && WM->getMyNum()!=11)
     {
+//        cout << "=-=-=-=-=-=--=-=--=-=-=-=-" << endl;
+       
+
         VecPosition dest = VecPosition::givePosition(ball,(goal-ball).getDirection(),0.1);
         VecPosition oppositeTirak ,thisTirak;
         if ( ball.getY() > 0 ){
@@ -224,7 +227,7 @@ string Decide::Attack()
     else if(!(WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Right || WM->getPlayMode() == PM_BeforeKickOff ) )
     {
         Log.Log ( 2 , "Darja Mizadam !" );
-        return SK->finalAction( "darja" ,tFinal);
+//        return SK->finalAction( "darja" ,tFinal);
         return "";
     }
     return ss.str();
