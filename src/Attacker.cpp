@@ -93,7 +93,7 @@ string Decide::Attack()
 
     else if (shouldPlay() && closest==WM->getMyNum() && WM->getMyNum() !=10 && WM->getMyNum()!=11)
     {
-        cout << "=-=-=-=-=-=--=-=--=-=-=-=-" << endl;
+//        cout << "=-=-=-=-=-=--=-=--=-=-=-=-" << endl;
         if (shouldClear ( x,y,s ))
         {
             ACT->setCurrentAct(K, s, x, y);
@@ -149,11 +149,12 @@ string Decide::Attack()
 
         if ( fabs(WM->getMyAngleToBall()) > max(8,min(25,me.getDistanceTo(ball)*20)) )
         {
-            cout << "Turn : " <<  WM->getMyAngleToBall() << endl;
+//            cout << "Turn : " <<  WM->getMyAngleToBall() << endl;
             if (WM->getMyAngleToBall() > 0)
             {
                 if ( c.isInside(me) )
-                    return SK->finalAction("turnL" ,tFinal);
+                    return SK->
+                            finalAction("turnL" ,tFinal);
                 else
                     return SK->finalAction("walkAngleL",tFinal);
 
@@ -167,7 +168,7 @@ string Decide::Attack()
             }
          }
         else if ( c.isInside( me ) && !tri.isInside(me) && fabs(meGoal.getY()) > 0.9){
-            cout <<  "side turning " << endl;
+//            cout <<  "side turning " << endl;
                 if (WM->getMyAngleToGoal() > 0)
                     return SK->finalAction("sideTurnL",tFinal);
                 else

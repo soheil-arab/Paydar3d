@@ -91,20 +91,20 @@ Localize::Localize(WorldModel *wm)
 
 void Localize::test()
 {
-    if(WM->getLastSeenLines().size()>0)
-    {
+//    if(WM->getLastSeenLines().size()>0)
+//    {
 
-        for(vector<line>::iterator l=WM->getLastSeenLines().begin();l!=WM->getLastSeenLines().end();l++)
-        {
-            cout<<"num of lines : "<<WM->getLastSeenLines().size()<<endl;
-            Vector3f beg = l->getBegin();
-            Vector3f end = l->getEnd();
-            beg = PolarToCartecian(beg);
-            end = PolarToCartecian(end);
-            line lcart=line(beg,end);
-            cout<<"beg : " << beg << "end : " <<end <<"---> "<<line_recognitation(lcart)<<endl;
-        }
-    }
+//        for(vector<line>::iterator l=WM->getLastSeenLines().begin();l!=WM->getLastSeenLines().end();l++)
+//        {
+//            cout<<"num of lines : "<<WM->getLastSeenLines().size()<<endl;
+//            Vector3f beg = l->getBegin();
+//            Vector3f end = l->getEnd();
+//            beg = PolarToCartecian(beg);
+//            end = PolarToCartecian(end);
+//            line lcart=line(beg,end);
+//            cout<<"beg : " << beg << "end : " <<end <<"---> "<<line_recognitation(lcart)<<endl;
+//        }
+//    }
 
 
     //    cout<<WM->getFlagGlobal()["F1R"]<<"soheile kalle kiri"<< endl;

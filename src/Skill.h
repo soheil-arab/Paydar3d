@@ -35,6 +35,7 @@ private :
   double Turn60R[24][24];
   double Turn10[12][24];
   double Turn10R[24][24];
+  double getAngle (double spent, double v0, double a, double *v);
 public :
   Skill(WorldModel*);
   string beam ( double x , double y , double ang);
