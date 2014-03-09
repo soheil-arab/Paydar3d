@@ -52,16 +52,13 @@ set(robotoos_SRCS
    main.cpp
 )
 
-
+set(CMAKE_CXX_FLAGS " -pg -I/usr/include/eigen3 -lorocos-kdl")
 
 include_directories(${SPARK_INCLUDE_DIR}  )
-
 
 add_executable(Robotoos3D ${robotoos_SRCS})
 
 target_link_libraries(Robotoos3D)
-
-
 
 install(TARGETS   Robotoos3D        		DESTINATION ${CMAKE_SOURCE_DIR}/bin)
 install(PROGRAMS  start.sh       		DESTINATION ${CMAKE_SOURCE_DIR}/bin)
@@ -71,3 +68,5 @@ install(PROGRAMS  kill.sh        		DESTINATION ${CMAKE_SOURCE_DIR}/bin)
 execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_SOURCE_DIR}/src/ACT ${CMAKE_BINARY_DIR}/src/ACT)
 execute_process(COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/src/start.sh ${CMAKE_BINARY_DIR}/src/start.sh)
 execute_process(COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/src/kill.sh ${CMAKE_BINARY_DIR}/src/kill.sh)
+
+

@@ -35,7 +35,7 @@ void Logger::Log ( int level , const char *format,...)
     string end (buffer);
     if ( type == LOG_STD )
     {
-//        cout  << cycle << " :"<< end << endl;
+        cout  << cycle << " :"<< end << endl;
     }
     else if ( !file )
     {

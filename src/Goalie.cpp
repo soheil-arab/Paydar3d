@@ -27,7 +27,7 @@ string Decide::goalie()
     static double df=0;
     Command com;
     double x,y,ang;
-    double angleToFront=WM->getMyAngleTo(myPos+Vector3f(1,0,0));
+    double angleToFront=WM->getMyAngleTo(myPos+salt::Vector3f(1,0,0));
     VecPosition Bball=VecPosition::givePosition(ball,(VecPosition(WM->getFieldLength()/2,0)-ball).getDirection(),-0.15);
     Rect r1(VecPosition(-WM->getFieldLength()/2,1.5),VecPosition(-WM->getFieldLength()/2+2.5,-1.5));
     string sa;
@@ -104,12 +104,12 @@ string Decide::goalie()
     }
     else
     {
-        if (shouldClear ( x,y,s ) )
-        {
-            tFinal=0;
-            ACT->setCurrentAct(K,s,x,y);
-        }
-        else if (shouldPlay() && (r1.isInside(ball) || me.getDistanceTo(ball)<0.4) && WM->getClosestOurToBall()==WM->getMyNum())
+//        if (shouldClear ( x,y,s ) )
+//        {
+//            tFinal=0;
+//            ACT->setCurrentAct(K,s,x,y);
+//        }
+        if (shouldPlay() && (r1.isInside(ball) || me.getDistanceTo(ball)<0.4) && WM->getClosestOurToBall()==WM->getMyNum())
         {
             return moveToPosP(true,ball-VecPosition(0.2,0),tFinal);
         }

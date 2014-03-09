@@ -8,7 +8,7 @@ class Decide
 private:
   WorldModel *WM;
   Skill *SK;
-  Vector3f myPos, ballPos;
+  salt::Vector3f myPos, ballPos;
   VecPosition center;
   Act *ACT;
   bool beamed;
@@ -24,7 +24,7 @@ public:
   string Deffend();
   string Middle();
   bool canShoot(double &dx, double &dy,string &side);
-  bool shouldClear(double&, double&,SideT&);
+  bool shouldClear(double&, double&,SideT&,Triangle t);
   bool shouldShoot(double&, double&,SideT&);
   bool canBackShoot(string &);
   bool shouldTurn90(string &);
@@ -43,7 +43,7 @@ public:
   bool shouldSSideWalk(SideT &side);
   bool isBackOfBall(VecPosition);
   bool isInCone(double dWidth, VecPosition start , VecPosition end, VecPosition pos);
-  bool objectIsInCone(double dWidth, VecPosition start, VecPosition end,Vector3f &posobj, object ob=OBJECT_BALL);
+  bool objectIsInCone(double dWidth, VecPosition start, VecPosition end,salt::Vector3f &posobj, object ob=OBJECT_BALL);
   int minDistToMeInArray(int [],int,bool);
   string moveToPos(VecPosition,double,bool&);
   VecPosition defendpositioning();

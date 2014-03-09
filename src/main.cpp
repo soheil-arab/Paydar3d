@@ -109,6 +109,11 @@ int main(int argc, char *argv[])
         string dec ;
         while (1)
         {
+            timespec *start, *end;
+            start = new timespec;
+            end = new timespec;
+            clock_gettime(CLOCK_REALTIME, start); // Works on Linux
+
             dec = "";
             ///~ Receive Message From server
             sockClient->receive(get);
@@ -122,6 +127,10 @@ int main(int argc, char *argv[])
             dec = DC->decide();
             ///~ And Send It To Server
             sockClient->send(dec) ;
+            clock_gettime(CLOCK_REALTIME, end); // Works on Linux
+
+            cout << ( end->tv_nsec - start->tv_nsec  )/1000000000.0 << endl;
+
 
         }
         ///~ Close Connection

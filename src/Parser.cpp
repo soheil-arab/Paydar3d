@@ -1,5 +1,6 @@
 #include "Parser.h"
 #include "rvdraw.h"
+#include <sys/time.h>
 
 Parser::Parser(WorldModel *wm)
 {
@@ -32,6 +33,9 @@ Parser::Parser(WorldModel *wm)
  * */
 void Parser::Parse(string &msg)
 {
+
+
+
 //    cout << msg << endl;
     for ( int i = 0; i<msg.length(); i++)
         if ( msg[i]=='(' || msg[i]==')')
@@ -293,8 +297,6 @@ void Parser::Parse(string &msg)
             }
         }
 
-
-
         pos = msg.find("P",pos+1);
 
     }
@@ -408,14 +410,6 @@ void Parser::Parse(string &msg)
 
             }
         }
-        //cout << "LL " << msg1 << " " <<  msg1.size() << endl;
-        //if (msg1.size() == 1)
-        //;
-        //else
-        //msg1="0";
-        //cout << "LL " << msg1 << " " << msg1.size() << endl;
-
-
     }
 
     pos = msg.find("mypos");

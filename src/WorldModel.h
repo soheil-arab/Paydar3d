@@ -10,6 +10,7 @@
 #include "Math.h"
 #include "Logger.h"
 #include "line.h"
+
 using namespace std;
 class WorldModel
 {

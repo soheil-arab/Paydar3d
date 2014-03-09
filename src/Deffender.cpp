@@ -93,11 +93,11 @@ string Decide::Deffend()
     }
     else if (shouldPlay() && parseBallPos()==WM->getMyNum())
     {
-        if (shouldClear ( x,y,s ))
-        {
-            ACT->setCurrentAct(K, s, x, y);
-            tFinal=0;
-        }
+//        if (shouldClear ( x,y,s ))
+//        {
+//            ACT->setCurrentAct(K, s, x, y);
+//            tFinal=0;
+//        }
         ////////decide/////////
         return moveToPosP(true,ball-VecPosition(0.2,0),tFinal);
 
@@ -105,9 +105,9 @@ string Decide::Deffend()
     else if(me.getDistanceTo(defendpositioning())>0.1 && shouldPlay2())
         return moveToPosP(false,defendpositioning(),tFinal);
     ////////////positioning///////////////////
-    else if(fabs(WM->getMyAngleTo(myPos+Vector3f(1,0,0)))>15 && shouldPlay2())
+    else if(fabs(WM->getMyAngleTo(myPos+salt::Vector3f(1,0,0)))>15 && shouldPlay2())
     {
-        if(WM->getMyAngleTo(myPos+Vector3f(1,0,0))>0)
+        if(WM->getMyAngleTo(myPos+salt::Vector3f(1,0,0))>0)
         {
             return SK->finalAction("turnL",tFinal);
         }
