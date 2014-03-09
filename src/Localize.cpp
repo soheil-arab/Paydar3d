@@ -203,6 +203,8 @@ double Localize::Distance_Cartesian_Point_Line(Vector3f point_cartesian,line l)
 
 
 
+
+
 string Localize::line_recognitation(line line_to_detect)
 {
     double min=1000;
