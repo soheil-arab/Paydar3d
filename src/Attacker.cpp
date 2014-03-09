@@ -98,11 +98,7 @@ string Decide::Attack()
     else if (shouldPlay() && closest==WM->getMyNum() && WM->getMyNum() !=10 && WM->getMyNum()!=11)
     {
 //        cout << "=-=-=-=-=-=--=-=--=-=-=-=-" << endl;
-        if (shouldClear ( x,y,s ))
-        {
-            ACT->setCurrentAct(K, s, x, y);
-            tFinal=0;
-        }
+       
 
         VecPosition dest = VecPosition::givePosition(ball,(goal-ball).getDirection(),0.1);
         VecPosition oppositeTirak ,thisTirak;
