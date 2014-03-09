@@ -74,7 +74,7 @@ double Decide::goaliepositioning()
 
 
 
-bool Decide::shouldClear(double &dx, double &dy,SideT &side)
+bool Decide::shouldClear(double &dx, double &dy,SideT &side,Triangle t)
 {
     myPos = WM->getMyPos();
     ballPos = WM->getBallPos();
@@ -90,6 +90,10 @@ bool Decide::shouldClear(double &dx, double &dy,SideT &side)
     Rect O_P_A(VecPosition(-15,1.1),VecPosition(-13.2,-1.1));
     VecPosition p1,p2;
 
+    if ( me.getX() >  2 && !t.isInside(me))
+    {
+        return false;
+    }
     if ( WM->getMyAngleToBall()  < 0 )
         side = Right;
     else
@@ -258,7 +262,7 @@ bool Decide::isInCone(double dWidth, VecPosition start , VecPosition end, VecPos
     return false;
 }
 ///////////////////////////////////////////////////////////////////////
-bool Decide::objectIsInCone(double dWidth, VecPosition start , VecPosition end,Vector3f &posobj, object ob)
+bool Decide::objectIsInCone(double dWidth, VecPosition start , VecPosition end,salt::Vector3f &posobj, object ob)
 {
     myPos = WM->getMyPos();
     ballPos = WM->getBallPos();
@@ -349,7 +353,7 @@ bool Decide::objectIsInCone(double dWidth, VecPosition start , VecPosition end,V
     
     int o=minDistToMeInArray(numopp,ko,true);
     int t=minDistToMeInArray(numteam,kt,false);
-    posobj=Vector3f(0,0,0);
+    posobj=salt::Vector3f(0,0,0);
     if(o!=0 && t!=0){
         if(me.getDistanceTo(VecPosition(WM->getOppPos(o).x(),WM->getOppPos(o).y()))<me.getDistanceTo(VecPosition(WM->getOurPos(t).x(),WM->getOurPos(t).y()))   )
             posobj=WM->getOppPos(o);
@@ -475,8 +479,8 @@ bool Decide::shback()
 string Decide::moveToPosP(bool nearball,VecPosition endpos,double &tFinal){
     VecPosition ball(WM->getBallPos().x(),WM->getBallPos().y());
     VecPosition me(WM->getMyPos().x(),WM->getMyPos().y());
-    Vector3f    endPos(endpos.getX(),endpos.getY(),0);
-    Vector3f    posincone(0,0,0);
+    salt::Vector3f    endPos(endpos.getX(),endpos.getY(),0);
+    salt::Vector3f    posincone(0,0,0);
     VecPosition frontpos=VecPosition::givePosition(me,VecPosition::normalizeAngle(WM->getMyAngle()),0.6);
     bool        frontcon=objectIsInCone(tanDeg(70),me,frontpos,posincone,OBJECT_PLAYERS_NO_GOALIE);
     frontcon=false;
@@ -564,8 +568,8 @@ string Decide::moveToPosP(bool nearball,VecPosition endpos,double &tFinal){
 string Decide::moveToPosition(VecPosition endpos,double &tFinal){
     VecPosition ball(WM->getBallPos().x(),WM->getBallPos().y());
     VecPosition me(WM->getMyPos().x(),WM->getMyPos().y());
-    Vector3f    endPos(endpos.getX(),endpos.getY(),0);
-    Vector3f    posincone(0,0,0);
+    salt::Vector3f    endPos(endpos.getX(),endpos.getY(),0);
+    salt::Vector3f    posincone(0,0,0);
     VecPosition frontpos=VecPosition::givePosition(me,VecPosition::normalizeAngle(WM->getMyAngle()),0.7);
     bool        frontcon=objectIsInCone(tanDeg(70),me,frontpos,posincone,OBJECT_PLAYERS_NO_GOALIE);
     frontcon=false;
@@ -585,9 +589,9 @@ string Decide::moveToPosition(VecPosition endpos,double &tFinal){
         dist2=true;
     if(me.getDistanceTo(endpos)<0.2)
         dist2=false;
-    if(fabs(WM->getMyAngleTo(WM->getMyPos()+Vector3f(0.5,0,0)))>25)
+    if(fabs(WM->getMyAngleTo(WM->getMyPos()+salt::Vector3f(0.5,0,0)))>25)
         angjolo=true;
-    if(fabs(WM->getMyAngleTo(WM->getMyPos()+Vector3f(0.5,0,0)))<5)
+    if(fabs(WM->getMyAngleTo(WM->getMyPos()+salt::Vector3f(0.5,0,0)))<5)
         angjolo=false;
     if(me.getDistanceTo(endpos)>3)
         door=true;
@@ -634,7 +638,7 @@ string Decide::moveToPosition(VecPosition endpos,double &tFinal){
         if(angjolo && dist2)
         {
             //cout<<"turn1\n";
-            if(WM->getMyAngleTo(WM->getMyPos()+Vector3f(0.5,0,0))<0)
+            if(WM->getMyAngleTo(WM->getMyPos()+salt::Vector3f(0.5,0,0))<0)
                 return SK->finalAction("turnR",tFinal);
             else
                 return SK->finalAction("turnL",tFinal);
@@ -678,11 +682,11 @@ string Decide::moveToNearBall(double &tFinal)
 {
     VecPosition ball(WM->getBallPos().x(),WM->getBallPos().y());
     VecPosition me(WM->getMyPos().x(),WM->getMyPos().y());
-    Vector3f    posincone(0,0,0);
+    salt::Vector3f    posincone(0,0,0);
     VecPosition frontpos=VecPosition::givePosition(me,VecPosition::normalizeAngle(WM->getMyAngle()),0.6);
     bool        frontcon=objectIsInCone(tanDeg(70),me,frontpos,posincone,OBJECT_PLAYERS_NO_GOALIE);
-    double      ang=fabs(WM->getMyAngleTo(Vector3f(14.5,0,0)));
-    double      ang2=fabs(WM->getMyAngleTo(Vector3f(15.5,0,0)));
+    double      ang=fabs(WM->getMyAngleTo(salt::Vector3f(14.5,0,0)));
+    double      ang2=fabs(WM->getMyAngleTo(salt::Vector3f(15.5,0,0)));
     double      angGoal;
     if(ball.getX()>13 && fabs(ball.getY())<1.2)
         angGoal=ang2;
@@ -1072,12 +1076,12 @@ string Decide::mvPos(VecPosition pos,bool isball,double &tFinal,double ang,bool 
     if(!n1)
     {
 n1:
-        if(me.getDistanceTo(pos)>0.4 && fabs(WM->getMyAngleTo(Vector3f(pos.getX(),pos.getY(),0)))<35)
+        if(me.getDistanceTo(pos)>0.4 && fabs(WM->getMyAngleTo(salt::Vector3f(pos.getX(),pos.getY(),0)))<35)
         {
             //cout<<"! n11\n";
-            if(fabs(WM->getMyAngleTo(Vector3f(pos.getX(),pos.getY(),0)))>10)
+            if(fabs(WM->getMyAngleTo(salt::Vector3f(pos.getX(),pos.getY(),0)))>10)
             {
-                if(WM->getMyAngleTo(Vector3f(pos.getX(),pos.getY(),0))<0)
+                if(WM->getMyAngleTo(salt::Vector3f(pos.getX(),pos.getY(),0))<0)
                 {
                     return SK->finalAction("walkAngleR",tFinal);
                 }
@@ -1091,10 +1095,10 @@ n1:
                 return SK->finalAction("walk",tFinal);
             }
         }
-        else if(fabs(WM->getMyAngleTo(Vector3f(pos.getX(),pos.getY(),0)))>30 && fabs(WM->getMyAngleTo(Vector3f(pos.getX(),pos.getY(),0)))<90)
+        else if(fabs(WM->getMyAngleTo(salt::Vector3f(pos.getX(),pos.getY(),0)))>30 && fabs(WM->getMyAngleTo(salt::Vector3f(pos.getX(),pos.getY(),0)))<90)
         {
             //cout<<"! n12\n";
-            if(WM->getMyAngleTo(Vector3f(pos.getX(),pos.getY(),0))>0)
+            if(WM->getMyAngleTo(salt::Vector3f(pos.getX(),pos.getY(),0))>0)
             {
                 return SK->finalAction("turnL",tFinal);
             }
@@ -1103,12 +1107,12 @@ n1:
                 return SK->finalAction("turnR",tFinal);
             }
         }
-        else if(me.getDistanceTo(pos)>0.4 && fabs(WM->getMyAngleTo(Vector3f(pos.getX(),pos.getY(),0)))>145 && fabs(WM->getMyAngleTo(Vector3f(pos.getX(),pos.getY(),0)))<180)
+        else if(me.getDistanceTo(pos)>0.4 && fabs(WM->getMyAngleTo(salt::Vector3f(pos.getX(),pos.getY(),0)))>145 && fabs(WM->getMyAngleTo(salt::Vector3f(pos.getX(),pos.getY(),0)))<180)
         {
             //cout<<"! n13\n";
-            if(fabs(WM->getMyAngleTo(Vector3f(pos.getX(),pos.getY(),0)))>25)
+            if(fabs(WM->getMyAngleTo(salt::Vector3f(pos.getX(),pos.getY(),0)))>25)
             {
-                if(WM->getMyAngleTo(Vector3f(pos.getX(),pos.getY(),0))>0)
+                if(WM->getMyAngleTo(salt::Vector3f(pos.getX(),pos.getY(),0))>0)
                 {
                     return SK->finalAction("bwalkAngleL",tFinal);
                 }
@@ -1122,10 +1126,10 @@ n1:
                 return SK->finalAction("bwalk",tFinal);
             }
         }
-        else if(fabs(WM->getMyAngleTo(Vector3f(pos.getX(),pos.getY(),0)))<150 && fabs(WM->getMyAngleTo(Vector3f(pos.getX(),pos.getY(),0)))>90)
+        else if(fabs(WM->getMyAngleTo(salt::Vector3f(pos.getX(),pos.getY(),0)))<150 && fabs(WM->getMyAngleTo(salt::Vector3f(pos.getX(),pos.getY(),0)))>90)
         {
             //cout<<"! n14\n";
-            if(WM->getMyAngleTo(Vector3f(pos.getX(),pos.getY(),0))>0)
+            if(WM->getMyAngleTo(salt::Vector3f(pos.getX(),pos.getY(),0))>0)
             {
                 return SK->finalAction("turnL",tFinal);
             }
@@ -1297,11 +1301,11 @@ n1:
                 return SK->finalAction("bwalk",tFinal);
             }
         }
-        else if(me.getDistanceTo(ball)>0.4 && fabs(WM->getMyAngleTo(Vector3f(pos.getX(),pos.getY(),0)))<45)
+        else if(me.getDistanceTo(ball)>0.4 && fabs(WM->getMyAngleTo(salt::Vector3f(pos.getX(),pos.getY(),0)))<45)
         {
-            if(fabs(WM->getMyAngleTo(Vector3f(pos.getX(),pos.getY(),0)))>10)
+            if(fabs(WM->getMyAngleTo(salt::Vector3f(pos.getX(),pos.getY(),0)))>10)
             {
-                if(WM->getMyAngleTo(Vector3f(pos.getX(),pos.getY(),0))<0)
+                if(WM->getMyAngleTo(salt::Vector3f(pos.getX(),pos.getY(),0))<0)
                 {
                     return SK->finalAction("walkAngleR",tFinal);
                 }
@@ -1700,9 +1704,9 @@ n1:
         else if(!Xa && me.getX()>ball.getX() && fabs(WM->getMyAngleToGoal())<70)
         {
             //cout<<"isball6\n";
-            if(fabs(WM->getMyAngleTo(Vector3f(ball.getX(),ball.getY(),0)))<145 && fabs(ball.getX()-me.getX())>0.4 )
+            if(fabs(WM->getMyAngleTo(salt::Vector3f(ball.getX(),ball.getY(),0)))<145 && fabs(ball.getX()-me.getX())>0.4 )
             {
-                if(WM->getMyAngleTo(Vector3f(ball.getX(),ball.getY(),0))<0)
+                if(WM->getMyAngleTo(salt::Vector3f(ball.getX(),ball.getY(),0))<0)
                 {
                     return SK->finalAction("bwalkAngleL",tFinal);
                 }

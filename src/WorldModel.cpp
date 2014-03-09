@@ -282,7 +282,7 @@ void WorldModel::brinBeMA(){
         }
 
         Vector3f poss = flagGlobal[i->first] - headRotate.Rotate(i->second);
-        RVDraw::instance()->drawLine(sensedPos,sensedPos+headRotate.Rotate(i->second),GREEN,numberOfFlags);
+//        RVDraw::instance()->drawLine(sensedPos,sensedPos+headRotate.Rotate(i->second),GREEN,numberOfFlags);
 
         myPos += poss;
         numberOfFlags++;
@@ -312,7 +312,7 @@ void WorldModel::brinBeMA(){
         setSpeed((myPos-mylastPos)*50);
 
         setMyPos(myPos);
-        setMyAngle(Rad2Deg(gArcTan(newx.y()/newx.x())));
+//        setMyAngle(Rad2Deg(gArcTan(newx.y()/newx.x())));
         //        RVDraw::instance()->drawVector3f(myPos,GREEN,posN);
         if ( ballLastSeen == serverTime )          /// if See Ball In This Cycle Set Its Pos !
         {

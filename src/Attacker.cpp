@@ -10,6 +10,7 @@
    R   R   OOOOO   BBBBB    OOOOO     T      OOOOO   OOOOO  SSSSS
 */
 #include "Decide.h"
+#include "Geom.h"
 #include "rvdraw.h"
 string Decide::Attack()
 {
@@ -73,11 +74,13 @@ string Decide::Attack()
 
     /////////////////////////////////////////////////////////////
     int closest = parseBallPos();
-//    cout <<"closest : "<<closest<<endl;
+
     if (!ACT->isDone())
     {
         ss << ACT->doCurrentAct();
         tFinal=0;
+        Log.Log(2,"Doing Current Act");
+        return ss.str();
     }
     else if ((shouldStandUp(com, s)))
     {
@@ -86,6 +89,7 @@ string Decide::Attack()
     }
     else if(!did && !shouldPlay2())
     {
+        Log.Log(2,"Sefring");
         tFinal=0;
         return SK->sefr(did,tt,false);
     }
@@ -123,7 +127,7 @@ string Decide::Attack()
 
         VecPosition meGoal = meBall.getIntersection(goalLine);
 
-        Circle c(dest,0.6);
+        Circle c(dest,0.3);
 
         VecPosition i11,i12,i21,i22,finalPos1,finalPos2;
 
@@ -140,45 +144,75 @@ string Decide::Attack()
         else
             finalPos2 = i22;
 
-//        cout << finalPos1.getDistanceTo(finalPos2) << endl;
+
         Triangle tri(ball,finalPos1,finalPos2);
         RVDraw::instance()->drawLine(oppositeTirak,finalPos1,RED,5);
         RVDraw::instance()->drawLine(thisTirak,finalPos2,RED,6);
         RVDraw::instance()->drawLine(finalPos1,finalPos2,RED,7);
         RVDraw::instance()->drawCircle(ballPos,c.getRadius(),GREEN,8);
+        RVDraw::instance()->drawLine(me,ball,YELLO,9);
+        RVDraw::instance()->drawLine(me,VecPosition::givePosition(me,WM->getMyAngle(),1),BLUE,10);
 
-        if ( fabs(WM->getMyAngleToBall()) > max(8,min(25,me.getDistanceTo(ball)*20)) )
+        double thresh = max(7,min(20 ,me.getDistanceTo(ball)*20));
+
+        if (shouldClear ( x,y,s,tri ))
         {
-//            cout << "Turn : " <<  WM->getMyAngleToBall() << endl;
-            if (WM->getMyAngleToBall() > 0)
-            {
-                if ( c.isInside(me) )
-                    return SK->
-                            finalAction("turnL" ,tFinal);
-                else
-                    return SK->finalAction("walkAngleL",tFinal);
+            ACT->setCurrentAct(K, s, x, y);
+            tFinal=0;
+        }
 
+        if ( fabs(WM->getMyAngleToBall()) >  thresh )
+        {
+            if ( c.isInside(me) )
+            {
+                Log.Log(2,"Turning");
+                if ( WM->getMyAngleToBall() > 0 )
+                    return SK->finalAction("turnL" ,tFinal);
+                else
+                    return SK->finalAction("turnR" ,tFinal);
+            }
+            double backAng = VecPosition::normalizeAngle( WM->getMyAngleToBall()+180 );
+
+            cout << "threshold" << thresh <<" angle to ball :  " << WM->getMyAngleToBall() <<" my angle : " << WM->getMyAngle() << endl;
+
+            if ( fabs(backAng)  < 8 )
+            {
+                Log.Log(2,"BackWalking");
+                return SK->finalAction("bwalk",tFinal);
+            }
+           else if ( VecPosition::normalizeAngle( backAng )  < 20  && VecPosition::normalizeAngle( backAng)  > 0){
+                Log.Log(2,"BackWalking In AngleL");
+                return SK->finalAction("bwalkAngleL",tFinal);
+            }
+            else if ( VecPosition::normalizeAngle( backAng )  > -20  && VecPosition::normalizeAngle( backAng )  < 0 )
+            {
+                Log.Log(2,"BackWalking In AngleR");
+                return SK->finalAction("bwalkAngleR",tFinal);
+            }
+            else if (WM->getMyAngleToBall() > 0){
+                Log.Log(2,"Walking Angle L");
+                return SK->finalAction("walkAngleL",tFinal,1);
             }
             else{
-                if ( c.isInside(me) )
-                    return SK->finalAction("turnR" ,tFinal);
-                else
-                    return SK->finalAction("walkAngleR",tFinal);
-
+                    Log.Log(2,"Walking Angle R");
+                    return SK->finalAction("walkAngleR",tFinal,1);
             }
          }
         else if ( c.isInside( me ) && !tri.isInside(me) && fabs(meGoal.getY()) > 0.9){
-//            cout <<  "side turning " << endl;
+            Log.Log(2,"Side Turn");
                 if (WM->getMyAngleToGoal() > 0)
                     return SK->finalAction("sideTurnL",tFinal);
                 else
                     return SK->finalAction("sideTurnR",tFinal);
         }
         else
-            return SK->finalAction("walk",tFinal);
+        {
+            Log.Log(2,"Walk");
+            return SK->finalAction("walk",tFinal,1);
+        }
     }
     else if(me.getDistanceTo(attackpositioning())>0.1 && shouldPlay2()  && WM->getMyNum() !=10 && WM->getMyNum()!=11){
-        Vector3f vec(attackpositioning().getX(),attackpositioning().getY(),0);
+        salt::Vector3f vec(attackpositioning().getX(),attackpositioning().getY(),0);
         return moveToPosP(false,attackpositioning(),tFinal);
     }
     else if(fabs(WM->getMyAngleTo(WM->getBallPos()))>15 && shouldPlay2())
@@ -197,7 +231,7 @@ string Decide::Attack()
     else if(!(WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Right || WM->getPlayMode() == PM_BeforeKickOff ) )
     {
         Log.Log ( 2 , "Darja Mizadam !" );
-//        return SK->finalAction( "darja" ,tFinal);
+        return SK->finalAction( "darja" ,tFinal);
         return "";
     }
     return ss.str();

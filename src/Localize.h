@@ -9,9 +9,9 @@ using namespace std;
 class Localize{
 public:
     Localize(WorldModel*);
-    double Distance_Polar_Point_Line(Vector3f point_polar,line l);
-    double Distance_Cartesian_Point_Line(Vector3f point_polar,line l);
-    Vector3f calcPlaneNormal(vector<Vector3f> planePoints);
+    double Distance_Polar_Point_Line(salt::Vector3f point_polar,line l);
+    double Distance_Cartesian_Point_Line(salt::Vector3f point_polar,line l);
+    salt::Vector3f calcPlaneNormal(vector<salt::Vector3f> planePoints);
     string line_recognitation(line line_to_detect);
 
     void test();

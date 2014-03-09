@@ -1,9 +1,5 @@
 #include "Skill.h"
 #include "Skill.h"
-
-void fk (double, double);
-
-
 Skill::Skill(WorldModel*wm)
 {
     WM=wm;
@@ -165,6 +161,38 @@ Skill::Skill(WorldModel*wm)
             f >> standingB[i][j];
         }
     f.close();
+
+
+    rHipYawPitch = KDL::Joint(KDL::Vector(0,0,0),KDL::Vector(0.707,0.0,-0.707),KDL::Joint::RotAxis);
+    rHipRoll = KDL::Joint(KDL::Vector(0,0,0),KDL::Vector(0,-1,0),KDL::Joint::RotAxis);
+    rHipPitch = KDL::Joint(KDL::Vector(0,-0.01,0.04),KDL::Vector(-1,0,0),KDL::Joint::RotAxis);
+    rKneePitch = KDL::Joint(KDL::Vector(0,-0.01,0.045),KDL::Vector(-1,0,0),KDL::Joint::RotAxis);
+    rAnklePitch = KDL::Joint(KDL::Vector(0.0,0.0,0.0),KDL::Vector(-1,0,0),KDL::Joint::RotAxis);
+    rAnkleRoll = KDL::Joint(KDL::Vector(0,0,0),KDL::Vector(0,-1,0),KDL::Joint::RotAxis);
+
+
+    rLeg.addSegment(KDL::Segment("rAnkleRoll",rAnkleRoll,KDL::Frame(KDL::Vector(0,0.0,0.0))));
+    rLeg.addSegment(KDL::Segment("rAnklePitch",rAnklePitch,KDL::Frame(KDL::Vector(0,0.01,0.055))));
+    rLeg.addSegment(KDL::Segment("rKneePitch",rKneePitch,KDL::Frame(KDL::Vector(0,-0.005,0.125))));
+    rLeg.addSegment(KDL::Segment("rHipPitch",rHipPitch,KDL::Frame(KDL::Vector(0,-0.01,0.04))));
+    rLeg.addSegment(KDL::Segment("rHipRoll",rHipRoll,KDL::Frame(KDL::Vector(0,0,0))));
+    rLeg.addSegment(KDL::Segment("rHipYawPitch",rHipYawPitch,KDL::Frame(KDL::Vector(0.0,0.0,0.0))));
+
+
+    lHipYawPitch = KDL::Joint(KDL::Vector(0,0,0),KDL::Vector(-0.707,0.0,-0.707),KDL::Joint::RotAxis);
+    lHipRoll = KDL::Joint(KDL::Vector(0,0,0),KDL::Vector(0,1,0),KDL::Joint::RotAxis);
+    lHipPitch = KDL::Joint(KDL::Vector(0,-0.01,0.04)+KDL::Vector(0,0.01,-0.04),KDL::Vector(1,0,0),KDL::Joint::RotAxis);
+    lKneePitch = KDL::Joint(KDL::Vector(0,-0.01,0.045)+KDL::Vector(0,0.005,-0.125),KDL::Vector(1,0,0),KDL::Joint::RotAxis);
+    lAnkleRoll = KDL::Joint(KDL::Vector(0,-0.03,0.035)+KDL::Vector(0,0.03,-0.035),KDL::Vector(0,1,0),KDL::Joint::RotAxis);
+    lAnklePitch = KDL::Joint(KDL::Vector(0.0,0.0,0.0)+KDL::Vector(0,-0.01,-0.055),KDL::Vector(1,0,0),KDL::Joint::RotAxis);
+
+    lLeg.addSegment(KDL::Segment("lHipYawPitch",lHipYawPitch,KDL::Frame(KDL::Vector(0.0,0.0,0.0))));
+    lLeg.addSegment(KDL::Segment("lHipRoll",lHipRoll,KDL::Frame(KDL::Vector(0,0,0))));
+    lLeg.addSegment(KDL::Segment("lHipPitch",lHipPitch,KDL::Frame(KDL::Vector(0,0.01,-0.04))));
+    lLeg.addSegment(KDL::Segment("lKneePitch",lKneePitch,KDL::Frame(KDL::Vector(0,0.005,-0.125))));
+    lLeg.addSegment(KDL::Segment("lAnklePitch",lAnklePitch,KDL::Frame(KDL::Vector(0,-0.01,-0.055))));
+    lLeg.addSegment(KDL::Segment("lAnkleRoll",lAnkleRoll,KDL::Frame(KDL::Vector(0,0.0,0.0))));
+
 
 }
 
@@ -499,7 +527,8 @@ string Skill::beam(double x, double y, double ang)
 ///                             Say Ball Pos
 ///~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-string Skill::sayBallPos () {
+string Skill::sayBallPos ()
+{
     stringstream ss;
     ss << "(say "<< WM->getClosestOurToBall() << WM->getClosestOurToBall() << WM->getClosestOurToBall() <<")";
     return ss.str();
@@ -974,306 +1003,259 @@ bool Skill::isPossible(double l4)
     return false;
 }
 ///////////////////////////////////////////////////////////////////
-string Skill::shootR (bool &canshoot,bool &done,double &tFinal) {
-
-//    VecPosition me(WM->getMyPos().x(),WM->getMyPos().y());
-//    VecPosition ball(WM->getBallPos().x(),WM->getBallPos().y());
-//    static bool ne=true;
-//    static VecPosition H = FK_FOOT_HIP (-65 , 45 ) ;
-//    VecPosition pos=VecPosition::givePosition(ball,VecPosition::normalizeAngle(WM->getMyAngle()),-0.01);
-//    double x1 =0.002 , y1 =0.0  ;
-//    double x2 = H.getX() , y2 =H.getY();
-//    double r3,r4,r5,l3,l4,l5;
-//    double P = 0.2 ;
-//    canshoot=IK_ALL ( VecPosition(x2,y2) , VecPosition ( x1 , y1) ,r3,r4,r5,l3,l4,l5);
-
+string Skill::shootR (bool &canshoot,bool &done,double &tFinal)
+{
     WM->setZ(0.54);
     stringstream ss("");
+    VecPosition me(WM->getMyPos().x(),WM->getMyPos().y());
+    VecPosition ball(WM->getBallPos().x(),WM->getBallPos().y());
+    static bool ne=true;
     static double t= 0;
     static bool did=false;
     static double tt=0;
+    static VecPosition H = FK_FOOT_HIP (-65 , 45 ) ;
+    VecPosition pos=VecPosition::givePosition(ball,VecPosition::normalizeAngle(WM->getMyAngle()),-0.01);
+    double x1 =0.002 , y1 =0.0  ;
+    double x2 = H.getX() , y2 =H.getY();
     double lj3 = WM->getJointAngle ( "lle3" ) ;
     double lj4 = WM->getJointAngle ( "lle4" ) ;
     double lj5 = WM->getJointAngle ( "lle5" ) ;
     double rj3 = WM->getJointAngle ( "rle3" ) ;
     double rj4 = WM->getJointAngle ( "rle4" ) ;
     double rj5 = WM->getJointAngle ( "rle5" ) ;
+    double r3,r4,r5,l3,l4,l5;
+    double P = 0.2 ;
+    static int id=0;
     static bool sw=true;
-    static double sideW;
+    canshoot=IK_ALL ( VecPosition(x2,y2) , VecPosition ( x1 , y1) ,r3,r4,r5,l3,l4,l5);
 
+    if( t>1.7 || me.getDistanceTo(ball)>0.4)
+    {
+        id=0;
+    }
 
-    double t1 = 0.32, t2 = 0.52, t3 = 1.22, t4 = 1.24, t5 = 1.74;
-
-    if ( WM->isFeltDown() || t>=t5) {
-        sideW = 0; t = 0; done = true;
-        sw=true; did=false; tt=0;
+    if ( WM->isFeltDown() || t>1.76 || (me.getDistanceTo(ball)>0.25 && id<35))
+    {
+        t = 0;
+        done = true;
+        sw=true;
+        did=false;
+        tt=0;
         return ss.str();
     }
-
+    if(me.getDistanceTo(ball)<0.17 && id<18 && !(WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Right ))
+    {
+        /// Shoot 2
+        ne=true;
+    }
+    else if((me.getDistanceTo(ball)>0.17 && id<18) || (WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Right))
+    {
+        /// Shoot 1
+        ne=false;
+    }
+    if(fabs(WM->getMyAngleToGoal())>5 && sw && !(WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Right) && me.getX()>-1 )
+    {
+        if(WM->getMyAngleToGoal()>0)
+        {
+            return finalAction("turnL",tFinal);
+        }
+        else
+        {
+            return finalAction("turnR",tFinal);
+        }
+    }
+    id++;
     sw=false;
 
-//    cout << "Amin: ShootR, Joints: " << rj3 << " " << rj4 << " " << rj5 << " " << lj3 << " " << lj4 << " " << lj5 << endl;
-
-
-    if (sideW < 0.8) {
-        sideW += 0.02;
-        static double a;
-        return finalAction("sideWalkR", a);
-    }
-
-    if(!did && t<0.2) {
+    if(!did && t<0.1)
+    {
         ss<<sefr(did,tt,false);
         return ss.str();
     }
 
     t+=0.02;
-
-
-    if(t < t1) {
-        ss<<moveJoint("lle2",-1.2)<<moveJoint("rle2",-1.2)<<moveJoint("lle6",1.2)<<moveJoint("rle6",1.2);
+    if(t<0.3)
+    {
+        ss<<moveJoint("lle2",-1)<<moveJoint("rle2",-1)<<moveJoint("lle6",1)<<moveJoint("rle6",1);
         return ss.str();
-    } else if(t < t2) {
+    }
+    else if(t<0.45)
+    {
         did=false;
         tt=0;
-        ss<<moveJoint("rle3",2.5)<<moveJoint("rle4",-5)<<moveJoint("rle5",4.25)<<moveJoint("rle2", -0.4);
-//        cout<<"Amin: t2->"<<rj3<<" "<<rj4<<" "<<rj5<<" "<<lj3<<endl;
-
+        ss<<moveJoint("lle2",0)<<moveJoint("rle3",2)<<moveJoint("rle4",-4)<<moveJoint("rle5",3.5);
         return ss.str();
-    } else if (t < t3) {
-        double r3 = 0.02*(-25-rj3)/(t3-t);
-        double r4 = 0.02*(-130-rj4)/(t3-t);
-        double l3 = 0.02*(25-lj3)/(t3-t);
-        double r5 = 0.02*(75-rj5)/(t3-t);
-
-
-//        cout<<"Amin: t3->"<<r3<<" "<<r4<<" "<<r5<<" "<<l3<<endl;
-        ss<<moveJoint("rle3",r3)<<moveJoint("rle4",r4)<<moveJoint("rle5",r5)<<moveJoint("lle3" , l3);
-    } else if (t < t4) {
-        double r3 = 0.02*(20-rj3)/(t4*t4-t*t);
-        double r4 = 0.02*(-40-rj4)/(t4*t4-t*t);
-        double l3 = 0.02*(-lj3)/(t4*t4-t*t);
-        double r5 = 0.02*(20-rj5)/(t4*t4-t*t );
-//        cout<<"Amin: t4->"<<r3<<" "<<r4<<" "<<r5<<" "<<l3<<endl;
-        ss<<moveJoint("rle3",r3)<<moveJoint("rle4",r4)<<moveJoint("rle5",r5)<<moveJoint("lle3" , l3);
-    } else if (t < t5) {
-        double r3 = 0.02*(70 -rj3)/(sqrt(t5)-sqrt(t));
-        double r4 = 0.02*(0-rj4)/(sqrt(t5)-sqrt(t));
-        double l3 = 0.02*(-25-lj3)/(sqrt(t5)-sqrt(t));
-        double r5 = 2*0.02*(-45-rj5)/(sqrt(t5)-sqrt(t));
-
-//        cout<<"Amin: t5->"<<r3<<" "<<r4<<" "<<r5<<" "<<l3<<endl;
-        ss<<moveJoint("rle3",r3)<<moveJoint("rle4",r4)<<moveJoint("rle5",r5)<<moveJoint("lle3" , l3);
+    }
+    else if ( IK_ALL ( VecPosition(x2,y2) , VecPosition ( x1 , y1) ,r3,r4,r5,l3,l4,l5) && t<0.9)
+    {
+        ss<< moveJoint ( "rle3" , (r3-rj3)*P) << moveJoint ( "rle4" , (r4-rj4)*P ) << moveJoint ( "rle5" ,  (r5-rj5)*P ) ;
+    }
+    else if(t>0.9 &&  t<1.1 && !ne)
+    {
+        ss<<moveJoint("rle6",-0.3)<<moveJoint("rle2",0.3);
+        ss<< moveJoint ( "rle5" ,0) << moveJoint ( "rle4" , -1.7);
+        ss<< moveJoint ( "rle3" , -1.2) << moveJoint ( "lle3" , 1.2);
+    }
+    else if(t>1.2 && t<1.3 && !ne)
+    {
+        ss<< moveJoint ( "rle5" ,0.6);
+        return ss.str();
+    }
+    else if(t>1.4 && t<1.5 && !ne)
+    {
+        ss<< moveJoint ( "rle3" , 8);
+        ss<<moveJoint ( "lle3" , -8)<<moveJoint ( "rle5" ,-8);
+        ss<<moveJoint ( "rle4" ,  8);
+    }
+    else if(t>1.5 && t<1.7 && !ne)
+    {
+        ss<<moveJoint ( "rle3" , -5)<<moveJoint ( "rle5" , -5.5);
+        ss<<moveJoint ( "rle4" , 8);
+    }
+    else if(t>0.9 &&  t<1.4 && ne)
+    {
+        ss<<moveJoint("rle6",-0.2)<<moveJoint("rle2",0.2);
+        ss<< moveJoint ( "rle5" ,-2.65) << moveJoint ( "rle4" , -3.04);
+        ss<< moveJoint ( "rle3" , -0.8) << moveJoint ( "lle3" , 0.8 );
+    }
+    else if(t>1.6 && t<1.72 && ne)
+    {
+        ss<< moveJoint ( "rle3" , 8);
+        ss<<moveJoint ( "lle3" , -8)<<moveJoint ( "rle5" ,8);
+        ss<<moveJoint ( "rle4" ,  8);
+    }
+    else if(t>1.7 && t<1.9 && ne)
+    {
+        ss<<moveJoint ( "rle3" , -5)<<moveJoint ( "rle5" , -5.5);
+        ss<<moveJoint ( "rle4" , 8);
     }
     return ss.str();
 }
 ///////////////////////////////////////////////////////////////////
-string Skill::shootL (bool &canshoot,bool &done,double &tFinal) {
-//    VecPosition me(WM->getMyPos().x(),WM->getMyPos().y());
-//    static bool ne=true;
-//    VecPosition pos=VecPosition::givePosition(ball,VecPosition::normalizeAngle(WM->getMyAngle()),-0.01);
-//    double x1 =0.002 , y1 =0.0  ;
-//    double x2 = H.getX() , y2 =H.getY();
-//    VecPosition ball(WM->getBallPos().x(),WM->getBallPos().y());
-//    static VecPosition H = FK_FOOT_HIP (-65 , 45 ) ;
-
-
+string Skill::shootL (bool &canshoot,bool &done,double &tFinal)
+{
     WM->setZ(0.54);
-    stringstream ss("");
-
+    stringstream ss;
+    VecPosition me(WM->getMyPos().x(),WM->getMyPos().y());
+    VecPosition ball(WM->getBallPos().x(),WM->getBallPos().y());
     static double t= 0;
-    static double sideW;
-    static bool did=false;
+    static bool did=false,ne=true;
     static double tt=0;
-
-    double rj3 = WM->getJointAngle ( "rle3" ) ;
-    double rj4 = WM->getJointAngle ( "rle4" ) ;
-    double rj5 = WM->getJointAngle ( "rle5" ) ;
+    static int id=0;
+    static VecPosition H = FK_FOOT_HIP (-65 , 45 ) ;
+    VecPosition pos      = VecPosition::givePosition(ball,VecPosition::normalizeAngle(WM->getMyAngle()),-0.01);
+    double x1 =0.002 , y1 =0.0;
+    double x2 = H.getX() , y2 =H.getY();
     double lj3 = WM->getJointAngle ( "lle3" ) ;
     double lj4 = WM->getJointAngle ( "lle4" ) ;
     double lj5 = WM->getJointAngle ( "lle5" ) ;
-
-//    cout << "Amin: " << lj4 << " " << lj5 << endl;
-    VecPosition a = FK_FOOT_HIP(lj4, lj5);
-//    cout << "Amin: YrFK " << a.getX() << " " << a.getY() << endl;
-
-    fk(lj4, lj5);
-    cout << endl;
-    static double l3_v0, l4_v0, l5_v0, r3_v0;
-//    double r3,r4,r5,l3,l4,l5;
-//    canshoot=IK_ALL ( VecPosition(x2,y2) , VecPosition ( x1 , y1) ,r3,r4,r5,l3,l4,l5);
-
-    static double t1 = 0.26, t2 = 0.56, t3 = 1, t4 = 1.02, t5 = 1.04;
-
-    if ( WM->isFeltDown() || t>=t5) {
-        sideW = 0;
-        t1 = 0.26; t2 = 0.56; t3 = 1; t4 = 1.02; t5 = 1.04;
-        l3_v0 = 0; l4_v0 = 0; l5_v0 = 0; r3_v0 = 0;
-        t = 0; done = true; did=false; tt=0;
-        return ss.str();
+    double rj3 = WM->getJointAngle ( "rle3" ) ;
+    double rj4 = WM->getJointAngle ( "rle4" ) ;
+    double rj5 = WM->getJointAngle ( "rle5" ) ;
+    double r3,r4,r5,l3,l4,l5;
+    double P = 0.2 ;
+    static bool sw=true;
+    canshoot=IK_ALL ( VecPosition(x2,y2) , VecPosition ( x1 , y1) ,r3,r4,r5,l3,l4,l5);
+    if(t>1.7 || me.getDistanceTo(ball)>0.4)
+    {
+        id=0;
     }
-
-//    cout << "Amin: ShootL, Joints: " << rj3 << " " << rj4 << " " << rj5 << " " << lj3 << " " << lj4 << " " << lj5 << endl;
-
-    if (sideW < 0.8) {
-        sideW += 0.02;
-        static double a;
-        return finalAction("sideWalkL", a);
-    }
-
-    if(!did && t<0.1) {
-        ss << sefr(did,tt,false);
-        return ss.str();
-    }
-//    cout << "Amin: sefr" << endl;
-    t+=0.02;
-
-//    cout << "Amin: t4: " << t4 << " " << t << endl;
-//    cout << "Amin: t5: " << t5 << " " << l3_v0 << endl;
-//    cout << "Amin: Sorat: " << l3_v0 << " " <<  l4_v0 << " " << l5_v0 << " " << r3_v0 << endl;
-//      cout << "Amin: Shetab: " << l3_a << " " <<  l4_a << " " <<  l5_a << " " << r3_a << endl;
-
-    if(t < t1) {
-        ss<<moveJoint("rle2",1.2)<<moveJoint("lle2",1.2)<<moveJoint("rle6",-1.2)<<moveJoint("lle6",-1.2);
-        return ss.str();
-    } else if(t < t2) {
+    if ( WM->isFeltDown()|| t>1.7 ||  ( me.getDistanceTo ( ball ) > 0.25 && id < 30 ) )
+    {
+        t = 0;
+        done = true;
+        sw=true;
         did=false;
         tt=0;
-        ss<<moveJoint("lle3",2.5)<<moveJoint("lle4",-5)<<moveJoint("lle5",4.25)<<moveJoint("lle2", 0.4);
         return ss.str();
-    } else if (t < t3) {
-
-        double l3 = 0.02*(-25-lj3)/(t3-t);
-        double l4 = 0.02*(-130-lj4)/(t3-t);
-        double r3 = 0.02*(25-rj3)/(t3-t);
-        double l5 = 0.02*(75-lj5)/(t3-t);
-
-
-//        cout<<"Amin: t3->"<<l3<<" "<<l4<<" "<<l5<<" "<<r3<<endl;
-        ss<<moveJoint("lle3",l3)<<moveJoint("lle4",l4)<<moveJoint("lle5",l5)<<moveJoint("rle3" , r3)<< endl;
-    } else if (t < t4) {
-        double deltaX = (20-lj3);
-        double l3_a = 2000 ;
-        if (l3_v0*l3_v0 + 2*l3_a*deltaX >= 0)
-            t4 = t+(-l3_v0+sqrt(l3_v0*l3_v0 + 2*l3_a*deltaX))/l3_a;
-        t5 = t4 + 0.04;
-        if (t >= t4) {
-            return ss.str();
-        }
-//        cout << "Amin: answers  " << (-l3_v0+sqrt(l3_v0*l3_v0 + 2*l3_a*deltaX))/l3_a  << " " << (-l3_v0-sqrt(l3_v0*l3_v0 + 2*l3_a*deltaX))/l3_a << endl;
-        double l4_a, l5_a, r3_a;
-        if (t4 - t >= 0.02) {
-            l4_a = (-40-lj4) / (0.5*(t4-t)*(t4-t)) - l4_v0 / (0.5*(t4-t));
-            l5_a = (20-lj5) / (0.5*(t4-t)*(t4-t)) - l5_v0 / (0.5*(t4-t));
-            r3_a = (0-rj3) / (0.5*(t4-t)*(t4-t)) - r3_v0 / (0.5*(t4-t));
-        }
-
-        double l3=0, l4=0, l5=0, r3=0;
-        if (fabs(20-lj3) >= 6 ) {
-            l3 = getAngle(t - t3, l3_v0, l3_a, &l3_v0);
-        } else {
-            l3 = 20 - lj3;
-        }
-        if (fabs(-40-lj4) >= 6 ) {
-            l4 = getAngle(t - t3, l4_v0, l4_a, &l4_v0);
-        } else {
-            l4 = -40-lj4;
-        }
-        if (fabs(0-rj3) >= 6 ) {
-            r3 = getAngle(t - t3, r3_v0, r3_a, &r3_v0);
-        } else {
-            r3 = 0 - rj3;
-        }
-        if (fabs(30-lj5) >= 6 ) {
-            getAngle(t - t3, l5_v0, l5_a, &l5_v0);
-            l5 = 3*0.02*(30-lj5)/(t4-t);
-        } else {
-            l5 = 30 - lj5;
-        }
-
-
-//        double l3 = 0.02*(30-lj3)/(t4*t4-t*t);
-//        double l4 = 0.02*(-60-lj4)/(t4*t4-t*t);
-//        double r3 = 0.02*(-rj3)/(t4-t);
-//        cout<<"Amin: t4->"<<l3<<" "<<l4<<" "<<l5<<" "<<r3<<endl;
-        cout << "Amin: t4: " << t4 << " " << t << endl;
-
-        cout << "Amin: Sorat: " << l3_v0 << " " <<  l4_v0 << " " << l5_v0 << " " << r3_v0 << endl;
-        cout << "Amin: Shetab: " << l3_a << " " <<  l4_a << " " <<  l5_a << " " << r3_a << endl;
-        ss<<moveJoint("lle3",l3)<<moveJoint("lle4",l4)<<moveJoint("lle5",l5)<<moveJoint("rle3" , r3);
-
-
     }
-    else if (t < t5) {
-
-        double deltaX = (100-lj3);
-        double l3_a = 100;
-
-        if (l3_v0*l3_v0 + 2*l3_a*deltaX >=0 && deltaX >= 0) {
-//            cout << "Amin: Here " << l3_v0 << endl;
-            t5 = t+(-l3_v0+sqrt(l3_v0*l3_v0 + 2*l3_a*deltaX))/l3_a;
-        } else {
-            t5 = max (t4 + 0.2 , t5);
+    if(me.getDistanceTo(ball)<0.17 && id<18 && !(WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Right))
+    {
+        ne=true;
+    }
+    else if((me.getDistanceTo(ball)>0.17 && id<18) || (WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Right))
+    {
+        ne=false;
+    }
+    if(fabs(WM->getMyAngleTo(Vector3f(9,0,0)))>5 && sw && !(WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Right) && me.getX()>-1)
+    {
+        if(WM->getMyAngleTo(Vector3f(9,0,0))>0)
+        {
+            return finalAction("turnL",tFinal);
         }
-        if (t >= t5)
-            return ss.str();
-//        cout << "Amin: answers  " << (-l3_v0+sqrt(l3_v0*l3_v0 + 2*l3_a*deltaX))/l3_a  << " " << (-l3_v0-sqrt(l3_v0*l3_v0 + 2*l3_a*deltaX))/l3_a << endl;
-
-        double l4_a = (0-lj4) / (0.5*(t5-t)*(   t5-t)) - l4_v0 / (0.5*(t5-t));
-        double l5_a = (-45-lj5) / (0.5*(t5-t)*(t5-t)) - l5_v0 / (0.5*(t5-t));
-        double r3_a = (-25-rj3) / (0.5*(t5-t)*(t5-t)) - r3_v0 / (0.5*(t5-t));
-
-        double l3=0, l4=0, l5=0, r3=0;
-        if (fabs(100-lj3) >= 6 ) {
-//            cout << "Amin: " << t << " -> " << lj3 << endl;
-           l3 = getAngle(t - t4, l3_v0, l3_a, &l3_v0);
-           if (l3 < 0)
-               l3 = 0;
-        } else {
-            l3 = 100 - lj3;
-            l3_v0 = 0;
+        else
+        {
+            return finalAction("turnR",tFinal);
         }
-        if (fabs(0-lj4) >= 6) {
-            l4 = getAngle(t - t4, l4_v0, l4_a, &l4_v0);
-        } else {
-            l4 = 0 - lj4;
-//            l4_v0 = 0;
+    }
+    sw=false;
+    id++;
 
-        }
-        if (fabs(-45-lj5) >= 6) {
-            l5 = -3*fabs(0.02*(-45-lj5)/(t5-t));
-        } else {
-            l5 = -45-lj5;
-//            l5_v0 = 0;
-
-        }
-        if (fabs(-25-rj3) >= 6) {
-            r3 = getAngle(t - t4, r3_v0, r3_a, &r3_v0);
-        } else {
-            r3 = -25-rj3;
-//            r3_v0 = 0;
-        }
-
-
-////        double l3 = 0.02*(80-lj3)/(t-t5);
-////        double l4 = 0.02*(0-lj4)/(sqrt(t5)-sqrt(t));
-////        double r3 = 0.02*(-45-rj3)/(sqrt(t5)-sqrt(t));
-//        cout << "Amin: Shetab: " << l3_a << " " <<  l4_a << " " <<  l5_a << " " << r3_a << endl;
-
-//        cout<<"Amin: t5->"<<l3<<" "<<l4<<" "<<l5<<" "<<r3<<endl;
-        ss<<moveJoint("lle3",l3)<<moveJoint("lle4",l4)<<moveJoint("lle5",l5)<<moveJoint("rle3" , r3);
+    if(!did && t<0.1)
+    {
+        ss<<sefr(did,tt,false);
+        return ss.str();
     }
 
+
+    t+=0.02;
+    if(t<0.3)
+    {
+        ss<<moveJoint("lle2",1)<<moveJoint("rle2",1)<<moveJoint("lle6",-1)<<moveJoint("rle6",-1);
+        return ss.str();
+    }
+    else if(t<0.45)
+    {
+        did=false;
+        tt=0;
+        ss<<moveJoint("rle2",0)<<moveJoint("lle3",2)<<moveJoint("lle4",-4)<<moveJoint("lle5",2);
+        return ss.str();
+    }
+    else if ( IK_ALL ( VecPosition(x2,y2) , VecPosition ( x1 , y1) ,r3,r4,r5,l3,l4,l5) && t<0.9)
+    {
+        ss<< moveJoint ( "lle3" , (r3-lj3)*P) << moveJoint ( "lle4" , (r4-lj4)*P ) << moveJoint ( "lle5" ,  (r5-lj5)*P ) ;
+    }
+    else if(t>0.9 &&  t<1.1 && !ne)
+    {
+        ss<<moveJoint("lle6",0.3)<<moveJoint("lle2",-0.3);
+        ss<< moveJoint ( "lle5" ,0) << moveJoint ( "lle4" , -1.7);
+        ss<< moveJoint ( "lle3" , -1.2) << moveJoint ( "rle3" , 1.2);
+    }
+    else if(t>1.2 && t<1.3 && !ne)
+    {
+        ss<< moveJoint ( "lle5" ,0.8);
+        return ss.str();
+    }
+    else if(t>1.4 && t<1.5 && !ne)
+    {
+        ss<< moveJoint ( "lle3" , 8);
+        ss<<moveJoint ( "rle3" , -8);
+        ss<<moveJoint ( "lle4" , 8)<<moveJoint ( "lle5" ,-8);
+    }
+    else if(t>1.5 && t<1.7 && !ne)
+    {
+        ss<<moveJoint ( "lle3" , -5)<<moveJoint ( "lle5" , -5);
+        ss<<moveJoint ( "lle4" , 8);
+    }
+    else if(t>0.9 &&  t<1.4 && ne)
+    {
+        ss<<moveJoint("lle6",0.2)<<moveJoint("lle2",-0.2);
+        ss<< moveJoint ( "lle5" ,-2.65) << moveJoint ( "lle4" , -3.04);
+        ss<< moveJoint ( "lle3" , -0.8) << moveJoint ( "rle3" , 0.8 );
+    }
+    else if(t>1.5 && t<1.62 && ne)
+    {
+        ss<< moveJoint ( "lle3" , 8);
+        ss<<moveJoint ( "rle3" , -8);
+        ss<<moveJoint ( "lle4" , 8)<<moveJoint ( "lle5" ,8);
+    }
+    else if(t>1.6 && t<1.8 && ne)
+    {
+        ss<<moveJoint ( "lle3" , -5)<<moveJoint ( "lle5" , -5);
+        ss<<moveJoint ( "lle4" , 8);
+    }
     return ss.str();
-
 }
-
-double Skill::getAngle (double spent, double v0, double a, double *v) {
-//    cout << "Amin: getAngle(): " << a << " " << v0 << " " << fabs(a*0.02 + v0) << endl;
-    *v = fabs(a*0.02 + v0);
-    return v0*0.02 + 0.5*a*(0.02*0.02 + 2*spent*0.02);
-
-}
-
 ////////////////////////////////////////////////////////////////////
 bool Skill::nazdik(string type) {
     if(type=="turnL" || type=="turnR" || type=="sideWalkR" || type=="sideWalkL" || type=="sideTurnL" || type=="sideTurnR")
@@ -1281,28 +1263,6 @@ bool Skill::nazdik(string type) {
     return false;
 }
 
-void fk (double lle4, double lle5) {
-    double t1, t2, t3, t4, t5, t6, t8, t9, t10, t12, t13, t14, t15, t24, t28, t36, t41, t48, t50;
-    double unknown[4][4];
-
-    t1 = cosDeg(lle5); t2 = cosDeg(lle4); t3 = t1*t2; t4 = sinDeg(lle5); t5 = sinDeg(lle4); t6 = t4*t5;
-    t8 = t3-1.0*t6; t9 = lle4+lle5; t10 = cosDeg(t9); t12 = t1*t5; t13 = t4*t2; t14 = t12+t13;
-    t15 = sinDeg(t9); t24 = 0.4E-1*t15+0.1E-1*t10-0.1E-1; t28 = -0.4E-1*t10+0.4E-1+0.1E-1*t15;
-    t36 = -0.45E-1*t5-0.1E-1+0.1E-1*t2; t41 = -0.45E-1*t2+0.45E-1-0.1E-1*t5; t48 = -t13-1.0*t12; t50 = -t6+t3;
-
-    unknown[0][0] = 1.0; unknown[0][1] = 0.0; unknown[0][2] = 0.0; unknown[0][3] = 0.0;
-    unknown[1][0] = 0.0; unknown[1][1] = t8*t10+t14*t15; unknown[1][2] = -1.0*t8*t15+t14*t10; unknown[1][3] = t8*t24+t14*t28-0.5E-2*t3+0.5E-2*t6+0.125*t12+0.125*t13+1.0*t1*t36+1.0*t4*t41+0.1E-1*t1+0.55E-1*t4;
-    unknown[2][0] = 0.0; unknown[2][1] = t48*t10+t50*t15; unknown[2][2] = -1.0*t48*t15+t50*t10; unknown[2][3] = t48*t24+t50*t28+0.5E-2*t13+0.5E-2*t12-0.125*t6+0.125*t3-1.0*t4*t36+1.0*t1*t41-0.1E-1*t4+0.55E-1*t1;
-    unknown[3][0] = 0.0; unknown[3][1] = 0.0; unknown[3][2] = 0.0; unknown[3][3] = 1.0;
-//          cout << "Amin: MyFK " << unknown[1][3] << " " << unknown[2][3] << endl;
-//          for (int i = 0 ; i < 4 ; i ++) {
-//              for (int j = 0 ; j < 4 ; j ++) {
-//                  cout <<  (double)((int)1000*unknown[i][j])/1000 << "        ";
-//              }
-//              cout << endl;
-//          }
-//          cout << "\n\n";
-}
 
 string Skill::finalAction (string type,double &t,double maxV)
 {
@@ -1840,4 +1800,321 @@ void Skill::speedControler(string type,double t,double &dd,double &bb,double &sd
     {
         sd=2;
     }
+}
+
+
+string Skill::WalkLib()
+{
+
+    static int t = 0 ;
+    t++ ;
+
+    unsigned int  nj2 = lLeg.getNrOfSegments();
+
+    KDL::JntArray jointpositionsl = KDL::JntArray(nj2);
+    KDL::JntArray jointpositionsr = KDL::JntArray(nj2);
+
+    KDL::JntArray lLegJMin =KDL::JntArray(nj2);
+    lLegJMin(0) = Deg2Rad(-90);
+    lLegJMin(1) = Deg2Rad(-25);
+    lLegJMin(2) = Deg2Rad(-25);
+    lLegJMin(3) = Deg2Rad(-130);
+    lLegJMin(4) = Deg2Rad(-45);
+    lLegJMin(5) = Deg2Rad(-45);
+
+   KDL:: JntArray lLegJMax = KDL::JntArray(nj2);
+    lLegJMax(0) = Deg2Rad(1);
+    lLegJMax(1) = Deg2Rad(45);
+    lLegJMax(2) = Deg2Rad(100);
+    lLegJMax(3) = Deg2Rad(1);
+    lLegJMax(4) = Deg2Rad(75);
+    lLegJMax(5) = Deg2Rad(25);
+
+    KDL::JntArray rLegJMin = KDL::JntArray(nj2);
+
+    rLegJMin(5) = Deg2Rad(-90);
+    rLegJMin(4) = Deg2Rad(-45);
+    rLegJMin(3) = Deg2Rad(-25);
+    rLegJMin(2) = Deg2Rad(-130);
+    rLegJMin(1) = Deg2Rad(-45);
+    rLegJMin(0) = Deg2Rad(-25);
+
+
+    KDL::JntArray rLegJMax = KDL::JntArray(nj2);
+
+    rLegJMax(5) = Deg2Rad(1);
+    rLegJMax(4) = Deg2Rad(25);
+    rLegJMax(3) = Deg2Rad(100);
+    rLegJMax(2) = Deg2Rad(1);
+    rLegJMax(1) = Deg2Rad(75);
+    rLegJMax(0) = Deg2Rad(45);
+
+    KDL::ChainFkSolverPos_recursive lLegFKSolver = KDL::ChainFkSolverPos_recursive(lLeg);
+    KDL::ChainIkSolverVel_wdls lLegIkSolverVel(lLeg, 0.01, 100);//Inverse velocity solver, from Cartesian to joint space
+    KDL::ChainIkSolverPos_NR_JL lLegIksolverPosJ (lLeg,lLegJMin,lLegJMax,lLegFKSolver,lLegIkSolverVel,100,1e-3);//Maximum 100 iterations, stop at accuracy 1e-6
+
+    KDL::ChainFkSolverPos_recursive rLegFKSolver = KDL::ChainFkSolverPos_recursive(rLeg);
+    KDL::ChainIkSolverVel_wdls rLegIkSolverVel(rLeg ,0.01, 100);//Inverse velocity solver, from Cartesian to joint space
+    KDL::ChainIkSolverPos_NR_JL rLegIksolverPosJ (rLeg,rLegJMin,rLegJMax,rLegFKSolver,rLegIkSolverVel,100,1e-3);//Maximum 100 iterations, stop at accuracy 1e-6
+
+    jointpositionsl(0) = Deg2Rad(0) ;
+    jointpositionsl(1) = Deg2Rad(0) ;
+    jointpositionsl(2) = Deg2Rad(20) ;
+    jointpositionsl(3) = Deg2Rad(-60) ;
+    jointpositionsl(4) = Deg2Rad(40) ;
+    jointpositionsl(5) = Deg2Rad(0) ;
+
+    jointpositionsr(5) = Deg2Rad(0) ;
+    jointpositionsr(4) = Deg2Rad(0) ;
+    jointpositionsr(3) = Deg2Rad(20) ;
+    jointpositionsr(2) = Deg2Rad(-60) ;
+    jointpositionsr(1) = Deg2Rad(40) ;
+    jointpositionsr(0) = Deg2Rad(0) ;
+
+    if (t<20 ) return "";
+
+    if ( t > 20 && t < 100 )
+        return moveJoints(jointpositionsl,jointpositionsl,0.1);
+
+    KDL::Frame rHipStanding;
+    KDL::Frame lAnkleStanding;
+
+    static KDL::JntArray JLLeg(lLeg.getNrOfSegments());
+    static KDL::JntArray JLLegInit(lLeg.getNrOfSegments());
+
+    static KDL::JntArray JRLeg(rLeg.getNrOfSegments());
+    static KDL::JntArray JRLegInit(rLeg.getNrOfSegments());
+
+    static double bb = 0.1 ;
+
+    bb+=0.008;
+    if ( bb > 1.2 )
+        bb=1.2;
+    static double T = 10 * 0.02;
+    static double w = (2*M_PI)/T;
+    double a = 0.05*bb  , b = -0.015*bb ;
+    double a1 = a, b1 = b;
+    double x1 = a*cos(w*t*0.02) , y1 =b*sin(w*t*0.02)  ;
+    double x2 = a1*cos(w*t*0.02) , y2 = b1*sin(w*t*0.02) ;
+
+
+    lLegFKSolver.JntToCart( jointpositionsl ,lAnkleStanding );
+
+    KDL::Frame lfrm (  KDL::Vector( lAnkleStanding.p.x() ,lAnkleStanding.p.y()+x1,lAnkleStanding.p.z()+y1)  );
+
+    rLegFKSolver.JntToCart( jointpositionsr , rHipStanding );
+    KDL::Frame rfrm ( KDL::Vector( rHipStanding.p.x() ,rHipStanding.p.y()+x2,rHipStanding.p.z()+y2));
+
+
+    int solvedl = lLegIksolverPosJ.CartToJnt(JLLegInit , lfrm , JLLeg ) ;
+    JLLegInit=JLLeg;
+
+    int solvedr = rLegIksolverPosJ.CartToJnt(JRLegInit , rfrm , JRLeg ) ;
+    JRLegInit=JRLeg;
+
+    if ( solvedl!=0 || solvedr!=0 )
+        exit(0);
+//        return "";
+    KDL::JntArray serversendR (nj2) ;
+
+        serversendR(0) = JRLeg(5);
+        serversendR(1) = JRLeg(4);
+        serversendR(2) = JRLeg(3) + Deg2Rad(5);
+        serversendR(3) = JRLeg(2);
+        serversendR(4) = JRLeg(1);
+        serversendR(5) = JRLeg(0);
+
+        JLLeg(2) = JLLeg(2)+ Deg2Rad(5);
+
+    return moveJoints(JLLeg,serversendR,0.2);
+    return "";
+}
+//////////////////////////////
+
+string Skill::WalkAngleLib()
+{
+
+    static int t = 0 ;
+    t++ ;
+
+    unsigned int  nj2 = lLeg.getNrOfSegments();
+
+    KDL::JntArray jointpositionsl = KDL::JntArray(nj2);
+    KDL::JntArray jointpositionsr = KDL::JntArray(nj2);
+
+    KDL::JntArray lLegJMin =KDL::JntArray(nj2);
+    lLegJMin(0) = Deg2Rad(-90);
+    lLegJMin(1) = Deg2Rad(-25);
+    lLegJMin(2) = Deg2Rad(-25);
+    lLegJMin(3) = Deg2Rad(-130);
+    lLegJMin(4) = Deg2Rad(-45);
+    lLegJMin(5) = Deg2Rad(-45);
+
+   KDL:: JntArray lLegJMax = KDL::JntArray(nj2);
+    lLegJMax(0) = Deg2Rad(1);
+    lLegJMax(1) = Deg2Rad(45);
+    lLegJMax(2) = Deg2Rad(100);
+    lLegJMax(3) = Deg2Rad(1);
+    lLegJMax(4) = Deg2Rad(75);
+    lLegJMax(5) = Deg2Rad(25);
+
+    KDL::JntArray rLegJMin = KDL::JntArray(nj2);
+
+    rLegJMin(5) = Deg2Rad(-90);
+    rLegJMin(4) = Deg2Rad(-45);
+    rLegJMin(3) = Deg2Rad(-25);
+    rLegJMin(2) = Deg2Rad(-130);
+    rLegJMin(1) = Deg2Rad(-45);
+    rLegJMin(0) = Deg2Rad(-25);
+
+    KDL::JntArray rLegJMax = KDL::JntArray(nj2);
+
+    rLegJMax(5) = Deg2Rad(1);
+    rLegJMax(4) = Deg2Rad(25);
+    rLegJMax(3) = Deg2Rad(100);
+    rLegJMax(2) = Deg2Rad(1);
+    rLegJMax(1) = Deg2Rad(75);
+    rLegJMax(0) = Deg2Rad(45);
+
+    KDL::ChainFkSolverPos_recursive lLegFKSolver = KDL::ChainFkSolverPos_recursive(lLeg);
+    KDL::ChainIkSolverVel_wdls lLegIkSolverVel(lLeg, 0.01, 100);//Inverse velocity solver, from Cartesian to joint space
+    KDL::ChainIkSolverPos_NR_JL lLegIksolverPosJ (lLeg,lLegJMin,lLegJMax,lLegFKSolver,lLegIkSolverVel,100,1e-3);//Maximum 100 iterations, stop at accuracy 1e-6
+
+    KDL::ChainFkSolverPos_recursive rLegFKSolver = KDL::ChainFkSolverPos_recursive(rLeg);
+    KDL::ChainIkSolverVel_wdls rLegIkSolverVel(rLeg ,0.01, 100);//Inverse velocity solver, from Cartesian to joint space
+    KDL::ChainIkSolverPos_NR_JL rLegIksolverPosJ (rLeg,rLegJMin,rLegJMax,rLegFKSolver,rLegIkSolverVel,100,1e-3);//Maximum 100 iterations, stop at accuracy 1e-6
+
+    jointpositionsl(0) = Deg2Rad(0) ;
+    jointpositionsl(1) = Deg2Rad(0) ;
+    jointpositionsl(2) = Deg2Rad(30) ;
+    jointpositionsl(3) = Deg2Rad(-60) ;
+    jointpositionsl(4) = Deg2Rad(30) ;
+    jointpositionsl(5) = Deg2Rad(0) ;
+
+    jointpositionsr(5) = Deg2Rad(0) ;
+    jointpositionsr(4) = Deg2Rad(0) ;
+    jointpositionsr(3) = Deg2Rad(30) ;
+    jointpositionsr(2) = Deg2Rad(-60) ;
+    jointpositionsr(1) = Deg2Rad(30) ;
+    jointpositionsr(0) = Deg2Rad(0) ;
+
+    if (t<21) return "";
+
+    if ( t > 20 && t < 100 )
+        return moveJoints(jointpositionsl,jointpositionsl,0.1);
+
+    KDL::Frame rHipStanding;
+    KDL::Frame lAnkleStanding;
+
+    static KDL::JntArray JLLeg(lLeg.getNrOfSegments());
+    static KDL::JntArray JLLegInit(lLeg.getNrOfSegments());
+
+    static KDL::JntArray JRLeg(rLeg.getNrOfSegments());
+    static KDL::JntArray JRLegInit(rLeg.getNrOfSegments());
+
+    static double bb = 0.1 ;
+
+    double theta = Deg2Rad(10);
+
+
+    bb+=0.008;
+    if ( bb > 1.2 )
+        bb=1.2;
+    int Period = 10 ;
+    static double T = Period * 0.02;
+    static double w = (2*M_PI)/T;
+    double a = 0.05*bb  , b = -0.015*bb ;
+    double a1 = a, b1 = b;
+    double x1 = -a*cos(w*t*0.02)*sin(theta) , y1= a*cos(w*t*0.02)*cos(theta) , z1 =b*sin(w*t*0.02)  ;
+    double x2 = -a1*cos(w*t*0.02)*sin(theta) , y2=a1*cos(w*t*0.02)*cos(theta) , z2 = b1*sin(w*t*0.02) ;
+
+    KDL::Rotation lLegRot ;
+    KDL::Rotation rHipRot = KDL::Rotation::RotZ(0);
+
+    int AllTime = Period / 2;
+
+    if ( t % (2*AllTime) < AllTime )
+    {
+         lLegRot = KDL::Rotation::RotZ(
+                     (t%(2*AllTime))*theta/(double)AllTime
+                     );
+         cout << Rad2Deg((t%(2*AllTime))*theta/(double)AllTime)  << endl;
+    } else
+    {
+        lLegRot = KDL::Rotation::RotZ(
+                    ((2*AllTime-(t%(2*AllTime)))*theta)/(double)AllTime
+                    );
+        cout <<Rad2Deg(((2*AllTime-(t%(2*AllTime)))*theta)/(double)AllTime) << endl;
+    }
+
+//    lLegRot = KDL::Rotation::RotZ(0);
+
+    lLegFKSolver.JntToCart( jointpositionsl ,lAnkleStanding );
+
+    KDL::Frame lfrm (  lLegRot , KDL::Vector( lAnkleStanding.p.x()+x1 ,lAnkleStanding.p.y()+y1,lAnkleStanding.p.z()+z1)  );
+
+    rLegFKSolver.JntToCart( jointpositionsr , rHipStanding );
+    KDL::Frame rfrm ( rHipRot, KDL::Vector( rHipStanding.p.x()+x2 ,rHipStanding.p.y()+y2,rHipStanding.p.z()+z2));
+
+
+    int solvedl = lLegIksolverPosJ.CartToJnt(JLLegInit , lfrm , JLLeg ) ;
+    JLLegInit=JLLeg;
+
+    int solvedr = rLegIksolverPosJ.CartToJnt(JRLegInit , rfrm , JRLeg ) ;
+    JRLegInit=JRLeg;
+
+
+
+    if ( solvedl!=0 || solvedr!=0 )
+        exit(0);
+    KDL::JntArray serversendR (nj2) ;
+
+        serversendR(0) = JRLeg(5);
+        serversendR(1) = JRLeg(4);
+        serversendR(2) = JRLeg(3) + Deg2Rad(5) ;
+        serversendR(3) = JRLeg(2);
+        serversendR(4) = JRLeg(1);
+        serversendR(5) = JRLeg(0);
+
+        JLLeg(2) = JLLeg(2)+ Deg2Rad(5);
+
+    return moveJoints(JLLeg,serversendR,0.2);
+    return "";
+}
+
+
+//////////////////////////////
+string Skill::moveJoints(KDL::JntArray left,KDL::JntArray right , double p)  {
+    KDL::JntArray curLeft(6),curRight(6);
+    KDL::JntArray diffLeft(6),diffRight(6);
+
+    for (int i=0; i<6; ++i)
+    {
+        curRight(i)=WM->getJointAngle(WM->num2Str(2+2*i+1));
+        curLeft(i)=WM->getJointAngle(WM->num2Str(2+2*i));
+
+        diffRight(i)=(right(i))-Deg2Rad(curRight(i));
+
+        diffRight(i)=Rad2Deg(diffRight(i));
+        diffRight(i)=fabs(diffRight(i))<0.1?0:diffRight(i)*p;
+        diffLeft(i)=(left(i))-Deg2Rad(curLeft(i));
+        diffLeft(i)=Rad2Deg(diffLeft(i));
+        diffLeft(i)=fabs(diffLeft(i))<0.1?0:diffLeft(i)*p;
+    }
+
+    string sc;
+
+    for(int jid=0; jid<6; jid++) {
+        string s1, s2;
+        stringstream ss;
+        ss << diffRight(jid);
+        s1 = ss.str();
+        ss.str("");
+        ss << diffLeft(jid);
+        s2=ss.str();
+        sc+="(" + WM->num2Str(2+2*jid+1)+ " " + s1 +")";
+        sc+="(" + WM->num2Str(2+2*jid) + " " + s2 +")";
+    }
+
+    return sc;
 }
