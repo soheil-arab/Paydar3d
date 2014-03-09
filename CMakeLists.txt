@@ -26,8 +26,7 @@ set (rcssnet_SRCS
 	${CMAKE_CURRENT_SOURCE_DIR}/lib/rcssnet/udpsocket.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/lib/rcssnet/udpsocket.hpp
 )
-set ( CMAKE_CXX_FLAGS  "-O3 -pipe" )
-
+set(CMAKE_CXX_FLAGS " -pg -I/usr/include/eigen3 -lorocos-kdl")
 ########## add configs ########## 
 add_definitions(-DHAVE_CONFIG_H)
 
@@ -37,7 +36,4 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/robotoos_config.h.cmake
 
 ########## add subdirectories ############
 add_subdirectory(src)
-
-
-
 

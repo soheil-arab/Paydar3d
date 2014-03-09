@@ -27,7 +27,7 @@ string Decide::goalie()
     static double df=0;
     Command com;
     double x,y,ang;
-    double angleToFront=WM->getMyAngleTo(myPos+Vector3f(1,0,0));
+    double angleToFront=WM->getMyAngleTo(myPos+salt::Vector3f(1,0,0));
     VecPosition Bball=VecPosition::givePosition(ball,(VecPosition(WM->getFieldLength()/2,0)-ball).getDirection(),-0.15);
     Rect r1(VecPosition(-WM->getFieldLength()/2,1.5),VecPosition(-WM->getFieldLength()/2+2.5,-1.5));
     string sa;

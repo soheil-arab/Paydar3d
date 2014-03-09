@@ -14,6 +14,7 @@
 #include "rvdraw.h"
 string Decide::Attack()
 {
+    return SK->WalkLib();
     stringstream ss("");
     myPos = WM->getMyPos();
     ballPos = WM->getBallPos();
@@ -74,7 +75,7 @@ string Decide::Attack()
 
     /////////////////////////////////////////////////////////////
     int closest = parseBallPos();
-//    cout <<"closest : "<<closest<<endl;
+
     if (!ACT->isDone())
     {
         ss << ACT->doCurrentAct();
@@ -137,8 +138,6 @@ string Decide::Attack()
             finalPos2 = i22;
 
 
-
-//        cout << finalPos1.getDistanceTo(finalPos2) << endl;
         Triangle tri(ball,finalPos1,finalPos2);
         RVDraw::instance()->drawLine(oppositeTirak,finalPos1,RED,5);
         RVDraw::instance()->drawLine(thisTirak,finalPos2,RED,6);
@@ -206,7 +205,7 @@ string Decide::Attack()
         }
     }
     else if(me.getDistanceTo(attackpositioning())>0.1 && shouldPlay2()  && WM->getMyNum() !=10 && WM->getMyNum()!=11){
-        Vector3f vec(attackpositioning().getX(),attackpositioning().getY(),0);
+        salt::Vector3f vec(attackpositioning().getX(),attackpositioning().getY(),0);
         return moveToPosP(false,attackpositioning(),tFinal);
     }
     else if(fabs(WM->getMyAngleTo(WM->getBallPos()))>15 && shouldPlay2())

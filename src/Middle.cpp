@@ -98,9 +98,9 @@ string Decide::Middle()
     else if(me.getDistanceTo(middlepositioning())>0.1 && shouldPlay2()){
         return moveToPosP(false,middlepositioning(),tFinal);
     }
-    else if(fabs(WM->getMyAngleTo(myPos+Vector3f(1,0,0)))>15 && shouldPlay2())
+    else if(fabs(WM->getMyAngleTo(myPos+salt::Vector3f(1,0,0)))>15 && shouldPlay2())
     {
-        if(WM->getMyAngleTo(myPos+Vector3f(1,0,0))>0)
+        if(WM->getMyAngleTo(myPos+salt::Vector3f(1,0,0))>0)
         {
             return SK->finalAction("turnL",tFinal);
         }

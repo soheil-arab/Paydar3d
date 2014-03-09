@@ -1,6 +1,27 @@
 #ifndef SKILL
 #define SKILL
 #include "WorldModel.h"
+
+#include <kdl/chain.hpp>
+#include <kdl/tree.hpp>
+#include <kdl/chainfksolver.hpp>
+#include <kdl/chainfksolverpos_recursive.hpp>
+#include <kdl/chainfksolvervel_recursive.hpp>
+#include <kdl/treefksolver.hpp>
+#include <kdl/treefksolverpos_recursive.hpp>
+#include <kdl/frames_io.hpp>
+
+#include <kdl/chainiksolvervel_pinv.hpp>
+#include <kdl/chainiksolvervel_wdls.hpp>
+#include <kdl/chainiksolvervel_pinv_givens.hpp>
+#include <kdl/chainiksolverpos_nr.hpp>
+#include <kdl/chainiksolverpos_nr_jl.hpp>
+
+#include <kdl/path_circle.hpp>
+#include <kdl/trajectory_segment.hpp>
+#include <kdl/velocityprofile_dirac.hpp>
+#include <kdl/rotational_interpolation_sa.hpp>
+
 class Skill
 {
 private :
@@ -34,7 +55,28 @@ private :
   double Turn60[24][24];
   double Turn60R[24][24];
   double Turn10[12][24];
-  double Turn10R[24][24];
+  double Turn10R[24][24];  
+  KDL::Chain rLeg;
+  KDL::Chain lLeg;
+
+  KDL::Joint rHipYawPitch;
+  KDL::Joint rHipRoll ;
+  KDL::Joint rHipPitch ;
+  KDL::Joint rKneePitch;
+  KDL::Joint rAnklePitch;
+  KDL::Joint rAnkleRoll;
+
+
+  KDL::Joint lHipYawPitch ;
+  KDL::Joint lHipRoll ;
+  KDL::Joint lHipPitch;
+  KDL::Joint lKneePitch ;
+  KDL::Joint lAnklePitch;
+  KDL::Joint lAnkleRoll;
+
+
+
+
 public :
   Skill(WorldModel*);
   string beam ( double x , double y , double ang);
@@ -68,6 +110,9 @@ public :
   string StandUpBack ( bool &done );
   string ToRightSide(int i,bool &done);
   string ToLeftSide(int i,bool &done);
+  string WalkLib();
+  string WalkAngleLib();
+  string moveJoints(KDL::JntArray left,KDL::JntArray right , double p)  ;
 
   /// Inverse Knimatics
   VecPosition FK_FOOT_HIP (double le4 , double le5);
