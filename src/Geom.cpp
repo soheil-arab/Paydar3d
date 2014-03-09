@@ -503,11 +503,11 @@ void VecPosition::show( CoordSystemT cs )
 {
     if ( cs == CARTESIAN )
     {
-        cout << *this << endl;
+//        cout << *this << endl;
     }
     else
     {
-        cout << "( r: " << getMagnitude( ) << ", phi: " << getDirection( ) << "  )";
+//        cout << "( r: " << getMagnitude( ) << ", phi: " << getDirection( ) << "  )";
     }
 }
 

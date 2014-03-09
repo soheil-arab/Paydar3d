@@ -99,7 +99,7 @@ string Decide::goalie()
     else if ( (  shouldStandUp ( com , s )  ) )
     {
         tFinal=0;
-        Log.Log ( 1 , "Standing Up !" );
+//        Log.Log ( 1 , "Standing Up !" );
         ACT->setCurrentAct( com , s );
     }
     else

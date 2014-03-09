@@ -93,7 +93,7 @@ string Decide::Attack()
 
     else if (shouldPlay() && closest==WM->getMyNum() && WM->getMyNum() !=10 && WM->getMyNum()!=11)
     {
-        cout << "=-=-=-=-=-=--=-=--=-=-=-=-" << endl;
+//        cout << "=-=-=-=-=-=--=-=--=-=-=-=-" << endl;
         if (shouldClear ( x,y,s ))
         {
             ACT->setCurrentAct(K, s, x, y);
@@ -142,14 +142,14 @@ string Decide::Attack()
 
 //        cout << finalPos1.getDistanceTo(finalPos2) << endl;
         Triangle tri(ball,finalPos1,finalPos2);
-        RVDraw::instance()->drawLine(oppositeTirak,finalPos1,RED,5);
-        RVDraw::instance()->drawLine(thisTirak,finalPos2,RED,6);
-        RVDraw::instance()->drawLine(finalPos1,finalPos2,RED,7);
-        RVDraw::instance()->drawCircle(ballPos,c.getRadius(),GREEN,8);
+//        RVDraw::instance()->drawLine(oppositeTirak,finalPos1,RED,5);
+//        RVDraw::instance()->drawLine(thisTirak,finalPos2,RED,6);
+//        RVDraw::instance()->drawLine(finalPos1,finalPos2,RED,7);
+//        RVDraw::instance()->drawCircle(ballPos,c.getRadius(),GREEN,8);
 
         if ( fabs(WM->getMyAngleToBall()) > max(8,min(25,me.getDistanceTo(ball)*20)) )
         {
-            cout << "Turn : " <<  WM->getMyAngleToBall() << endl;
+//            cout << "Turn : " <<  WM->getMyAngleToBall() << endl;
             if (WM->getMyAngleToBall() > 0)
             {
                 if ( c.isInside(me) )
@@ -167,7 +167,7 @@ string Decide::Attack()
             }
          }
         else if ( c.isInside( me ) && !tri.isInside(me) && fabs(meGoal.getY()) > 0.9){
-            cout <<  "side turning " << endl;
+//            cout <<  "side turning " << endl;
                 if (WM->getMyAngleToGoal() > 0)
                     return SK->finalAction("sideTurnL",tFinal);
                 else
@@ -184,18 +184,18 @@ string Decide::Attack()
     {
         if(WM->getMyAngleTo(WM->getBallPos())>0)
         {
-            Log.Log ( 2 , "Turn Left !" );
+//            Log.Log ( 2 , "Turn Left !" );
             return SK->finalAction("turnL",tFinal);
         }
         else
         {
-            Log.Log ( 2 , "Turn Right !" );
+//            Log.Log ( 2 , "Turn Right !" );
             return SK->finalAction("turnR",tFinal);
         }
     }
     else if(!(WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Right || WM->getPlayMode() == PM_BeforeKickOff ) )
     {
-        Log.Log ( 2 , "Darja Mizadam !" );
+//        Log.Log ( 2 , "Darja Mizadam !" );
 //        return SK->finalAction( "darja" ,tFinal);
         return "";
     }
