@@ -20,8 +20,8 @@
 */
 #include "Parser.h"
 #include "Decide.h"
-//#include "ConnectionManager.h"
-#include "connection.h"
+#include "ConnectionManager.h"
+//#include "connection.h"
 #include <cstring>
 #include <cstdio>
 #include <string>
@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
     try
     {
         /// create a connection
-        connection *sockClient = new connection ;
+        ConnectionManager *sockClient = new ConnectionManager ;
         ///~ WorldModel to Save World Info
         WorldModel *WM = new WorldModel;
         /// ~ Class Decide For Decition making
@@ -96,27 +96,33 @@ int main(int argc, char *argv[])
         }
         /// connect To Server
 
-        sockClient->connect_to(ip.c_str(),port);
+//        sockClient->connect_to(ip.c_str(),port);
+        sockClient->Connect(rcss::net::Addr(port,ip));
         /// send scene Message
-        sockClient->send(string("(scene rsg/agent/nao/nao.rsg)"));
+        sockClient->Send(string("(scene rsg/agent/nao/nao.rsg)"));
+
         string get;
-        sockClient->receive(get);
+        get = sockClient->Receive();
+
         stringstream ss;
         usleep (500);
         /// init Agent and Send number and our team name (Robotoos3D)
         ss << "(init (unum " << WM->getMyNum () << ")(teamname " << WM->getOurName() << "))" ;
-        sockClient->send(ss.str());
+        sockClient->Send(ss.str());
         string dec ;
         while (1)
         {
             timespec *start, *end;
             start = new timespec;
             end = new timespec;
-            clock_gettime(CLOCK_REALTIME, start); // Works on Linux
 
             dec = "";
             ///~ Receive Message From server
-            sockClient->receive(get);
+
+            clock_gettime(CLOCK_REALTIME, start); // Works on Linux
+            get= sockClient->Receive();
+            clock_gettime(CLOCK_REALTIME, end); // Works on Linux
+
             ///~ Then Parse it and Save Information in WorldModel
             P->Parse(get);
             ///~ Calcualate ObjectS Pos , Angle , Velocity and ...
@@ -126,9 +132,8 @@ int main(int argc, char *argv[])
             ///~ Decide What To Do
             dec = DC->decide();
             ///~ And Send It To Server
-            sockClient->send(dec) ;
-            clock_gettime(CLOCK_REALTIME, end); // Works on Linux
 
+            sockClient->Send(dec) ;
             cout << ( end->tv_nsec - start->tv_nsec  )/1000000000.0 << endl;
 
 

@@ -67,19 +67,13 @@ void ConnectionManager::Send(string msg)
 
 string ConnectionManager::Receive()
 {
-    const unsigned MAX_MESSAGE_SIZE = 6000;
     uint32_t msgsize;
     input.read(reinterpret_cast<char *>(&msgsize), sizeof(msgsize));
     msgsize = ntohl(msgsize);
-    if (msgsize > MAX_MESSAGE_SIZE)
-    {
 
-        return "";
-    }
     char buffer[msgsize+1];
     input.read(buffer, msgsize);
     buffer[msgsize]='\0';
-
 
     return buffer;
 }

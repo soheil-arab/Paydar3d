@@ -16,9 +16,9 @@ Skill.cpp
 Skill.h
 Svd.cpp
 WorldModel.cpp
-#ConnectionManager.cpp
+ConnectionManager.cpp
 Logger.cpp
-connection.cpp
+#~ connection.cpp
 line.cpp
 Localize.cpp
 )
@@ -38,9 +38,9 @@ rvdraw.h
 Types.h
 vector.h
 WorldModel.h
-#ConnectionManager.h
+ConnectionManager.h
 Logger.h
-connection.h
+#~ connection.h
 line.h
 Localize.h
 )

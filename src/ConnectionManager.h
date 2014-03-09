@@ -38,21 +38,21 @@
 
 class ConnectionManager
 {
-public:
-  ConnectionManager();
-  virtual ~ConnectionManager();
+    public:
+        ConnectionManager();
+        virtual ~ConnectionManager();
 
-  void Connect(rcss::net::Addr addr);
-  void Reconnect();
-  void Disconnect();
-  void Send(std::string msg);
-  std::string Receive();
+        void Connect(rcss::net::Addr addr);
+        void Reconnect();
+        void Disconnect();
+        void Send(std::string msg);
+        std::string Receive();
 
-private:
-  rcss::net::TCPSocket socket;
-  //rcss::net::UDPSocket socket;
-  rcss::net::ISocketStream input;
-  rcss::net::OSocketStream output;
+    private:
+        rcss::net::TCPSocket socket;
+        //rcss::net::UDPSocket socket;
+        rcss::net::ISocketStream input;
+        rcss::net::OSocketStream output;
 };
 
 #endif /*CONNECTIONMANAGER_H_*/
