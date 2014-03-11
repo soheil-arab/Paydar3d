@@ -12,9 +12,9 @@ using namespace std;
 Localize::Localize(WorldModel *wm)
 {
     WM=wm;
-    
-    
-    
+
+
+
     /*
      *             ---------------------------FR--------------------------
      *             |               |                    |                |
@@ -48,7 +48,7 @@ Localize::Localize(WorldModel *wm)
      *             |               |                    |                |
      *              -----------------------FL-----------------------------
      */
-    
+
     //defining the global position of the lines
     line_global["FR"] = line(Vector3f(15,-10,0),Vector3f(15,10,0));
     line_global["FL"]=line(Vector3f(-15,-10,0),Vector3f(-15,10,0));
@@ -60,7 +60,7 @@ Localize::Localize(WorldModel *wm)
     line_global["PLN"]=line(Vector3f(-15,3,0),Vector3f(-13.2,3,0));
     line_global["PL"]=line(Vector3f(-13.2,-3,0),Vector3f(-13.2,3,0));
     line_global["PLS"]=line(Vector3f(-15,-3,0),Vector3f(-13.2,-3,0));
-    
+
     flag_names.push_back("G1L");
     flag_names.push_back("G2L");
     flag_names.push_back("G1R");
@@ -69,10 +69,10 @@ Localize::Localize(WorldModel *wm)
     flag_names.push_back("F2L");
     flag_names.push_back("F1R");
     flag_names.push_back("F2R");
-    
+
     line_names.push_back("FL");
     line_names.push_back("FR");
-    
+
     line_names.push_back("FN");
     line_names.push_back("FS");
     line_names.push_back("PRN");
@@ -81,11 +81,11 @@ Localize::Localize(WorldModel *wm)
     line_names.push_back("PLN");
     line_names.push_back("PL");
     line_names.push_back("PLS");
-    
-    
-    
-    
-    
+
+
+
+
+
 }
 
 
@@ -94,7 +94,7 @@ void Localize::test()
 
 
 
-//    Eigen::MatrixXi a ;
+//    Eigen::Matrix ;
 //    a<<1,2,
 //            3,4;
 //    cout << "Here is the matrix a\n" << a << endl;
@@ -275,11 +275,7 @@ string Localize::line_recognitation(line line_to_detect)
 
 
 
-<<<<<<< HEAD
-    // cout <<"avalesh"<<endl;
-=======
 //    cout<<"avalesh"<<endl;
->>>>>>> 3e4842c17761644eff76fdea2c5d34067fc52744
 
     for(vector<string>::iterator l_iterator=line_names.begin() ; l_iterator != line_names.end(); l_iterator++)
     {
@@ -353,25 +349,17 @@ string Localize::line_recognitation(line line_to_detect)
 
 
 
-//        // cout <<"vasate"<<endl;
+//        cout<<"vasate"<<endl;
 
         //the other situations
         for(vector<string>::iterator f_iterator=flag_names.begin();f_iterator!=flag_names.end();f_iterator++)
         {
 
-<<<<<<< HEAD
-            // cout <<"avale for"<<endl;
-
-            distance=WM->flagGlobal[*f_iterator]-line_global[*l_iterator].begin ;
-
-            // cout <<"dovome for"<<endl;
-=======
 //            cout<<"avale for"<<endl;
 
             distance=WM->flagGlobal[*f_iterator]-line_global[*l_iterator].begin ;
 
 //            cout<<"dovome for"<<endl;
->>>>>>> 3e4842c17761644eff76fdea2c5d34067fc52744
 
 
             if(WM->getFlagLastSeen(*f_iterator) ==  WM->serverTime &&(  fabs(Distance_Cartesian_Point_Line(WM->flag[*f_iterator],line_to_detect)
@@ -379,11 +367,7 @@ string Localize::line_recognitation(line line_to_detect)
                                                                         || distance.Length() > 20 )
                     )
             {
-<<<<<<< HEAD
-                // cout <<"omad vase break"<<endl;
-=======
 //                cout<<"omad vase break"<<endl;
->>>>>>> 3e4842c17761644eff76fdea2c5d34067fc52744
                 breakup=true;
                 break;
             }
@@ -391,10 +375,6 @@ string Localize::line_recognitation(line line_to_detect)
 
         }
 
-<<<<<<< HEAD
-        // cout <<"for tamom shod"<<endl;
-=======
->>>>>>> 3e4842c17761644eff76fdea2c5d34067fc52744
 
         if(breakup)
         {
@@ -403,11 +383,7 @@ string Localize::line_recognitation(line line_to_detect)
         }
         result=*l_iterator;
 
-<<<<<<< HEAD
-        // cout <<"result :"<<result<<endl;
-=======
 //        cout<<"result :"<<result<<endl;
->>>>>>> 3e4842c17761644eff76fdea2c5d34067fc52744
 
         return result;
     }
@@ -419,15 +395,11 @@ string Localize::line_recognitation(line line_to_detect)
 
 
 
-<<<<<<< HEAD
-    //                          // cout <<CartecianToPolar(flag).theta<<"and the other is: "<<CartecianToPolar(the_other_vector).theta<<endl;
-=======
 
 
 
 
     //                          cout<<CartecianToPolar(flag).theta<<"and the other is: "<<CartecianToPolar(the_other_vector).theta<<endl;
->>>>>>> 3e4842c17761644eff76fdea2c5d34067fc52744
 
     //                            for(vector<string>::iterator i=flag_names.begin();i!=flag_names.end();i++){
 
@@ -455,7 +427,7 @@ string Localize::line_recognitation(line line_to_detect)
     //                                            if(fabs(Distance_Cartesian_Point_Line(WM->flag[*i],line_to_detect))<0.1)
     //                                            {
 
-    //                                                // cout <<"omad to"<<endl;
+    //                                                cout<<"omad to"<<endl;
 
     //                                                Vector3f flag=WM->flag[*i];
     //                                                Vector3f beg=PolarToCartecian(line_to_detect.begin);
@@ -475,7 +447,7 @@ string Localize::line_recognitation(line line_to_detect)
     //                                                {
 
 
-    //                                                    // cout <<"F1R"<<endl;
+    //                                                    cout<<"F1R"<<endl;
     //                            if(CartecianToPolar(flag).theta > CartecianToPolar(the_other_vector).theta)
     //                            {
     //                                return "FR";
@@ -483,7 +455,7 @@ string Localize::line_recognitation(line line_to_detect)
     //                            }
     //                            else
     //                            {
-    //                                // cout <<"FN"<<endl;
+    //                                cout<<"FN"<<endl;
     //                                return "FN";
     //                            }
     //                        }
@@ -491,12 +463,12 @@ string Localize::line_recognitation(line line_to_detect)
 
     //                        if(*i=="F2R")
     //                        {
-    //                            // cout <<"F2R"<<endl;
-    //                            // cout <<CartecianToPolar(flag).theta<<"and the other is: "<<CartecianToPolar(the_other_vector).theta<<endl;
+    //                            cout<<"F2R"<<endl;
+    //                            cout<<CartecianToPolar(flag).theta<<"and the other is: "<<CartecianToPolar(the_other_vector).theta<<endl;
 
     //                            if(CartecianToPolar(flag).theta > CartecianToPolar(the_other_vector).theta)
     //                            {
-    //                                // cout <<"FS"<<endl;
+    //                                cout<<"FS"<<endl;
     //                                return "FS";
 
     //                            }
@@ -515,12 +487,12 @@ string Localize::line_recognitation(line line_to_detect)
 
     //    if(min<0.1)
     //    {
-    //        //        // cout <<result<<endl;
+    //        //        cout<<result<<endl;
     //        return result;
     //    }
     //    else
     //    {
-    //        //        // cout <<"the others"<<endl;
+    //        //        cout<<"the others"<<endl;
     //        return "the others";
     //    }
 }
