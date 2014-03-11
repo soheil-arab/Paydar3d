@@ -1177,9 +1177,9 @@ string Skill::shootL (bool &canshoot,bool &done,double &tFinal)
     {
         ne=false;
     }
-    if(fabs(WM->getMyAngleTo(Vector3f(9,0,0)))>5 && sw && !(WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Right) && me.getX()>-1)
+    if(fabs(WM->getMyAngleTo(salt::Vector3f(9,0,0)))>5 && sw && !(WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Right) && me.getX()>-1)
     {
-        if(WM->getMyAngleTo(Vector3f(9,0,0))>0)
+        if(WM->getMyAngleTo(salt::Vector3f(9,0,0))>0)
         {
             return finalAction("turnL",tFinal);
         }

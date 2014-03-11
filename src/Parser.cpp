@@ -1,6 +1,7 @@
 #include "Parser.h"
 #include "rvdraw.h"
 #include <sys/time.h>
+#include <regex>
 
 Parser::Parser(WorldModel *wm)
 {
@@ -31,22 +32,20 @@ Parser::Parser(WorldModel *wm)
  * @do parse message
  *
  * */
-void Parser::Parse(string &msg)
+void Parser::Parse(string msg)
 {
-
-
-
 //    cout << msg << endl;
-    for ( int i = 0; i<msg.length(); i++)
-        if ( msg[i]=='(' || msg[i]==')')
-        {
-            msg[i]=' ';
-        }
+//    for ( int i = 0; i<msg.length(); i++)
+//        if ( msg[i]=='(' || msg[i]==')')
+//        {
+//            msg[i]=' ';
+//        }
     Polar goal;
     Polar flag;
     Polar ball;
     double time;
     string temp;
+//    regex rr("\\(time \\(now ([-+]?[0-9]*\.?[0-9]+)\\)\\)");
     /*
      * Time & PlayMode Parser
      */
@@ -109,12 +108,12 @@ void Parser::Parse(string &msg)
     pos=msg.find("L");
     while(pos !=string::npos)
     {
-        stringstream edame(msg.substr(pos));
-        double x1,y1,z1,x2,y2,z2;
-        edame>>temp>>temp>>x1>>y1>>z1>>temp>>x2>>y2>>z2;
-        line l(Vector3f(x1,y1,z1),Vector3f(x2,y2,z2),WM->serverTime);
+//        stringstream edame(msg.substr(pos));
+//        double x1,y1,z1,x2,y2,z2;
+//        edame>>temp>>temp>>x1>>y1>>z1>>temp>>x2>>y2>>z2;
+//        line l(Vector3f(x1,y1,z1),Vector3f(x2,y2,z2),WM->serverTime);
 //        cout<<l.begin<<"and "<<l.end<<endl;
-        WM->setSeenLines(l);
+//        WM->setSeenLines(l);
         //       RVDraw::instance()->drawVector3f(x1*cosDeg());
         pos=msg.find("L",pos+1);
 

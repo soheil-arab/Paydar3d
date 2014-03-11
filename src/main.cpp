@@ -20,8 +20,8 @@
 */
 #include "Parser.h"
 #include "Decide.h"
-#include "ConnectionManager.h"
-//#include "connection.h"
+//#include "ConnectionManager.h"
+#include "connection.h"
 #include <cstring>
 #include <cstdio>
 #include <string>
@@ -34,10 +34,10 @@ using namespace std;
 void printHelp(char arg[]);
 int main(int argc, char *argv[])
 {
-    try
-    {
+
         /// create a connection
-        ConnectionManager *sockClient = new ConnectionManager ;
+//        ConnectionManager *sockClient = new ConnectionManager ;
+        connection *sockClient = new connection;
         ///~ WorldModel to Save World Info
         WorldModel *WM = new WorldModel;
         /// ~ Class Decide For Decition making
@@ -95,20 +95,22 @@ int main(int argc, char *argv[])
             }
         }
         /// connect To Server
-
+        try
+        {
 //        sockClient->connect_to(ip.c_str(),port);
-        sockClient->Connect(rcss::net::Addr(port,ip));
+        sockClient->connect_to(ip.c_str(),port);
         /// send scene Message
-        sockClient->Send(string("(scene rsg/agent/nao/nao.rsg)"));
+//        sockClient->Receive();
+        sockClient->send(string("(scene rsg/agent/nao/nao.rsg)"));
 
         string get;
-        get = sockClient->Receive();
+        sockClient->receive(get);
 
         stringstream ss;
         usleep (500);
         /// init Agent and Send number and our team name (Robotoos3D)
         ss << "(init (unum " << WM->getMyNum () << ")(teamname " << WM->getOurName() << "))" ;
-        sockClient->Send(ss.str());
+        sockClient->send(ss.str());
         string dec ;
         while (1)
         {
@@ -117,24 +119,42 @@ int main(int argc, char *argv[])
             end = new timespec;
 
             dec = "";
-            ///~ Receive Message From server
 
+//            clock_gettime(CLOCK_REALTIME, start); // Works on Linux
+            sockClient->receive(get);
+//            clock_gettime(CLOCK_REALTIME, end); // Works on Linux
+//            if (  (end->tv_nsec - start->tv_nsec  )/1000000000.0 > 0)
+//                cout << "Rec Time : " << ( end->tv_nsec - start->tv_nsec  )/1000000000.0 << endl;
+//            else
+//                cout << "Rec Minus: " << end->tv_nsec << " " << start->tv_nsec<< endl;
             clock_gettime(CLOCK_REALTIME, start); // Works on Linux
-            get= sockClient->Receive();
+            P->Parse(get);
+//            clock_gettime(CLOCK_REALTIME, end); // Works on Linux
+
+
+//            cout << "Parse Time : " << ( end->tv_nsec - start->tv_nsec  )/1000000000.0 << endl;
+
+//            localize->doLocalize()
+//            clock_gettime(CLOCK_REALTIME, start); // Works on Linux
+            WM->Localize();
+//            localize->test();
+            dec = DC->decide();
             clock_gettime(CLOCK_REALTIME, end); // Works on Linux
 
-            ///~ Then Parse it and Save Information in WorldModel
-            P->Parse(get);
-            ///~ Calcualate ObjectS Pos , Angle , Velocity and ...
-//            localize->doLocalize()
-            WM->Localize();
-            localize->test();
-            ///~ Decide What To Do
-            dec = DC->decide();
-            ///~ And Send It To Server
+//            cout << "Process Time : " << ( end->tv_nsec - start->tv_nsec  )/1000000000.0 << endl;
+            if (  ( end->tv_nsec - start->tv_nsec  )/1000000000.0 > 0.02)
+            {
+                cout <<"Rinesh Happend : " <<( end->tv_nsec - start->tv_nsec  )/1000000000.0<< endl;
+            }
+//            clock_gettime(CLOCK_REALTIME, start); // Works on Linux
+            sockClient->send(dec+"(syn)") ;
+//            clock_gettime(CLOCK_REALTIME, end); // Works on Linux
+//            usleep (10000);
 
-            sockClient->Send(dec) ;
-            cout << ( end->tv_nsec - start->tv_nsec  )/1000000000.0 << endl;
+
+//            cout << "Send Time:" << ( end->tv_nsec - start->tv_nsec  )/1000000000.0 << endl;
+//            cout << get << endl;
+//            cout << "-======-----=-=-=-=-=-=-=-=-=-=" << endl;
 
 
         }
@@ -143,6 +163,7 @@ int main(int argc, char *argv[])
     }
     catch (exception &e)
     {
+        sockClient->disconnect();
 //        cout << e.what() << endl;       /// if any exception happend Handle it & Print Error
     }
     return 0;

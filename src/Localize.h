@@ -13,7 +13,7 @@ public:
     double Distance_Cartesian_Point_Line(salt::Vector3f point_polar,line l);
     salt::Vector3f calcPlaneNormal(vector<salt::Vector3f> planePoints);
     string line_recognitation(line line_to_detect);
-    Vector3f line_intersection(line l1,line l2);
+    salt::Vector3f line_intersection(line l1,line l2);
 
     void test();
     WorldModel *WM;

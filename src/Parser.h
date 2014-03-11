@@ -9,6 +9,6 @@ private :
   map <string ,PlayMode > pms;
 public :
   Parser(WorldModel*);
-  void Parse(string &);
+  void Parse(string );
 };
 #endif

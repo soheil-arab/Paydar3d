@@ -82,7 +82,6 @@ vector<line> WorldModel::getLastSeenLines()
         if(lines_we_see[i].time_we_saw_it==serverTime)
             lastSeenLines.insert(lastSeenLines.end(),lines_we_see[i]);
     }
-
     return lastSeenLines;
 }
 
@@ -190,10 +189,10 @@ Vector3f WorldModel::general_rotation(Vector3f initial,Vector3f axis,double angl
 
 
 void WorldModel::brinBeMA(){
-    isServerBeamed();
+//    isServerBeamed();
     initDimentions();
     initFlags();
-    kalman_filter();
+//    kalman_filter();
 
 
     //    cout<<(int)(getACC().x()*10000)/(float)10000<<" "<<(int)(getACC().y()*10000)/(float)10000<<" "<<(int)(getACC().z()*10000)/(float)10000<<endl;

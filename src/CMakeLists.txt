@@ -1,48 +1,47 @@
 set(robotoos_SRC
-
-Act.cpp
-Attacker.cpp
-bools.cpp
-Deffender.cpp
-Geom.cpp
-Goalie.cpp
-MainDecide.cpp
-Math.cpp
-matrix.cpp
-Middle.cpp
-Parser.cpp
-Parser.h
-Skill.cpp
-Skill.h
-Svd.cpp
-WorldModel.cpp
-ConnectionManager.cpp
-Logger.cpp
-#~ connection.cpp
-line.cpp
+    Act.cpp
+    Attacker.cpp
+    bools.cpp
+    Deffender.cpp
+    Geom.cpp
+    Goalie.cpp
+    MainDecide.cpp
+    Math.cpp
+    matrix.cpp
+    Middle.cpp
+    Parser.cpp
+    Parser.h
+    Skill.cpp
+    Skill.h
+    Svd.cpp
+    WorldModel.cpp
+    #ConnectionManager.cpp
+    Logger.cpp
+    connection.cpp
+    line.cpp
 Localize.cpp
 )
 
 set(robotoos_HEAD
-Act.h
-Decide.h
-defines.h
-Geom.h
-gmath.h
-Math.h
-matrix.h
-salt.h
-Svd.h
-tvector.h
-rvdraw.h
-Types.h
-vector.h
-WorldModel.h
-ConnectionManager.h
-Logger.h
-#~ connection.h
-line.h
-Localize.h
+    Act.h
+    Decide.h
+    defines.h
+    Geom.h
+    gmath.h
+    Math.h
+    matrix.h
+    salt.h
+    Svd.h
+    tvector.h
+    rvdraw.h
+    Types.h
+    vector.h
+    WorldModel.h
+    #ConnectionManager.h
+    Logger.h
+    connection.h
+    line.h
+    Localize.h
 )
 
 set(robotoos_SRCS
@@ -52,7 +51,7 @@ set(robotoos_SRCS
    main.cpp
 )
 
-set(CMAKE_CXX_FLAGS " -pg -I/usr/include/eigen3 -lorocos-kdl")
+set(CMAKE_CXX_FLAGS "-pg -std=c++11 -I/usr/include/eigen3 -lorocos-kdl")
 
 include_directories(${SPARK_INCLUDE_DIR}  )
 

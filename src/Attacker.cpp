@@ -14,6 +14,7 @@
 #include "rvdraw.h"
 string Decide::Attack()
 {
+//    return SK->WalkLib();
     stringstream ss("");
     myPos = WM->getMyPos();
     ballPos = WM->getBallPos();
@@ -140,7 +141,6 @@ string Decide::Attack()
         else
             finalPos2 = i22;
 
-
         Triangle tri(ball,finalPos1,finalPos2);
         RVDraw::instance()->drawLine(oppositeTirak,finalPos1,RED,5);
         RVDraw::instance()->drawLine(thisTirak,finalPos2,RED,6);
@@ -169,7 +169,7 @@ string Decide::Attack()
             }
             double backAng = VecPosition::normalizeAngle( WM->getMyAngleToBall()+180 );
 
-            cout << "threshold" << thresh <<" angle to ball :  " << WM->getMyAngleToBall() <<" my angle : " << WM->getMyAngle() << endl;
+//            cout << "threshold" << thresh <<" angle to ball :  " << WM->getMyAngleToBall() <<" my angle : " << WM->getMyAngle() << endl;
 
             if ( fabs(backAng)  < 8 )
             {
