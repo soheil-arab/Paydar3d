@@ -4,7 +4,7 @@
 #include "WorldModel.h"
 #include "line.h"
 #include "string.h"
-
+#include <eigen3/Eigen/Core>
 
 
 using namespace std;
@@ -89,9 +89,26 @@ Localize::Localize(WorldModel *wm)
 }
 
 
-
 void Localize::test()
 {
+
+
+
+//    Eigen::MatrixXi a ;
+//    a<<1,2,
+//            3,4;
+//    cout << "Here is the matrix a\n" << a << endl;
+//    cout << "Here is the matrix a^T\n" << a.transpose() << endl;
+//    cout << "Here is the conjugate of a\n" << a.conjugate() << endl;
+//    cout << "Here is the matrix a^*\n" << a.adjoint() << endl;
+
+
+
+
+//    cout<<"FR va FS"<<line_intersection(line_global["FR"],line_global["FS"]);
+//    cout<<"FN va FS"<<line_intersection(line_global["FN"],line_global["FS"]);
+
+
     if(WM->getLastSeenLines().size()>1)
     {
         for(int counter=0;counter<WM->getLastSeenLines().size();counter++)
@@ -118,6 +135,10 @@ void Localize::test()
                 RVDraw::instance()->drawLine(WM->sensedPos+WM->headRotate.Rotate(lcart.begin),WM->sensedPos+WM->headRotate.Rotate(lcart.end),GREEN,6);
         }
     }
+
+    cout<<"tedad: "<<WM->lines_we_see.size()<<endl;
+
+    WM->resetLastSeenLines();
 }
 
 /*
@@ -200,6 +221,34 @@ double Localize::Distance_Cartesian_Point_Line(Vector3f point_cartesian,line l)
 
 
 
+Eigen::MatrixXi Localize::overdetermined(Eigen::MatrixXi A,Eigen::VectorXf b)
+{
+
+
+
+
+    return (A);
+
+}
+
+
+
+Vector3f Localize::line_intersection(line l1, line l2)
+{
+    Vector3f result=Vector3f(0,0,0);
+    Vector3f normal_l1=(l1.end-l1.begin)/((l1.end-l1.begin).Length());
+    Vector3f normal_l2=(l2.end-l2.begin)/((l2.end-l2.begin).Length());
+
+    if((normal_l1+normal_l2).Length() < 0.1 || (normal_l1-normal_l2).Length() < 0.1 || (normal_l2-normal_l1).Length() < 0.1)
+    {
+        cout<<"parallel"<<endl;
+        return result;
+    }
+
+
+
+}
+
 
 
 
@@ -226,7 +275,7 @@ string Localize::line_recognitation(line line_to_detect)
 
 
 
-    cout<<"avalesh"<<endl;
+//    cout<<"avalesh"<<endl;
 
     for(vector<string>::iterator l_iterator=line_names.begin() ; l_iterator != line_names.end(); l_iterator++)
     {
@@ -306,11 +355,11 @@ string Localize::line_recognitation(line line_to_detect)
         for(vector<string>::iterator f_iterator=flag_names.begin();f_iterator!=flag_names.end();f_iterator++)
         {
 
-            cout<<"avale for"<<endl;
+//            cout<<"avale for"<<endl;
 
             distance=WM->flagGlobal[*f_iterator]-line_global[*l_iterator].begin ;
 
-            cout<<"dovome for"<<endl;
+//            cout<<"dovome for"<<endl;
 
 
             if(WM->getFlagLastSeen(*f_iterator) ==  WM->serverTime &&(  fabs(Distance_Cartesian_Point_Line(WM->flag[*f_iterator],line_to_detect)
@@ -318,7 +367,7 @@ string Localize::line_recognitation(line line_to_detect)
                                                                         || distance.Length() > 20 )
                     )
             {
-                cout<<"omad vase break"<<endl;
+//                cout<<"omad vase break"<<endl;
                 breakup=true;
                 break;
             }
@@ -326,7 +375,6 @@ string Localize::line_recognitation(line line_to_detect)
 
         }
 
-        cout<<"for tamom shod"<<endl;
 
         if(breakup)
         {
@@ -335,10 +383,14 @@ string Localize::line_recognitation(line line_to_detect)
         }
         result=*l_iterator;
 
-        cout<<"result :"<<result<<endl;
+//        cout<<"result :"<<result<<endl;
 
         return result;
     }
+
+
+
+
 
 
 

@@ -137,6 +137,7 @@ public:
   void setSeenLines(line);
   double    serverTime, Time;
   map<string,Vector3f> getFlag();
+  void resetLastSeenLines();
 
 
 

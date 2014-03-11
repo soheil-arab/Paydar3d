@@ -73,6 +73,12 @@ Vector3f WorldModel::localize_with_lines(map<line, double> lines_we_see,map<stri
 
 }
 
+void WorldModel::resetLastSeenLines()
+{
+    if(!lines_we_see.empty())
+        lines_we_see.clear();
+}
+
 
 vector<line> WorldModel::getLastSeenLines()
 {
