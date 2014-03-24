@@ -5,7 +5,7 @@
 #include <sstream>
 #include <fstream>
 #include <string>
-#include <map>
+#include <unordered_map>
 #include <cmath>
 #include "Math.h"
 #include "Logger.h"
@@ -15,7 +15,7 @@ using namespace std;
 class WorldModel
 {
 public:
-  WorldModel();
+  WorldModel() ;
   ~WorldModel();
 
   void kalman_filter();
@@ -37,7 +37,7 @@ public:
   void setOppPos(int, Vector3f);
   void setOurName(string);
   void setOppName(string);
-  void setTeamSide(string);
+  void setTeamSide(SideT);
   void setPlayMode(PlayMode);
   void setFootPress(string, FootRes);
   void setMyNum(int);
@@ -56,7 +56,7 @@ public:
   void setOppPlayerPartPos ( int num , string part , Polar pos );
   void setACC ( Vector3f pos );
   vector<line> getLastSeenLines();
-  map<string,Vector3f> getFlagGlobal();
+  unordered_map<string,Vector3f> getFlagGlobal();
 
 
 
@@ -136,7 +136,7 @@ public:
   void clearBodyRotate ();
   void setSeenLines(line);
   double    serverTime, Time;
-  map<string,Vector3f> getFlag();
+  unordered_map<string,Vector3f> getFlag();
   void resetLastSeenLines();
 
 
@@ -153,7 +153,8 @@ public:
   double    myAngle,myPhi;
   double    ballAng;
   bool      Sense;
-  string    side, oppName, ourName;
+  SideT side;
+  string    oppName, ourName;
   PlayMode  playMode ;
   string    lastHear;
   string    names[22];
@@ -162,75 +163,28 @@ public:
   Vector3f  ballPos;
   Vector3f  ballVel;
   Vector3f  ball;
-  map<string, Polar> flagPolar;
-  map<string, Vector3f> flag;
-  map<string, double> flagLastSeen;
-  map<string, Vector3f> flagGlobal;
-  map<string, double> joint;
-  map<string, double> lastJoint;
-  map<int, Polar> mates, opps;
-  map<string, FootRes> footPress;
+  FootRes lf,rf;
+  unordered_map<string, Polar> flagPolar;
+  unordered_map<string, Vector3f> flag;
+  unordered_map<string, double> flagLastSeen;
+  unordered_map<string, Vector3f> flagGlobal;
+  unordered_map<string, double> joint;
+  unordered_map<string, double> lastJoint;
+  unordered_map<int, Polar> mates, opps;
+
   Matrix    R;
   double    width, length, goalWidth;
-  map<int, RelPlayerInfo> ourRel;
-  map<int, RelPlayerInfo> theirRel;
-  map<int, GloPlayerInfo> our;
-  map<int, GloPlayerInfo> their;
+  unordered_map<int, RelPlayerInfo> ourRel;
+  unordered_map<int, RelPlayerInfo> theirRel;
+  unordered_map<int, GloPlayerInfo> our;
+  unordered_map<int, GloPlayerInfo> their;
   bool      Localed;
-  double    rfTime  ;
-  double    lfTime  ;
   Matrix bodyRotate;
   Matrix headRotate;
   Matrix headR ;
   Vector3f speed;
 
-  Vector3f localize_with_lines(map<line,double> ,map<string,Polar> );
-
-
-private:
-//  Vector3f  ACC;
-//  Vector3f mylastPos;
-//  bool      canSeeFlags;
-//  int       num;
-//  double    myZ;
-//  double    ballLastSeen, ballPrevLastSeen;
-//  double    timeLastHear;
-//  double    myAngle,myPhi;
-//  double    ballAng;
-//  bool      Sense;
-//  string    side, oppName, ourName;
-//  PlayMode  playMode ;
-//  string    lastHear;
-//  string    names[22];
-//  Polar     ballPolar;
-//  Vector3f  gyro;
-//  Vector3f  ballPos;
-//  Vector3f  ballVel;
-//  Vector3f  ball;
-//  map<string, Polar> flagPolar;
-//  map<string, Vector3f> flag;
-//  map<string, double> flagLastSeen;
-//  map<string, Vector3f> flagGlobal;
-//  map<string, double> joint;
-//  map<string, double> lastJoint;
-//  map<int, Polar> mates, opps;
-//  map<string, FootRes> footPress;
-//  Matrix    R;
-//  double    width, length, goalWidth;
-//  map<int, RelPlayerInfo> ourRel;
-//  map<int, RelPlayerInfo> theirRel;
-//  map<int, GloPlayerInfo> our;
-//  map<int, GloPlayerInfo> their;
-//  bool      Localed;
-//  double    rfTime  ;
-//  double    lfTime  ;
-//  Matrix bodyRotate;
-//  Matrix headRotate;
-//  Matrix headR ;
-//  Vector3f speed;
-
-//  Vector3f localize_with_lines(map<line,double> ,map<string,Polar> );
-
+    //  Vector3f localize_with_lines(unordered_map<line,double> ,unordered_map<string,Polar> );
 
 
 

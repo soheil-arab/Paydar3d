@@ -94,7 +94,7 @@ bool Decide::shouldClear(double &dx, double &dy,SideT &side,Triangle t)
     {
         return false;
     }
-    if ( WM->getMyAngleToBall()  < 0 )
+    if ( WM->getMyAngleToBall() < 0 )
         side = Right;
     else
         side = Left;
@@ -123,17 +123,18 @@ bool Decide::startShoot(){
 
 bool Decide::shouldPlay()
 {
-    if (WM->getPlayMode() ==  PM_PlayOn )
+    PlayMode pm = WM->getPlayMode() ;
+    if ( pm ==  PM_PlayOn )
     {
         return true;
     }
-    if(WM->getPlayMode() == PM_Goal_Left || WM->getPlayMode() == PM_Goal_Right )
+    if( pm == PM_Goal_Left || pm == PM_Goal_Right )
     {
         return false;
     }
     if (WM->getTeamSide() == Left )
     {
-        switch ( WM->getPlayMode() )
+        switch ( pm )
         {
         case PM_KickOff_Left :
         case PM_KickIn_Left :
@@ -144,13 +145,11 @@ bool Decide::shouldPlay()
         case PM_FREE_KICK_LEFT :
             return true;
             break;
-
         }
-
     }
     if (WM->getTeamSide() == Right)
     {
-        switch ( WM->getPlayMode() )
+        switch ( pm )
         {
         case PM_KickOff_Right :
         case PM_KickIn_Right :
@@ -168,7 +167,8 @@ bool Decide::shouldPlay()
 
 bool Decide::canBeam()
 {
-    if (WM->getPlayMode() == PM_BeforeKickOff || WM->getPlayMode() == PM_Goal_Left || WM->getPlayMode() == PM_Goal_Right )
+    PlayMode pm = WM->getPlayMode();
+    if ( pm == PM_BeforeKickOff || pm  == PM_Goal_Left || pm  == PM_Goal_Right )
     {
         return true;
     }

@@ -20,7 +20,7 @@ public:
 
     void test();
     WorldModel *WM;
-    map<string,line> line_global;
+    unordered_map <string,line> line_global;
     vector<string> flag_names;
     vector<string> line_names;
 };

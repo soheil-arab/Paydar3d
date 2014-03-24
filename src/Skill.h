@@ -56,6 +56,10 @@ private :
   double Turn60R[24][24];
   double Turn10[12][24];
   double Turn10R[24][24];  
+
+
+
+  /// IK_ENGINE_VARS
   KDL::Chain rLeg;
   KDL::Chain lLeg;
 
@@ -73,6 +77,13 @@ private :
   KDL::Joint lKneePitch ;
   KDL::Joint lAnklePitch;
   KDL::Joint lAnkleRoll;
+  KDL::ChainFkSolverPos_recursive *lLegFKSolver;
+  KDL::ChainIkSolverVel_wdls *lLegIkSolverVel;
+  KDL::ChainIkSolverPos_NR_JL *lLegIksolverPosJ;
+
+  KDL::ChainFkSolverPos_recursive *rLegFKSolver;
+  KDL::ChainIkSolverVel_wdls *rLegIkSolverVel;
+  KDL::ChainIkSolverPos_NR_JL *rLegIksolverPosJ;
 
 
 
@@ -110,9 +121,6 @@ public :
   string StandUpBack ( bool &done );
   string ToRightSide(int i,bool &done);
   string ToLeftSide(int i,bool &done);
-  string WalkLib();
-  string WalkAngleLib();
-  string moveJoints(KDL::JntArray left,KDL::JntArray right , double p)  ;
 
   /// Inverse Knimatics
   VecPosition FK_FOOT_HIP (double le4 , double le5);
@@ -126,5 +134,25 @@ public :
   bool   nazdik(string);
   void getAnklePos (   double P0[3]
                   , double A1 = 0 , double A2 = 0 , double A3 = 0 , double A4 = 0 );
+
+
+    //// WALK_FUNCS
+    ///
+  string SideWalkLib(int &t,SideT side);
+  string WalkLib(int &t,SideT side);
+  string WalkAngleLib(int &t,SideT side);
+  string SideTurn(int &t,SideT side);
+  void newSpeedController ( double &bb , int t , Command comm);
+
+
+  /// new Turn Func
+  ///
+  string TurnLib ( int &t , SideT side);
+
+
+  string moveJoints(KDL::JntArray left,KDL::JntArray right , double p)  ;
+
+
+
 };
 #endif

@@ -35,6 +35,7 @@ struct Polar
 enum Command
 {
   W,
+  WA,
   Di,
   T90,
   TU,
@@ -42,10 +43,12 @@ enum Command
   K,
   SSW,
   SSW2,
+  ST,
   SUB,
   SUF,
   DP,
   back,
+  ZR,
   None,
 
 };

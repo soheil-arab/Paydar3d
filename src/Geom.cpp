@@ -1743,3 +1743,33 @@ bool Triangle::isInside(VecPosition pos){
      return ((b1 == b2) && (b2 == b3));
 
 }
+
+
+VecPosition Triangle::IntersectionWithLine (Line l,bool &nr)
+{
+    Line a = Line::makeLineFromTwoPoints(p1,p2);
+    Line b = Line::makeLineFromTwoPoints(p1,p3);
+    Line c = Line::makeLineFromTwoPoints(p2,p3);
+
+    VecPosition pos_a = l.getIntersection(a);
+    VecPosition pos_b = l.getIntersection(b);
+    VecPosition pos_c = l.getIntersection(c);
+    nr = false;
+    if ( l.isInBetween(pos_a,p1,p2) )
+    {
+        nr = true;
+        return pos_a;
+    }
+    else if ( l.isInBetween(pos_b,p1,p3) )
+    {
+        nr = true;
+        return pos_b;
+    }
+    else if ( l.isInBetween(pos_c,p2,p3) )
+    {
+        nr = true;
+        return pos_c;
+    }
+    nr = false;
+    return NULL;
+}

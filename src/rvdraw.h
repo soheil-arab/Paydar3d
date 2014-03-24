@@ -484,8 +484,22 @@ public:
         drawSphere(float(iPos.x()), float(iPos.y()), float(iPos.z()), float(iRadius), rgb[0], rgb[1], rgb[2], &circ);
         swapBuffers(&circ);
     }
+    
+    void drawAnnotation(string str,Vector3f iPos, Color iCo, int iNumber)
+    {
+        string annot("annot.");
+            char buf[10];
+            sprintf(buf, "%d", iNumber);
+            annot += buf;
+        float rgb[3];
+        fillColor(iCo, rgb);
+        drawAnnotation(&str ,float(iPos.x()), float(iPos.y()), float(iPos.z()), rgb[0], rgb[1], rgb[2], &annot);
+        swapBuffers(&annot);
+    }
+    
 
-
+// drawAnnotation(const string* text, float x, float y, float z, float r,
+//        float g, float b, const string* setName)
 
 
 };

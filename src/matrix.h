@@ -540,7 +540,7 @@ f_inline  Matrix  Matrix::zero()
           El(i,j)=0.0;
         }
     }
-
+  return *this;
 }
 
 // Multiply a Vector3f with this Matrix

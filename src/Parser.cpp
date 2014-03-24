@@ -1,66 +1,377 @@
 #include "Parser.h"
 #include "rvdraw.h"
-#include <sys/time.h>
-#include <regex>
+#include <thread>
+
+PlayMode Parser::getPlayModeByString(string &str)
+{
+    if ( str == "BeforeKickOff" )
+        return PM_BeforeKickOff;
+    if ( str == "PlayOn" )
+        return PM_PlayOn;
+    if ( str == "KickOff_Left" )
+        return PM_KickOff_Left;
+    if ( str == "KickOff_Right" )
+        return PM_KickOff_Right;
+    if ( str == "KickIn_Left" )
+        return PM_KickIn_Left;
+    if ( str == "KickIn_Right" )
+        return PM_KickIn_Right;
+    if ( str == "corner_kick_left" )
+        return PM_CORNER_KICK_LEFT;
+    if ( str == "corner_kick_right" )
+        return PM_CORNER_KICK_RIGHT;
+    if ( str == "goal_kick_left" )
+        return PM_GOAL_KICK_LEFT;
+    if ( str == "goal_kick_right" )
+        return PM_GOAL_KICK_RIGHT;
+    if ( str == "Goal_Left" )
+        return PM_Goal_Left;
+    if ( str == "Goal_Right" )
+        return PM_Goal_Right;
+    if ( str == "offside_left" )
+        return PM_OFFSIDE_LEFT;
+    if ( str == "offside_right" )
+        return PM_OFFSIDE_RIGHT;
+    if ( str == "GameOver" )
+        return PM_GameOver;
+    if ( str == "free_kick_left" )
+        return PM_FREE_KICK_LEFT;
+    if ( str == "free_kick_right" )
+        return PM_FREE_KICK_RIGHT;
+    return PM_NONE;
+}
 
 Parser::Parser(WorldModel *wm)
 {
+    wm_lock = new mutex();
     WM = wm;
-    pms["BeforeKickOff"] = PM_BeforeKickOff ;
-    pms["KickOff_Left"] = PM_KickOff_Left ;
-    pms["KickOff_Right"] = PM_KickOff_Right ;
-    pms["PlayOn"] = PM_PlayOn ;
-    pms["KickIn_Left"] = PM_KickIn_Left;
-    pms["KickIn_Right"] =  PM_KickIn_Right ;
-    pms["corner_kick_left"] = PM_CORNER_KICK_LEFT;
-    pms["corner_kick_right"] = PM_CORNER_KICK_RIGHT;
-    pms["goal_kick_left"] = PM_GOAL_KICK_LEFT ;
-    pms["goal_kick_right"] = PM_GOAL_KICK_RIGHT ;
-    pms["offside_left"] =  PM_OFFSIDE_LEFT ;
-    pms["offside_right"] = PM_OFFSIDE_RIGHT ;
-    pms["GameOver"] = PM_GameOver ;
-    pms["Goal_Left"] = PM_Goal_Left ;
-    pms["Goal_Right"] = PM_Goal_Right ;
-    pms["free_kick_left"] = PM_FREE_KICK_LEFT ;
-    pms["free_kick_right"] = PM_FREE_KICK_RIGHT ;
-    pms["unknown"] = PM_NONE ;
 }
 
-/**
- *
- * @param msg witch is the massage that will parse
- * @do parse message
- *
- * */
-void Parser::Parse(string msg)
+void Parser::parseHingeJoint(string &msg)
 {
-//    cout << msg << endl;
-//    for ( int i = 0; i<msg.length(); i++)
-//        if ( msg[i]=='(' || msg[i]==')')
-//        {
-//            msg[i]=' ';
-//        }
-    Polar goal;
-    Polar flag;
-    Polar ball;
+    /*
+     * Angle Parse
+     */
+    string temp;
+    int pos = msg.find("HJ");
+    for (int i = 0; i < 22; i++)
+    {
+        if (pos == string::npos)
+            break;
+        string name;
+        double angle;
+        stringstream edame(msg.substr(pos));
+
+        edame >> temp >> temp >> name >> temp >> angle;
+        wm_lock->lock();
+        WM->setJointAngle(name, angle);
+        wm_lock->unlock();
+        pos = msg.find("HJ", pos + 1);
+    }
+}
+
+void Parser::parseLines(string &msg)
+{
+    string temp;
+    int pos=msg.find("L");
+    while(pos !=string::npos)
+    {
+        stringstream edame(msg.substr(pos));
+        double x1,y1,z1,x2,y2,z2;
+        edame>>temp>>temp>>x1>>y1>>z1>>temp>>x2>>y2>>z2;
+        wm_lock->lock();
+        WM->setSeenLines(line (Vector3f(x1,y1,z1),Vector3f(x2,y2,z2),WM->serverTime));
+        wm_lock->unlock();
+        pos=msg.find("L",pos+1);
+    }
+}
+
+void Parser::parseSide(string &msg)
+{
+    int pos = msg.find(" left");
+    if (pos != string::npos)
+    {
+        wm_lock->lock();
+        WM->setTeamSide(Left);
+        wm_lock->unlock();
+    }
+
+    pos = msg.find(" right");
+    if (pos != string::npos)
+    {
+        wm_lock->lock();
+        WM->setTeamSide(Right);
+        wm_lock->unlock();
+    }
+}
+
+void Parser::parseFrp(string &msg)
+{
+    string temp;
+    int pos = msg.find("FRP");
+    while (pos != string::npos)
+    {
+        stringstream edame(msg.substr(pos));
+        string name;
+        FootRes foot;
+        edame >> temp >> temp >> name >> temp
+              >> foot.c.x()
+              >> foot.c.y()
+              >> foot.c.z()
+              >> temp
+              >> foot.f.x()
+              >> foot.f.y()
+              >> foot.f.z();
+        wm_lock->lock();
+        WM->setFootPress(name, foot);
+        wm_lock->unlock();
+        pos = msg.find("FRP",pos+1);
+    }
+
+
+}
+
+void Parser::parseHearMessage(string &msg)
+{
+
     double time;
     string temp;
-    regex timeRegex("\\(time \\(now ([-+]?[0-9]*\.?[0-9]+)\\)\\)");
-    regex gsRegex("\\(GS \\(t ([-+]?[0-9]*\.?[0-9]+)\\) \\(pm ([a-zA-Z0-9_]*)\\)\\)");
-    regex gyroRegex("\\(GYR \\(n torso\\) \\(rt ([-+]?[0-9]*\.?[0-9]+) ([-+]?[0-9]*\.?[0-9]+) ([-+]?[0-9]*\.?[0-9]+)\\)\\)");
-    regex accRegex("\\(ACC \\(n torso\  \) \\(a ([-+]?[0-9]*\.?[0-9]+) ([-+]?[0-9]*\.?[0-9]+) ([-+]?[0-9]*\.?[0-9]+)\\)\\)");
-    regex hjRegex("\\(HJ \\(n ([a-zA-Z0-9_]*)\\) \\(ax ([-+]?[0-9]*\.?[0-9]+)\\)\\)");
-    regex flagRegex("\\(([a-zA-Z0-9_]*) \\(pol ([-+]?[0-9]*\.?[0-9]+) ([-+]?[0-9]*\.?[0-9]+) ([-+]?[0-9]*\.?[0-9]+)\\)\\)");
-    regex ballRegex("\\(B \\(pol ([-+]?[0-9]*\.?[0-9]+) ([-+]?[0-9]*\.?[0-9]+) ([-+]?[0-9]*\.?[0-9]+)\\)\\)");
-    regex meRegex("\\(P \\(team ([a-zA-Z0-9_]*)\\) \\(id ([-+]?[0-9]*\.?[0-9]+)\\) \\(rlowerarm \\(pol ([-+]?[0-9]*\.?[0-9]+) ([-+]?[0-9]*\.?[0-9]+) ([-+]?[0-9]*\.?[0-9]+)\\)\\) \\(llowerarm \\(pol ([-+]?[0-9]*\.?[0-9]+) ([-+]?[0-9]*\.?[0-9]+) ([-+]?[0-9]*\.?[0-9]+)\\)\\) \\(rfoot \\(pol ([-+]?[0-9]*\.?[0-9]+) ([-+]?[0-9]*\.?[0-9]+) ([-+]?[0-9]*\.?[0-9]+)\\)\\) \\(lfoot \\(pol ([-+]?[0-9]*\.?[0-9]+) ([-+]?[0-9]*\.?[0-9]+) ([-+]?[0-9]*\.?[0-9]+)\\)\\)\\)");
-    regex lineRegex("\\(L \\(pol ([-+]?[0-9]*\.?[0-9]+) ([-+]?[0-9]*\.?[0-9]+) ([-+]?[0-9]*\.?[0-9]+)\\) \\(pol ([-+]?[0-9]*\.?[0-9]+) ([-+]?[0-9]*\.?[0-9]+) ([-+]?[0-9]*\.?[0-9]+)\\)\\)");
-    regex playerRegex("\\(P \\(team ([a-zA-Z0-9_]*)\\) \\(id ([-+]?[0-9]*\.?[0-9]+)\\) \\(head \\(pol ([-+]?[0-9]*\.?[0-9]+) ([-+]?[0-9]*\.?[0-9]+) ([-+]?[0-9]*\.?[0-9]+)\\)\\) \\(rlowerarm \\(pol ([-+]?[0-9]*\.?[0-9]+) ([-+]?[0-9]*\.?[0-9]+) ([-+]?[0-9]*\.?[0-9]+)\\)\\) \\(llowerarm \\(pol ([-+]?[0-9]*\.?[0-9]+) ([-+]?[0-9]*\.?[0-9]+) ([-+]?[0-9]*\.?[0-9]+)\\)\\) \\(rfoot \\(pol ([-+]?[0-9]*\.?[0-9]+) ([-+]?[0-9]*\.?[0-9]+) ([-+]?[0-9]*\.?[0-9]+)\\)\\) \\(lfoot \\(pol ([-+]?[0-9]*\.?[0-9]+) ([-+]?[0-9]*\.?[0-9]+) ([-+]?[0-9]*\.?[0-9]+)\\)\\)\\)");
-    regex frpRegex("\\(FRP \\(n ([a-zA-Z0-9_]*)\\) \\(c ([-+]?[0-9]*\.?[0-9]+) ([-+]?[0-9]*\.?[0-9]+) ([-+]?[0-9]*\.?[0-9]+)\\) \\(f ([-+]?[0-9]*\.?[0-9]+) ([-+]?[0-9]*\.?[0-9]+) ([-+]?[0-9]*\.?[0-9]+)\\)\\)");
+    int pos = msg.find("hear");
+    if (pos != string::npos)
+    {
+        stringstream edame(msg.substr(pos));
+        string msg1;
+        edame >> temp >> time >> temp >> msg1 ;
+
+        if (msg1.size() ==3 && msg1[0]==msg1[1] && msg1[1] == msg1[2]){
+            msg1=msg1.substr(0,1);
+            wm_lock->lock();
+            WM->setLastMsg( msg1 , time );
+            wm_lock->unlock();
+        }
+        else
+        {
+
+            pos = msg.find("hear",pos+1);
+            if (pos != string::npos)
+            {
+                stringstream edame(msg.substr(pos));
+
+                edame >> temp >> time >> temp >> msg1 ;
+
+                if (msg1.size() == 3 && msg1[0]==msg1[1] && msg1[1] == msg1[2]){
+                    msg1=msg1.substr(0,1);
+                    wm_lock->lock();
+                    WM->setLastMsg( msg1 , time );
+                    wm_lock->unlock();
+                }
+
+            }
+        }
+    }
+}
+
+void Parser::parseSense(string &msg)
+{
+    string temp;
+    int pos = msg.find("mypos");
+    if (pos != string::npos)
+    {
+        stringstream edame(msg.substr(pos));
+        double x,y,z;
+        edame >> temp >> x >> y >> z ;
+        wm_lock->lock();
+        WM->setSense(true);
+        WM->sensedPos = Vector3f(x,y,z);
+        wm_lock->unlock();
+    }
+
+    pos = msg.find("myorien");
+    if (pos != string::npos)
+    {
+        stringstream edame(msg.substr(pos));
+        double ang;
+        edame >> temp >> ang ;
+        wm_lock->lock();
+        WM->setSense(true);
+        WM->myOrien = ang;
+        wm_lock->unlock();
+    }
+}
+
+void Parser::parseFlags(string &msg)
+{
+    Polar goal;
+    Polar flag;
 
     /*
-     * Time & PlayMode Parser
+     * Goal Flags Parse
      */
-    //    cout<<msg<<endl;
+
+    string temp;
+    int pos = msg.find("G1L");
+    if (pos != string::npos)
+    {
+        stringstream edame(msg.substr(pos));
+        edame >> temp >> temp >> goal.dist >> goal.theta >> goal.phi;
+        wm_lock->lock();
+        WM->setFlagPos("G1L", goal);
+        wm_lock->unlock();
+    }
+    pos = msg.find("G2L");
+    if (pos != string::npos)
+    {
+        stringstream edame(msg.substr(pos));
+        edame >> temp >> temp >> goal.dist >> goal.theta >> goal.phi;
+        wm_lock->lock();
+        WM->setFlagPos("G2L", goal);
+        wm_lock->unlock();
+    }
+    pos = msg.find("G1R");
+    if (pos != string::npos)
+    {
+        stringstream edame(msg.substr(pos));
+        edame >> temp >> temp >> goal.dist >> goal.theta >> goal.phi;
+        wm_lock->lock();
+        WM->setFlagPos("G1R", goal);
+        wm_lock->unlock();
+    }
+    pos = msg.find("G2R");
+    if (pos != string::npos)
+    {
+        stringstream edame(msg.substr(pos));
+        edame >> temp >> temp >> goal.dist >> goal.theta >> goal.phi;
+        wm_lock->lock();
+        WM->setFlagPos("G2R", goal);
+        wm_lock->unlock();
+    }
+
+    /*
+     * Flags Parse
+     */
+
+    pos = msg.find("F1L");
+    if (pos != string::npos)
+    {
+        stringstream edame(msg.substr(pos));
+        edame >> temp >> temp >> flag.dist >> flag.theta >> flag.phi;
+        wm_lock->lock();
+        WM->setFlagPos("F1L", flag);
+        wm_lock->unlock();
+    }
+    pos = msg.find("F2L");
+    if (pos != string::npos)
+    {
+        stringstream edame(msg.substr(pos));
+        edame >> temp >> temp >> flag.dist >> flag.theta >> flag.phi;
+        wm_lock->lock();
+        WM->setFlagPos("F2L", flag);
+        wm_lock->unlock();
+    }
+    pos = msg.find("F1R");
+    if (pos != string::npos)
+    {
+        stringstream edame(msg.substr(pos));
+        edame >> temp >> temp >> flag.dist >> flag.theta >> flag.phi;
+        wm_lock->lock();
+        WM->setFlagPos("F1R", flag);
+        wm_lock->unlock();
+    }
+    pos = msg.find("F2R");
+    if (pos != string::npos)
+    {
+        stringstream edame(msg.substr(pos));
+        edame >> temp >> temp >> flag.dist >> flag.theta >> flag.phi;
+        wm_lock->lock();
+        WM->setFlagPos("F2R", flag);
+        wm_lock->unlock();
+    }
+}
+
+void Parser::parsePlayers(string &msg)
+{
+    /*
+     * Player Pos Parse
+     */
+
+    string temp;
+    int pos = msg.find("P");
+    while (pos != string::npos)
+    {
+        stringstream edame(msg.substr(pos));
+        edame >> temp >> temp;
+        if ( temp != "team" )
+        {
+            pos = msg.find("P",pos+1);
+            continue;
+        }
+        string name,place;
+        int num=0;
+        Polar ppol;
+        edame >> name ;
+        if ( name != WM->getOurName() )
+        {
+            wm_lock->lock();
+            WM->setOppName( name );
+            wm_lock->unlock();
+        }
+        edame >> temp >> num >> place >> temp >> ppol.dist >> ppol.theta >> ppol.phi ;
+        if ( place == "head" )
+        {
+            if ( name == WM->getOurName() )
+            {
+                wm_lock->lock();
+                WM->setOurPlayerPos ( num , ppol ) ;
+                wm_lock->unlock();
+            }
+            else
+            {
+                wm_lock->lock();
+                WM->setOppPlayerPos ( num , ppol ) ;
+                wm_lock->unlock();
+            }
+        }
+        else
+        {
+            if ( name == WM->getOurName() )
+            {
+                wm_lock->lock();
+                WM->setOurPlayerPartPos ( num , place , ppol ) ;
+                wm_lock->unlock();
+            }
+            else
+            {
+                wm_lock->lock();
+                WM->setOppPlayerPartPos ( num , place , ppol ) ;
+                wm_lock->unlock();
+            }
+        }
+
+        pos = msg.find("P",pos+1);
+
+    }
+}
+
+void Parser::parseTime(string &msg)
+{
+
+    double time;
+
+    string temp;
+    int pos = msg.find("time");
+    if (pos != string::npos)
+    {
+        stringstream edame(msg.substr(pos));
+        edame >> temp >> temp >> time;
+        wm_lock->lock();
+        WM->setServerTime(time);
+        wm_lock->unlock();
+    }
+}
+
+void Parser::parseGameState(string &msg)
+{
+    string temp;
     int pos = msg.find("GS");
     if (pos != string::npos)
     {
@@ -70,7 +381,9 @@ void Parser::Parse(string msg)
         {
             stringstream edame(msg.substr(pos));
             edame >> temp >> pm;
-            WM->setPlayMode(pms[pm]);
+            wm_lock->lock();
+            WM->setPlayMode(getPlayModeByString(pm));
+            wm_lock->unlock();
         }
     }
 
@@ -91,254 +404,33 @@ void Parser::Parse(string msg)
             if (pos != string::npos && name.length() == 1)
             {
                 edame >> curr;
+                wm_lock->lock();
                 WM->setTime(curr);
+                wm_lock->unlock();
                 break;
             }
-
         }
     }
+}
 
-
-
-    /*
-     * Time Parse
-     */
-    pos = msg.find("time");
-    if (pos != string::npos)
-    {
-        stringstream edame(msg.substr(pos));
-        edame >> temp >> temp >> time;
-        WM->setServerTime(time);
-    }
-
-
-    //kossher parsing
-    //    bool not_found=false;
-    //    while(!not_found)
-    //    {
-    pos=msg.find("L");
-    while(pos !=string::npos)
-    {
-//        stringstream edame(msg.substr(pos));
-//        double x1,y1,z1,x2,y2,z2;
-//        edame>>temp>>temp>>x1>>y1>>z1>>temp>>x2>>y2>>z2;
-//        line l(Vector3f(x1,y1,z1),Vector3f(x2,y2,z2),WM->serverTime);
-//        cout<<l.begin<<"and "<<l.end<<endl;
-//        WM->setSeenLines(l);
-        //       RVDraw::instance()->drawVector3f(x1*cosDeg());
-        pos=msg.find("L",pos+1);
-
-    }
-
-    //        else{
-    //            not_found=true;
-    //        }
-
-    //    }
-
-
-
-
-    /*
-     * Goal Flags Parse
-     */
-
-    pos = msg.find("G1L");
-    if (pos != string::npos)
-    {
-        stringstream edame(msg.substr(pos));
-        edame >> temp >> temp >> goal.dist >> goal.theta >> goal.phi;
-        WM->setFlagPos("G1L", goal);
-    }
-    pos = msg.find("G2L");
-    if (pos != string::npos)
-    {
-        stringstream edame(msg.substr(pos));
-        edame >> temp >> temp >> goal.dist >> goal.theta >> goal.phi;
-        WM->setFlagPos("G2L", goal);
-    }
-    pos = msg.find("G1R");
-    if (pos != string::npos)
-    {
-        stringstream edame(msg.substr(pos));
-        edame >> temp >> temp >> goal.dist >> goal.theta >> goal.phi;
-        WM->setFlagPos("G1R", goal);
-    }
-    pos = msg.find("G2R");
-    if (pos != string::npos)
-    {
-        stringstream edame(msg.substr(pos));
-        edame >> temp >> temp >> goal.dist >> goal.theta >> goal.phi;
-        WM->setFlagPos("G2R", goal);
-    }
-
-    /*
-     * Flags Parse
-     */
-
-
-    pos = msg.find("F1L");
-    if (pos != string::npos)
-    {
-        stringstream edame(msg.substr(pos));
-        edame >> temp >> temp >> flag.dist >> flag.theta >> flag.phi;
-        WM->setFlagPos("F1L", flag);
-    }
-    pos = msg.find("F2L");
-    if (pos != string::npos)
-    {
-        stringstream edame(msg.substr(pos));
-        edame >> temp >> temp >> flag.dist >> flag.theta >> flag.phi;
-        WM->setFlagPos("F2L", flag);
-    }
-    pos = msg.find("F1R");
-    if (pos != string::npos)
-    {
-        stringstream edame(msg.substr(pos));
-        edame >> temp >> temp >> flag.dist >> flag.theta >> flag.phi;
-        WM->setFlagPos("F1R", flag);
-    }
-    pos = msg.find("F2R");
-    if (pos != string::npos)
-    {
-        stringstream edame(msg.substr(pos));
-        edame >> temp >> temp >> flag.dist >> flag.theta >> flag.phi;
-        WM->setFlagPos("F2R", flag);
-    }
-
-    /*
-     * Ball Pos Parse
-     */
-
-    pos = msg.find("B");
-    while (1)
-    {
-        if (pos == string::npos)
-        {
-            break;
-        }
-        stringstream edame(msg.substr(pos));
-        string name;
-        edame >> name;
-        if (name.length() != 1)
-        {
-            pos = msg.find("B", pos + 1);
-            continue;
-        }
-        edame >> temp >> ball.dist >> ball.theta >> ball.phi;
-        WM->setBallPolarPos(ball);
-        break;
-    }
-
+void Parser::parseGyroAndAccell(string &msg)
+{
     /*
      * Gyro Parse
      */
 
-    pos = msg.find("GYR");
+    string temp;
+    int pos = msg.find("GYR");
     if (pos != string::npos)
     {
         Vector3f gyr;
         stringstream edame(msg.substr(pos));
         edame >> temp >> temp >> temp >> temp >> gyr.x() >> gyr.y() >> gyr.z();
+        wm_lock->lock();
         WM->setGyro(gyr);
+        wm_lock->unlock();
     }
 
-    /*
-     * Angle Parse
-     */
-    pos = msg.find("HJ");
-    for (int i = 0; i < 22; i++)
-    {
-        if (pos == string::npos)
-        {
-            break;
-        }
-        string name;
-        double angle;
-        stringstream edame(msg.substr(pos));
-        edame >> temp >> temp >> name >> temp >> angle;
-        WM->setJointAngle(name, angle);
-        pos = msg.find("HJ", pos + 1);
-    }
-
-    /*
-     * Player Pos Parse
-     */
-
-    pos = msg.find("P");
-    while (pos != string::npos)
-    {
-        stringstream edame(msg.substr(pos));
-        edame >> temp >> temp;
-        if ( temp != "team" )
-        {
-            pos = msg.find("P",pos+1);
-            continue;
-        }
-        string name,place;
-        int num=0;
-        Polar ppol;
-        edame >> name ;
-        if ( name != WM->getOurName() )
-        {
-            WM->setOppName( name );
-        }
-        edame >> temp >> num >> place >> temp >> ppol.dist >> ppol.theta >> ppol.phi ;
-        if ( place == "head" )
-        {
-            if ( name == WM->getOurName() )
-            {
-                WM->setOurPlayerPos ( num , ppol ) ;
-            }
-            else
-            {
-                WM->setOppPlayerPos ( num , ppol ) ;
-            }
-        }
-        else
-        {
-            if ( name == WM->getOurName() )
-            {
-                WM->setOurPlayerPartPos ( num , place , ppol ) ;
-            }
-            else
-            {
-                WM->setOppPlayerPartPos ( num , place , ppol ) ;
-            }
-        }
-
-        pos = msg.find("P",pos+1);
-
-    }
-    /*
-     * Side Parser
-     */
-    pos = msg.find("left");
-    while (1)
-    {
-        if (pos == string::npos)
-        {
-            break;
-        }
-        if (msg [pos - 1] == ' ')
-        {
-            WM->setTeamSide("left");
-        }
-        pos = msg.find("left", pos + 1);
-    }
-    pos = msg.find("right");
-    while (1)
-    {
-        if (pos == string::npos)
-        {
-            break;
-        }
-        if (msg [pos - 1] == ' ')
-        {
-            WM->setTeamSide("right");
-        }
-        pos = msg.find("right", pos + 1);
-    }
 
     /*
      * Accelerometer Parse
@@ -350,97 +442,74 @@ void Parser::Parse(string msg)
         Vector3f acc;
         stringstream edame(msg.substr(pos));
         edame >> temp >> temp >> temp >> temp >> acc.x() >> acc.y() >> acc.z();
+        wm_lock->lock();
         WM->setACC(acc);
+        wm_lock->unlock();
     }
 
+}
+
+void Parser::parseBall(string &msg)
+{
     /*
-     * FRP Parser
+     * Ball Pos Parse
      */
 
-    pos = msg.find("FRP");
-    if (pos != string::npos)
-    {
-        stringstream edame(msg.substr(pos));
-        string name;
-        FootRes foot;
-        edame >> temp >> temp >> name >> temp
-              >> foot.c.x()
-              >> foot.c.y()
-              >> foot.c.z()
-              >> temp
-              >> foot.f.x()
-              >> foot.f.y()
-              >> foot.f.z();
-        WM->setFootPress(name, foot);
-    }
-    pos = msg.find("FRP", pos + 1);
-    if (pos != string::npos)
-    {
-        stringstream edame(msg.substr(pos));
-        string name;
-        FootRes foot;
-        edame >> temp >> temp >> name >> temp
-              >> foot.c.x()
-              >> foot.c.y()
-              >> foot.c.z()
-              >> temp
-              >> foot.f.x()
-              >> foot.f.y()
-              >> foot.f.z();
-        WM->setFootPress(name, foot);
-    }
-    //cout<<msg<<endl;
-    pos = msg.find("hear");
-    if (pos != string::npos)
-    {
-        stringstream edame(msg.substr(pos));
-        string msg1;
-        edame >> temp >> time >> temp >> msg1 ;
+    Polar ball;
 
-        //cout << "LL! " <<msg1 << endl;
-        if (msg1.size() ==3 && msg1[0]==msg1[1] && msg1[1] == msg1[2]){
-            msg1=msg1.substr(0,1);
-            WM->setLastMsg( msg1 , time );
-        }
-        else
+    string temp;
+    int pos = msg.find("B");
+    while (1)
+    {
+        if (pos == string::npos)
+            break;
+
+        stringstream edame(msg.substr(pos));
+        string name;
+        edame >> name;
+        if (name.length() != 1)
         {
-
-            pos = msg.find("hear",pos+1);
-            if (pos != string::npos)
-            {
-                stringstream edame(msg.substr(pos));
-
-                edame >> temp >> time >> temp >> msg1 ;
-                //cout << "msg1 after " <<msg1 << endl;
-
-                if (msg1.size() == 3 && msg1[0]==msg1[1] && msg1[1] == msg1[2]){
-                    msg1=msg1.substr(0,1);
-                    WM->setLastMsg( msg1 , time );
-                }
-
-            }
+            pos = msg.find("B", pos + 1);
+            continue;
         }
+        edame >> temp >> ball.dist >> ball.theta >> ball.phi;
+        wm_lock->lock();
+        WM->setBallPolarPos(ball);
+        wm_lock->unlock();
+        break;
     }
+}
 
-    pos = msg.find("mypos");
-    if (pos != string::npos)
-    {
-        stringstream edame(msg.substr(pos));
-        string msg;
-        double x,y,z;
-        edame >> temp >> x >> y >> z ;
-        WM->setSense(true);
-        WM->sensedPos = Vector3f(x,y,z);
-    }
+/**
+ *
+ * @param msg witch is the massage that will parse
+ * @do parse message
+ *
+ * */
+void Parser::Parse(string &msg)
+{
+    for ( int i = 0; i<msg.length(); i++)
+        if ( msg[i]=='(' || msg[i]==')')
+            msg[i]=' ';
 
-    pos = msg.find("myorien");
-    if (pos != string::npos)
+    std::vector<std::thread> all_threads;
+
+    all_threads.push_back(std::thread ( std::bind (&Parser::parseHingeJoint,this,msg) ));
+    all_threads.push_back(std::thread ( std::bind (&Parser::parseLines,this,msg) ));
+    all_threads.push_back(std::thread ( std::bind (&Parser::parseFlags,this,msg) ));
+    all_threads.push_back(std::thread ( std::bind (&Parser::parsePlayers,this,msg) ));
+    all_threads.push_back(std::thread ( std::bind (&Parser::parseTime,this,msg) ));
+    all_threads.push_back(std::thread ( std::bind (&Parser::parseGameState,this,msg) ));
+    all_threads.push_back(std::thread ( std::bind (&Parser::parseGyroAndAccell,this,msg) ));
+    all_threads.push_back(std::thread ( std::bind (&Parser::parseBall,this,msg) ));
+    all_threads.push_back(std::thread ( std::bind (&Parser::parseSide,this,msg) ));
+    all_threads.push_back(std::thread ( std::bind (&Parser::parseFrp,this,msg) ));
+    all_threads.push_back(std::thread ( std::bind (&Parser::parseHearMessage,this,msg) ));
+    all_threads.push_back(std::thread ( std::bind (&Parser::parseSense,this,msg) ));
+
+
+    for ( auto &i : all_threads )
     {
-        stringstream edame(msg.substr(pos));
-        string msg;
-        double ang;
-        edame >> temp >> ang ;
-        WM->setSense(true);
-        WM->myOrien = ang;
+        i.join();
     }
 }

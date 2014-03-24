@@ -32,45 +32,6 @@ Skill::Skill(WorldModel*wm)
         }
     f.close();
 
-    /*f.open("ACT/diveR.txt");
-    if ( !f)
-    {
-        cerr << "Could'nt Open File divrR" << endl;
-    }
-    f >> x >> y;
-    for (int i = 0; i < x; i++)
-        for (int j = 0; j < y; j++)
-        {
-            f >> diveR[i][j];
-        }
-    f.close();
-
-    f.open("ACT/diveL.txt");
-    if ( !f)
-    {
-        cerr << "Could'nt Open File diveL" << endl;
-    }
-    f >> x >> y;
-    for (int i = 0; i < x; i++)
-        for (int j = 0; j < y; j++)
-        {
-            f >> diveL[i][j];
-        }
-    f.close();
-
-    f.open("ACT/diveC.txt");
-    if ( !f)
-    {
-        cerr << "Could'nt Open File divrC" << endl;
-    }
-    f >> x >> y;
-    for (int i = 0; i < x; i++)
-        for (int j = 0; j < y; j++)
-        {
-            f >> diveC[i][j];
-        }
-    f.close();
-    */
     f.open("ACT/hfr.txt");
     if ( !f)
     {
@@ -162,21 +123,19 @@ Skill::Skill(WorldModel*wm)
         }
     f.close();
 
+    rHipYawPitch = KDL::Joint(KDL::Vector(0,0,0),KDL::Vector(-0.707,0.0,0.707),KDL::Joint::RotAxis);
+    rHipRoll = KDL::Joint(KDL::Vector(0,0,0),KDL::Vector(0,1,0),KDL::Joint::RotAxis);
+    rHipPitch = KDL::Joint(KDL::Vector(0,-0.01,0.04)+KDL::Vector(0,0.01,-0.04),KDL::Vector(1,0,0),KDL::Joint::RotAxis);
+    rKneePitch = KDL::Joint(KDL::Vector(0,-0.01,0.045)+KDL::Vector(0,0.005,-0.125),KDL::Vector(1,0,0),KDL::Joint::RotAxis);
+    rAnkleRoll = KDL::Joint(KDL::Vector(0,-0.03,0.035)+KDL::Vector(0,0.03,-0.035),KDL::Vector(0,1,0),KDL::Joint::RotAxis);
+    rAnklePitch = KDL::Joint(KDL::Vector(0.0,0.0,0.0)+KDL::Vector(0,-0.01,-0.055),KDL::Vector(1,0,0),KDL::Joint::RotAxis);
 
-    rHipYawPitch = KDL::Joint(KDL::Vector(0,0,0),KDL::Vector(0.707,0.0,-0.707),KDL::Joint::RotAxis);
-    rHipRoll = KDL::Joint(KDL::Vector(0,0,0),KDL::Vector(0,-1,0),KDL::Joint::RotAxis);
-    rHipPitch = KDL::Joint(KDL::Vector(0,-0.01,0.04),KDL::Vector(-1,0,0),KDL::Joint::RotAxis);
-    rKneePitch = KDL::Joint(KDL::Vector(0,-0.01,0.045),KDL::Vector(-1,0,0),KDL::Joint::RotAxis);
-    rAnklePitch = KDL::Joint(KDL::Vector(0.0,0.0,0.0),KDL::Vector(-1,0,0),KDL::Joint::RotAxis);
-    rAnkleRoll = KDL::Joint(KDL::Vector(0,0,0),KDL::Vector(0,-1,0),KDL::Joint::RotAxis);
-
-
-    rLeg.addSegment(KDL::Segment("rAnkleRoll",rAnkleRoll,KDL::Frame(KDL::Vector(0,0.0,0.0))));
-    rLeg.addSegment(KDL::Segment("rAnklePitch",rAnklePitch,KDL::Frame(KDL::Vector(0,0.01,0.055))));
-    rLeg.addSegment(KDL::Segment("rKneePitch",rKneePitch,KDL::Frame(KDL::Vector(0,-0.005,0.125))));
-    rLeg.addSegment(KDL::Segment("rHipPitch",rHipPitch,KDL::Frame(KDL::Vector(0,-0.01,0.04))));
-    rLeg.addSegment(KDL::Segment("rHipRoll",rHipRoll,KDL::Frame(KDL::Vector(0,0,0))));
     rLeg.addSegment(KDL::Segment("rHipYawPitch",rHipYawPitch,KDL::Frame(KDL::Vector(0.0,0.0,0.0))));
+    rLeg.addSegment(KDL::Segment("rHipRoll",rHipRoll,KDL::Frame(KDL::Vector(0,0,0))));
+    rLeg.addSegment(KDL::Segment("rHipPitch",rHipPitch,KDL::Frame(KDL::Vector(0,0.01,-0.04))));
+    rLeg.addSegment(KDL::Segment("rKneePitch",rKneePitch,KDL::Frame(KDL::Vector(0,0.005,-0.125))));
+    rLeg.addSegment(KDL::Segment("rAnklePitch",rAnklePitch,KDL::Frame(KDL::Vector(0,-0.01,-0.055))));
+    rLeg.addSegment(KDL::Segment("rAnkleRoll",rAnkleRoll,KDL::Frame(KDL::Vector(0,0.0,0.0))));
 
 
     lHipYawPitch = KDL::Joint(KDL::Vector(0,0,0),KDL::Vector(-0.707,0.0,-0.707),KDL::Joint::RotAxis);
@@ -193,6 +152,51 @@ Skill::Skill(WorldModel*wm)
     lLeg.addSegment(KDL::Segment("lAnklePitch",lAnklePitch,KDL::Frame(KDL::Vector(0,-0.01,-0.055))));
     lLeg.addSegment(KDL::Segment("lAnkleRoll",lAnkleRoll,KDL::Frame(KDL::Vector(0,0.0,0.0))));
 
+
+    unsigned int  nj2 = lLeg.getNrOfSegments();
+
+    KDL::JntArray lLegJMin =KDL::JntArray(nj2);
+    lLegJMin(0) = Deg2Rad(-90);
+    lLegJMin(1) = Deg2Rad(-25);
+    lLegJMin(2) = Deg2Rad(-25);
+    lLegJMin(3) = Deg2Rad(-130);
+    lLegJMin(4) = Deg2Rad(-45);
+    lLegJMin(5) = Deg2Rad(-45);
+
+   KDL:: JntArray lLegJMax = KDL::JntArray(nj2);
+    lLegJMax(0) = Deg2Rad(1);
+    lLegJMax(1) = Deg2Rad(45);
+    lLegJMax(2) = Deg2Rad(100);
+    lLegJMax(3) = Deg2Rad(1);
+    lLegJMax(4) = Deg2Rad(75);
+    lLegJMax(5) = Deg2Rad(25);
+
+    KDL::JntArray rLegJMin = KDL::JntArray(nj2);
+
+    rLegJMin(0) = Deg2Rad(-90);
+    rLegJMin(1) = Deg2Rad(-45);
+    rLegJMin(2) = Deg2Rad(-25);
+    rLegJMin(3) = Deg2Rad(-130);
+    rLegJMin(4) = Deg2Rad(-45);
+    rLegJMin(5) = Deg2Rad(-25);
+
+
+    KDL::JntArray rLegJMax = KDL::JntArray(nj2);
+
+    rLegJMax(0) = Deg2Rad(1);
+    rLegJMax(1) = Deg2Rad(25);
+    rLegJMax(2) = Deg2Rad(100);
+    rLegJMax(3) = Deg2Rad(1);
+    rLegJMax(4) = Deg2Rad(75);
+    rLegJMax(5) = Deg2Rad(45);
+
+    lLegFKSolver = new KDL::ChainFkSolverPos_recursive(lLeg);
+    lLegIkSolverVel = new KDL::ChainIkSolverVel_wdls(lLeg, 0.01, 100);//Inverse velocity solver, from Cartesian to joint space
+    lLegIksolverPosJ = new KDL::ChainIkSolverPos_NR_JL(lLeg,lLegJMin,lLegJMax,*lLegFKSolver,*lLegIkSolverVel,100,1e-3);//Maximum 100 iterations, stop at accuracy 1e-6
+
+    rLegFKSolver = new KDL::ChainFkSolverPos_recursive(rLeg);
+    rLegIkSolverVel = new KDL::ChainIkSolverVel_wdls(rLeg ,0.01, 100);//Inverse velocity solver, from Cartesian to joint space
+    rLegIksolverPosJ  = new KDL::ChainIkSolverPos_NR_JL (rLeg,rLegJMin,rLegJMax,*rLegFKSolver,*rLegIkSolverVel,100,1e-3);
 
 }
 
@@ -385,10 +389,7 @@ string Skill::fix()
     stringstream ss;
     for (int i = 0; i < 22; i++)
     {
-        if (  fabs( WM->getLastJointAngle(WM->num2Str(i)) - WM->getJointAngle(WM->num2Str(i)) ) >= 0.0 )
-        {
-            ss << moveJoint(WM->num2Str(i), 0);
-        }
+        ss << fix(WM->num2Str(i));
     }
     return ss.str();
 }
@@ -421,14 +422,7 @@ string Skill::set(string j, double ang, int cycle)
 /////////////////////////////////////////////////////////////////////
 string Skill::fix(string j)
 {
-    if (  ( WM->getLastJointAngle(j) - WM->getJointAngle(j) ) != 0.0 )
-    {
-        return moveJoint(j, 0);
-    }
-    else
-    {
-        return "" ;
-    }
+    return moveJoint(j, 0);
 }
 /////////////////////////////////////turn//////////////////////////////////
 string Skill::standUp(SideT s, bool &done, double &t)
@@ -1053,17 +1047,17 @@ string Skill::shootR (bool &canshoot,bool &done,double &tFinal)
         /// Shoot 1
         ne=false;
     }
-    if(fabs(WM->getMyAngleToGoal())>5 && sw && !(WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Right) && me.getX()>-1 )
-    {
-        if(WM->getMyAngleToGoal()>0)
-        {
-            return finalAction("turnL",tFinal);
-        }
-        else
-        {
-            return finalAction("turnR",tFinal);
-        }
-    }
+//    if(fabs(WM->getMyAngleToGoal())>5 && sw && !(WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Right) && me.getX()>-1 )
+//    {
+//        if(WM->getMyAngleToGoal()>0)
+//        {
+//            return finalAction("turnL",tFinal);
+//        }
+//        else
+//        {
+//            return finalAction("turnR",tFinal);
+//        }
+//    }
     id++;
     sw=false;
 
@@ -1177,17 +1171,17 @@ string Skill::shootL (bool &canshoot,bool &done,double &tFinal)
     {
         ne=false;
     }
-    if(fabs(WM->getMyAngleTo(salt::Vector3f(9,0,0)))>5 && sw && !(WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Right) && me.getX()>-1)
-    {
-        if(WM->getMyAngleTo(salt::Vector3f(9,0,0))>0)
-        {
-            return finalAction("turnL",tFinal);
-        }
-        else
-        {
-            return finalAction("turnR",tFinal);
-        }
-    }
+//    if(fabs(WM->getMyAngleTo(salt::Vector3f(9,0,0)))>5 && sw && !(WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Right) && me.getX()>-1)
+//    {
+//        if(WM->getMyAngleTo(salt::Vector3f(9,0,0))>0)
+//        {
+//            return finalAction("turnL",tFinal);
+//        }
+//        else
+//        {
+//            return finalAction("turnR",tFinal);
+//        }
+//    }
     sw=false;
     id++;
 
@@ -1670,7 +1664,6 @@ string Skill::finalAction (string type,double &t,double maxV)
     ta+=.02;
 
 
-
     return ss.str();
 }
 void Skill::speedControler(string type,double t,double &dd,double &bb,double &sd,double maxV)
@@ -1800,321 +1793,4 @@ void Skill::speedControler(string type,double t,double &dd,double &bb,double &sd
     {
         sd=2;
     }
-}
-
-
-string Skill::WalkLib()
-{
-
-    static int t = 0 ;
-    t++ ;
-
-    unsigned int  nj2 = lLeg.getNrOfSegments();
-
-    KDL::JntArray jointpositionsl = KDL::JntArray(nj2);
-    KDL::JntArray jointpositionsr = KDL::JntArray(nj2);
-
-    KDL::JntArray lLegJMin =KDL::JntArray(nj2);
-    lLegJMin(0) = Deg2Rad(-90);
-    lLegJMin(1) = Deg2Rad(-25);
-    lLegJMin(2) = Deg2Rad(-25);
-    lLegJMin(3) = Deg2Rad(-130);
-    lLegJMin(4) = Deg2Rad(-45);
-    lLegJMin(5) = Deg2Rad(-45);
-
-   KDL:: JntArray lLegJMax = KDL::JntArray(nj2);
-    lLegJMax(0) = Deg2Rad(1);
-    lLegJMax(1) = Deg2Rad(45);
-    lLegJMax(2) = Deg2Rad(100);
-    lLegJMax(3) = Deg2Rad(1);
-    lLegJMax(4) = Deg2Rad(75);
-    lLegJMax(5) = Deg2Rad(25);
-
-    KDL::JntArray rLegJMin = KDL::JntArray(nj2);
-
-    rLegJMin(5) = Deg2Rad(-90);
-    rLegJMin(4) = Deg2Rad(-45);
-    rLegJMin(3) = Deg2Rad(-25);
-    rLegJMin(2) = Deg2Rad(-130);
-    rLegJMin(1) = Deg2Rad(-45);
-    rLegJMin(0) = Deg2Rad(-25);
-
-
-    KDL::JntArray rLegJMax = KDL::JntArray(nj2);
-
-    rLegJMax(5) = Deg2Rad(1);
-    rLegJMax(4) = Deg2Rad(25);
-    rLegJMax(3) = Deg2Rad(100);
-    rLegJMax(2) = Deg2Rad(1);
-    rLegJMax(1) = Deg2Rad(75);
-    rLegJMax(0) = Deg2Rad(45);
-
-    KDL::ChainFkSolverPos_recursive lLegFKSolver = KDL::ChainFkSolverPos_recursive(lLeg);
-    KDL::ChainIkSolverVel_wdls lLegIkSolverVel(lLeg, 0.01, 100);//Inverse velocity solver, from Cartesian to joint space
-    KDL::ChainIkSolverPos_NR_JL lLegIksolverPosJ (lLeg,lLegJMin,lLegJMax,lLegFKSolver,lLegIkSolverVel,100,1e-3);//Maximum 100 iterations, stop at accuracy 1e-6
-
-    KDL::ChainFkSolverPos_recursive rLegFKSolver = KDL::ChainFkSolverPos_recursive(rLeg);
-    KDL::ChainIkSolverVel_wdls rLegIkSolverVel(rLeg ,0.01, 100);//Inverse velocity solver, from Cartesian to joint space
-    KDL::ChainIkSolverPos_NR_JL rLegIksolverPosJ (rLeg,rLegJMin,rLegJMax,rLegFKSolver,rLegIkSolverVel,100,1e-3);//Maximum 100 iterations, stop at accuracy 1e-6
-
-    jointpositionsl(0) = Deg2Rad(0) ;
-    jointpositionsl(1) = Deg2Rad(0) ;
-    jointpositionsl(2) = Deg2Rad(20) ;
-    jointpositionsl(3) = Deg2Rad(-60) ;
-    jointpositionsl(4) = Deg2Rad(40) ;
-    jointpositionsl(5) = Deg2Rad(0) ;
-
-    jointpositionsr(5) = Deg2Rad(0) ;
-    jointpositionsr(4) = Deg2Rad(0) ;
-    jointpositionsr(3) = Deg2Rad(20) ;
-    jointpositionsr(2) = Deg2Rad(-60) ;
-    jointpositionsr(1) = Deg2Rad(40) ;
-    jointpositionsr(0) = Deg2Rad(0) ;
-
-    if (t<20 ) return "";
-
-    if ( t > 20 && t < 100 )
-        return moveJoints(jointpositionsl,jointpositionsl,0.1);
-
-    KDL::Frame rHipStanding;
-    KDL::Frame lAnkleStanding;
-
-    static KDL::JntArray JLLeg(lLeg.getNrOfSegments());
-    static KDL::JntArray JLLegInit(lLeg.getNrOfSegments());
-
-    static KDL::JntArray JRLeg(rLeg.getNrOfSegments());
-    static KDL::JntArray JRLegInit(rLeg.getNrOfSegments());
-
-    static double bb = 0.1 ;
-
-    bb+=0.008;
-    if ( bb > 1.2 )
-        bb=1.2;
-    static double T = 10 * 0.02;
-    static double w = (2*M_PI)/T;
-    double a = 0.05*bb  , b = -0.015*bb ;
-    double a1 = a, b1 = b;
-    double x1 = a*cos(w*t*0.02) , y1 =b*sin(w*t*0.02)  ;
-    double x2 = a1*cos(w*t*0.02) , y2 = b1*sin(w*t*0.02) ;
-
-
-    lLegFKSolver.JntToCart( jointpositionsl ,lAnkleStanding );
-
-    KDL::Frame lfrm (  KDL::Vector( lAnkleStanding.p.x() ,lAnkleStanding.p.y()+x1,lAnkleStanding.p.z()+y1)  );
-
-    rLegFKSolver.JntToCart( jointpositionsr , rHipStanding );
-    KDL::Frame rfrm ( KDL::Vector( rHipStanding.p.x() ,rHipStanding.p.y()+x2,rHipStanding.p.z()+y2));
-
-
-    int solvedl = lLegIksolverPosJ.CartToJnt(JLLegInit , lfrm , JLLeg ) ;
-    JLLegInit=JLLeg;
-
-    int solvedr = rLegIksolverPosJ.CartToJnt(JRLegInit , rfrm , JRLeg ) ;
-    JRLegInit=JRLeg;
-
-    if ( solvedl!=0 || solvedr!=0 )
-        exit(0);
-//        return "";
-    KDL::JntArray serversendR (nj2) ;
-
-        serversendR(0) = JRLeg(5);
-        serversendR(1) = JRLeg(4);
-        serversendR(2) = JRLeg(3) + Deg2Rad(5);
-        serversendR(3) = JRLeg(2);
-        serversendR(4) = JRLeg(1);
-        serversendR(5) = JRLeg(0);
-
-        JLLeg(2) = JLLeg(2)+ Deg2Rad(5);
-
-    return moveJoints(JLLeg,serversendR,0.2);
-    return "";
-}
-//////////////////////////////
-
-string Skill::WalkAngleLib()
-{
-
-    static int t = 0 ;
-    t++ ;
-
-    unsigned int  nj2 = lLeg.getNrOfSegments();
-
-    KDL::JntArray jointpositionsl = KDL::JntArray(nj2);
-    KDL::JntArray jointpositionsr = KDL::JntArray(nj2);
-
-    KDL::JntArray lLegJMin =KDL::JntArray(nj2);
-    lLegJMin(0) = Deg2Rad(-90);
-    lLegJMin(1) = Deg2Rad(-25);
-    lLegJMin(2) = Deg2Rad(-25);
-    lLegJMin(3) = Deg2Rad(-130);
-    lLegJMin(4) = Deg2Rad(-45);
-    lLegJMin(5) = Deg2Rad(-45);
-
-   KDL:: JntArray lLegJMax = KDL::JntArray(nj2);
-    lLegJMax(0) = Deg2Rad(1);
-    lLegJMax(1) = Deg2Rad(45);
-    lLegJMax(2) = Deg2Rad(100);
-    lLegJMax(3) = Deg2Rad(1);
-    lLegJMax(4) = Deg2Rad(75);
-    lLegJMax(5) = Deg2Rad(25);
-
-    KDL::JntArray rLegJMin = KDL::JntArray(nj2);
-
-    rLegJMin(5) = Deg2Rad(-90);
-    rLegJMin(4) = Deg2Rad(-45);
-    rLegJMin(3) = Deg2Rad(-25);
-    rLegJMin(2) = Deg2Rad(-130);
-    rLegJMin(1) = Deg2Rad(-45);
-    rLegJMin(0) = Deg2Rad(-25);
-
-    KDL::JntArray rLegJMax = KDL::JntArray(nj2);
-
-    rLegJMax(5) = Deg2Rad(1);
-    rLegJMax(4) = Deg2Rad(25);
-    rLegJMax(3) = Deg2Rad(100);
-    rLegJMax(2) = Deg2Rad(1);
-    rLegJMax(1) = Deg2Rad(75);
-    rLegJMax(0) = Deg2Rad(45);
-
-    KDL::ChainFkSolverPos_recursive lLegFKSolver = KDL::ChainFkSolverPos_recursive(lLeg);
-    KDL::ChainIkSolverVel_wdls lLegIkSolverVel(lLeg, 0.01, 100);//Inverse velocity solver, from Cartesian to joint space
-    KDL::ChainIkSolverPos_NR_JL lLegIksolverPosJ (lLeg,lLegJMin,lLegJMax,lLegFKSolver,lLegIkSolverVel,100,1e-3);//Maximum 100 iterations, stop at accuracy 1e-6
-
-    KDL::ChainFkSolverPos_recursive rLegFKSolver = KDL::ChainFkSolverPos_recursive(rLeg);
-    KDL::ChainIkSolverVel_wdls rLegIkSolverVel(rLeg ,0.01, 100);//Inverse velocity solver, from Cartesian to joint space
-    KDL::ChainIkSolverPos_NR_JL rLegIksolverPosJ (rLeg,rLegJMin,rLegJMax,rLegFKSolver,rLegIkSolverVel,100,1e-3);//Maximum 100 iterations, stop at accuracy 1e-6
-
-    jointpositionsl(0) = Deg2Rad(0) ;
-    jointpositionsl(1) = Deg2Rad(0) ;
-    jointpositionsl(2) = Deg2Rad(30) ;
-    jointpositionsl(3) = Deg2Rad(-60) ;
-    jointpositionsl(4) = Deg2Rad(30) ;
-    jointpositionsl(5) = Deg2Rad(0) ;
-
-    jointpositionsr(5) = Deg2Rad(0) ;
-    jointpositionsr(4) = Deg2Rad(0) ;
-    jointpositionsr(3) = Deg2Rad(30) ;
-    jointpositionsr(2) = Deg2Rad(-60) ;
-    jointpositionsr(1) = Deg2Rad(30) ;
-    jointpositionsr(0) = Deg2Rad(0) ;
-
-    if (t<21) return "";
-
-    if ( t > 20 && t < 100 )
-        return moveJoints(jointpositionsl,jointpositionsl,0.1);
-
-    KDL::Frame rHipStanding;
-    KDL::Frame lAnkleStanding;
-
-    static KDL::JntArray JLLeg(lLeg.getNrOfSegments());
-    static KDL::JntArray JLLegInit(lLeg.getNrOfSegments());
-
-    static KDL::JntArray JRLeg(rLeg.getNrOfSegments());
-    static KDL::JntArray JRLegInit(rLeg.getNrOfSegments());
-
-    static double bb = 0.1 ;
-
-    double theta = Deg2Rad(10);
-
-
-    bb+=0.008;
-    if ( bb > 1.2 )
-        bb=1.2;
-    int Period = 10 ;
-    static double T = Period * 0.02;
-    static double w = (2*M_PI)/T;
-    double a = 0.05*bb  , b = -0.015*bb ;
-    double a1 = a, b1 = b;
-    double x1 = -a*cos(w*t*0.02)*sin(theta) , y1= a*cos(w*t*0.02)*cos(theta) , z1 =b*sin(w*t*0.02)  ;
-    double x2 = -a1*cos(w*t*0.02)*sin(theta) , y2=a1*cos(w*t*0.02)*cos(theta) , z2 = b1*sin(w*t*0.02) ;
-
-    KDL::Rotation lLegRot ;
-    KDL::Rotation rHipRot = KDL::Rotation::RotZ(0);
-
-    int AllTime = Period / 2;
-
-    if ( t % (2*AllTime) < AllTime )
-    {
-         lLegRot = KDL::Rotation::RotZ(
-                     (t%(2*AllTime))*theta/(double)AllTime
-                     );
-         cout << Rad2Deg((t%(2*AllTime))*theta/(double)AllTime)  << endl;
-    } else
-    {
-        lLegRot = KDL::Rotation::RotZ(
-                    ((2*AllTime-(t%(2*AllTime)))*theta)/(double)AllTime
-                    );
-        cout <<Rad2Deg(((2*AllTime-(t%(2*AllTime)))*theta)/(double)AllTime) << endl;
-    }
-
-//    lLegRot = KDL::Rotation::RotZ(0);
-
-    lLegFKSolver.JntToCart( jointpositionsl ,lAnkleStanding );
-
-    KDL::Frame lfrm (  lLegRot , KDL::Vector( lAnkleStanding.p.x()+x1 ,lAnkleStanding.p.y()+y1,lAnkleStanding.p.z()+z1)  );
-
-    rLegFKSolver.JntToCart( jointpositionsr , rHipStanding );
-    KDL::Frame rfrm ( rHipRot, KDL::Vector( rHipStanding.p.x()+x2 ,rHipStanding.p.y()+y2,rHipStanding.p.z()+z2));
-
-
-    int solvedl = lLegIksolverPosJ.CartToJnt(JLLegInit , lfrm , JLLeg ) ;
-    JLLegInit=JLLeg;
-
-    int solvedr = rLegIksolverPosJ.CartToJnt(JRLegInit , rfrm , JRLeg ) ;
-    JRLegInit=JRLeg;
-
-
-
-    if ( solvedl!=0 || solvedr!=0 )
-        exit(0);
-    KDL::JntArray serversendR (nj2) ;
-
-        serversendR(0) = JRLeg(5);
-        serversendR(1) = JRLeg(4);
-        serversendR(2) = JRLeg(3) + Deg2Rad(5) ;
-        serversendR(3) = JRLeg(2);
-        serversendR(4) = JRLeg(1);
-        serversendR(5) = JRLeg(0);
-
-        JLLeg(2) = JLLeg(2)+ Deg2Rad(5);
-
-    return moveJoints(JLLeg,serversendR,0.2);
-    return "";
-}
-
-
-//////////////////////////////
-string Skill::moveJoints(KDL::JntArray left,KDL::JntArray right , double p)  {
-    KDL::JntArray curLeft(6),curRight(6);
-    KDL::JntArray diffLeft(6),diffRight(6);
-
-    for (int i=0; i<6; ++i)
-    {
-        curRight(i)=WM->getJointAngle(WM->num2Str(2+2*i+1));
-        curLeft(i)=WM->getJointAngle(WM->num2Str(2+2*i));
-
-        diffRight(i)=(right(i))-Deg2Rad(curRight(i));
-
-        diffRight(i)=Rad2Deg(diffRight(i));
-        diffRight(i)=fabs(diffRight(i))<0.1?0:diffRight(i)*p;
-        diffLeft(i)=(left(i))-Deg2Rad(curLeft(i));
-        diffLeft(i)=Rad2Deg(diffLeft(i));
-        diffLeft(i)=fabs(diffLeft(i))<0.1?0:diffLeft(i)*p;
-    }
-
-    string sc;
-
-    for(int jid=0; jid<6; jid++) {
-        string s1, s2;
-        stringstream ss;
-        ss << diffRight(jid);
-        s1 = ss.str();
-        ss.str("");
-        ss << diffLeft(jid);
-        s2=ss.str();
-        sc+="(" + WM->num2Str(2+2*jid+1)+ " " + s1 +")";
-        sc+="(" + WM->num2Str(2+2*jid) + " " + s2 +")";
-    }
-
-    return sc;
 }

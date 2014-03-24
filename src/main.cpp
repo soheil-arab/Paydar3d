@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
 
         ///~  Default Team Name is Robotoos3D
         WM->setOurName("PaYdar3D");
-        ///~ Default Player is Attacker (Number 3)
+        ///~ Default Player is Attacker (Number 9)
         WM->setMyNum(9);
         ///~ standing Z is 0.54q
         WM->setZ(0.54);
@@ -101,7 +101,7 @@ int main(int argc, char *argv[])
         sockClient->connect_to(ip.c_str(),port);
         /// send scene Message
 //        sockClient->Receive();
-        sockClient->send(string("(scene rsg/agent/nao/nao.rsg)"));
+        sockClient->send("(scene rsg/agent/nao/nao.rsg)");
 
         string get;
         sockClient->receive(get);
@@ -112,51 +112,31 @@ int main(int argc, char *argv[])
         ss << "(init (unum " << WM->getMyNum () << ")(teamname " << WM->getOurName() << "))" ;
         sockClient->send(ss.str());
         string dec ;
+        timespec *start, *end;
+        start = new timespec;
+        end = new timespec;
+
         while (1)
         {
-            timespec *start, *end;
-            start = new timespec;
-            end = new timespec;
+            dec.clear();
 
-            dec = "";
-
-//            clock_gettime(CLOCK_REALTIME, start); // Works on Linux
             sockClient->receive(get);
-//            clock_gettime(CLOCK_REALTIME, end); // Works on Linux
-//            if (  (end->tv_nsec - start->tv_nsec  )/1000000000.0 > 0)
-//                cout << "Rec Time : " << ( end->tv_nsec - start->tv_nsec  )/1000000000.0 << endl;
-//            else
-//                cout << "Rec Minus: " << end->tv_nsec << " " << start->tv_nsec<< endl;
+
             clock_gettime(CLOCK_REALTIME, start); // Works on Linux
+
             P->Parse(get);
-//            clock_gettime(CLOCK_REALTIME, end); // Works on Linux
 
-
-//            cout << "Parse Time : " << ( end->tv_nsec - start->tv_nsec  )/1000000000.0 << endl;
-
-//            localize->doLocalize()
-//            clock_gettime(CLOCK_REALTIME, start); // Works on Linux
             WM->Localize();
-//            localize->test();
+            localize->test();
             dec = DC->decide();
             clock_gettime(CLOCK_REALTIME, end); // Works on Linux
 
-//            cout << "Process Time : " << ( end->tv_nsec - start->tv_nsec  )/1000000000.0 << endl;
-            if (  ( end->tv_nsec - start->tv_nsec  )/1000000000.0 > 0.02)
+            if (   ( end->tv_nsec - start->tv_nsec  )/1000000000.0 > 0.02  )
             {
-                cout <<"Rinesh Happend : " <<( end->tv_nsec - start->tv_nsec  )/1000000000.0<< endl;
+                cout <<"Rinesh Happend : " <<( end->tv_nsec - start->tv_nsec  )/1000000000.0 << "   " << get << endl;
+//                exit(0);
             }
-//            clock_gettime(CLOCK_REALTIME, start); // Works on Linux
-            sockClient->send(dec+"(syn)") ;
-//            clock_gettime(CLOCK_REALTIME, end); // Works on Linux
-//            usleep (10000);
-
-
-//            cout << "Send Time:" << ( end->tv_nsec - start->tv_nsec  )/1000000000.0 << endl;
-//            cout << get << endl;
-//            cout << "-======-----=-=-=-=-=-=-=-=-=-=" << endl;
-
-
+            sockClient->send(dec) ;
         }
         ///~ Close Connection
 
@@ -164,7 +144,7 @@ int main(int argc, char *argv[])
     catch (exception &e)
     {
         sockClient->disconnect();
-//        cout << e.what() << endl;       /// if any exception happend Handle it & Print Error
+        cout << e.what() << endl;       /// if any exception happend Handle it & Print Error
     }
     return 0;
 }

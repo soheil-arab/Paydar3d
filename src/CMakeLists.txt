@@ -19,7 +19,8 @@ set(robotoos_SRC
     Logger.cpp
     connection.cpp
     line.cpp
-Localize.cpp
+    Localize.cpp
+    Walk.cpp
 )
 
 set(robotoos_HEAD
@@ -51,13 +52,19 @@ set(robotoos_SRCS
    main.cpp
 )
 
-set(CMAKE_CXX_FLAGS "-pg -std=c++11 -I/usr/include/eigen3 -lorocos-kdl")
+#find_package( Boost REQUIRED COMPONENTS program_options regex )
+
+#include_directories(${BOOST_INCLUDEDIR})
+#link_directories(${BOOST_LIBRARYDIR})
+
+
+set(CMAKE_CXX_FLAGS "-std=c++11 -pthread -pg -g -I/usr/include/eigen3 -lorocos-kdl")
 
 include_directories(${SPARK_INCLUDE_DIR}  )
 
 add_executable(Robotoos3D ${robotoos_SRCS})
 
-target_link_libraries(Robotoos3D)
+target_link_libraries(Robotoos3D ${Boost_LIBRARIES})
 
 install(TARGETS   Robotoos3D        		DESTINATION ${CMAKE_SOURCE_DIR}/bin)
 install(PROGRAMS  start.sh       		DESTINATION ${CMAKE_SOURCE_DIR}/bin)

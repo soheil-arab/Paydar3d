@@ -21,13 +21,6 @@ line::line(Vector3f p1,Vector3f p2)
 }
 
 
-
-
-
-
-
-
-
 Vector3f line::getBegin()
 {
     return begin;
