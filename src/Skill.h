@@ -154,5 +154,9 @@ public :
 
 
 
+  //// Amins Ahoo Chesh siah
+
+  string shootR2 (bool &done) ;
+  string shootL2 (bool &done) ;
 };
 #endif

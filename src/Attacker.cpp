@@ -14,6 +14,9 @@
 #include "rvdraw.h"
 
 string Decide::Attack() {
+    static int ttt = 0;
+//    return SK->SideTurn(ttt,Right);
+    return SK->WalkAngleLib(ttt,Right);
     stringstream ss("");
     myPos = WM->getMyPos();
     ballPos = WM->getBallPos();
@@ -178,7 +181,7 @@ string Decide::Attack() {
 //        }
 
         if (fabs(WM->getMyAngleToBall()) > thresh) {
-            //            if (c.isInside(me)) {
+                        if (c.isInside(me)) {
             Log.Log(2, "Turning Inside Circle %f", WM->getMyAngleToBall());
             if (WM->getMyAngleToBall() > 0) {
                 if (curAct != 2) {
@@ -195,42 +198,42 @@ string Decide::Attack() {
                 }
                 return SK->TurnLib(libT, Right);
             }
-            //            }
-            //            if (fabs(WM->getMyAngleToBall()) > 40) {
-            //                Log.Log(2, "Turning OutSide Circle %f", WM->getMyAngleToBall());
-            //                if (WM->getMyAngleToBall() > 0) {
-            //                    if (curAct != 2) {
-            //                        curAct = 2;
-            //                        tFinal = 0;
-            //                        libT = 0;
-            //                    }
-            //                    return SK->TurnLib(libT, Left);
-            //                } else {
-            //                    if (curAct != 2) {
-            //                        curAct = 2;
-            //                        tFinal = 0;
-            //                        libT = 0;
-            //                    }
-            //                    return SK->TurnLib(libT, Right);
-            //                }
-            //            }
-            //            if (WM->getMyAngleToBall() > 0) {
-            //                Log.Log(2, "Walking Angle L");
-            //                if (curAct != 8) {
-            //                    curAct = 8;
-            //                    tFinal = 0;
-            //                    libT = 0;
-            //                }
-            //                return SK->WalkAngleLib(libT, Left);
-            //            } else {
-            //                Log.Log(2, "Walking Angle R");
-            //                if (curAct != 8) {
-            //                    curAct = 8;
-            //                    tFinal = 0;
-            //                    libT = 0;
-            //                }
-            //                return SK->WalkAngleLib(libT, Right);
-            //            }
+                        }
+                        if (fabs(WM->getMyAngleToBall()) > 40) {
+                            Log.Log(2, "Turning OutSide Circle %f", WM->getMyAngleToBall());
+                            if (WM->getMyAngleToBall() > 0) {
+                                if (curAct != 2) {
+                                    curAct = 2;
+                                    tFinal = 0;
+                                    libT = 0;
+                                }
+                                return SK->TurnLib(libT, Left);
+                            } else {
+                                if (curAct != 2) {
+                                    curAct = 2;
+                                    tFinal = 0;
+                                    libT = 0;
+                                }
+                                return SK->TurnLib(libT, Right);
+                            }
+                        }
+                        if (WM->getMyAngleToBall() > 0) {
+                            Log.Log(2, "Walking Angle L");
+                            if (curAct != 8) {
+                                curAct = 8;
+                                tFinal = 0;
+                                libT = 0;
+                            }
+                            return SK->WalkAngleLib(libT, Left);
+                        } else {
+                            Log.Log(2, "Walking Angle R");
+                            if (curAct != 8) {
+                                curAct = 8;
+                                tFinal = 0;
+                                libT = 0;
+                            }
+                            return SK->WalkAngleLib(libT, Right);
+                        }
         } else if (c.isInside(me) && !tri.isInside(me)) {
             Log.Log(2, "Side Turn");
             if (curAct != 6) {

@@ -209,7 +209,7 @@ string Skill::SideTurn(int &t, SideT side) {
     int Period = 10;
     static double T = Period * 0.02;
     static double w = (2 * M_PI) / T;
-    double a = 0.03 * bb, b = -0.015 * bb;
+    double a = 0.05 * bb, b = -0.015 * bb;
     double a1 = a, b1 = b;
     double x1 = a * cos(w * t * 0.02) * cos(theta), y1 = a * cos(w * t * 0.02) * sin(theta), z1 = b * sin(w * t * 0.02);
     double x2 = a1 * cos(w * t * 0.02 + M_PI) * cos(theta), y2 = a1 * cos(w * t * 0.02 + M_PI) * sin(theta), z2 = b1 * sin(w * t * 0.02 + M_PI);
@@ -546,3 +546,9 @@ void Skill::newSpeedController(double &bb, int t, Command comm) {
     }
 
 }
+
+
+///////////////////////////////////////
+
+
+

@@ -489,8 +489,8 @@ void WorldModel::kalman_filter() {
 //}
 
 void WorldModel::Localize() {
+//    getPosbyTwoFlag();
     brinBeMA();
-    //    getPosbyTwoFlag();
 }
 
 void WorldModel::getPosbyTwoFlag() {
@@ -556,6 +556,7 @@ void WorldModel::getPosbyTwoFlag() {
 
                 setMyAngle(theta - getJointAngle("he1"));
                 setMyPhi(phi - getJointAngle("he2"));
+
 
                 Matrix x;
 
@@ -726,6 +727,9 @@ void WorldModel::getPosbyTwoFlag() {
         }
 
     }
+
+    static int ppp = 0;
+    RVDraw::instance()->drawVector3f(pos,RED,ppp++);
 }
 
 //this function will set the speed which is an approximation of the exact speed
