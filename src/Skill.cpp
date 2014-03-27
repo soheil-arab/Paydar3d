@@ -174,11 +174,11 @@ Skill::Skill(WorldModel*wm) {
 
     lLegFKSolver = new KDL::ChainFkSolverPos_recursive(lLeg);
     lLegIkSolverVel = new KDL::ChainIkSolverVel_wdls(lLeg, 0.01, 100); //Inverse velocity solver, from Cartesian to joint space
-    lLegIksolverPosJ = new KDL::ChainIkSolverPos_NR_JL(lLeg, lLegJMin, lLegJMax, *lLegFKSolver, *lLegIkSolverVel, 100, 1e-3); //Maximum 100 iterations, stop at accuracy 1e-6
+    lLegIksolverPosJ = new KDL::ChainIkSolverPos_NR_JL(lLeg, lLegJMin, lLegJMax, *lLegFKSolver, *lLegIkSolverVel, 100, 0.01); //Maximum 100 iterations, stop at accuracy 1e-6
 
     rLegFKSolver = new KDL::ChainFkSolverPos_recursive(rLeg);
     rLegIkSolverVel = new KDL::ChainIkSolverVel_wdls(rLeg, 0.01, 100); //Inverse velocity solver, from Cartesian to joint space
-    rLegIksolverPosJ = new KDL::ChainIkSolverPos_NR_JL(rLeg, rLegJMin, rLegJMax, *rLegFKSolver, *rLegIkSolverVel, 100, 1e-3);
+    rLegIksolverPosJ = new KDL::ChainIkSolverPos_NR_JL(rLeg, rLegJMin, rLegJMax, *rLegFKSolver, *rLegIkSolverVel, 100, 0.01);
 
 }
 

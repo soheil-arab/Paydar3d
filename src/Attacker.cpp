@@ -185,7 +185,7 @@ string Decide::Attack()
                 return SK->TurnLib(libT, Right);
             }
         }
-        if (curAct == 7 && fabs(WM->getMyAngleToBall()) > 10 && !c.isInside( me )) {
+        if (curAct == 7 && fabs(WM->getMyAngleToBall()) > 10 && !c.isInside(me)) {
             Log.Log(2, "Completing Angle Walk");
 
             if (WM->getMyAngleToBall() > 0) {
@@ -214,7 +214,7 @@ string Decide::Attack()
                 int a1 = lineFromLeftSide.getCircleIntersectionPoints(ballCircle, &tmp1, &tmp2);
                 int a2 = lineFromRightSide.getCircleIntersectionPoints(ballCircle, &tmp1, &tmp2);
 
-                cout << a1 << "  " << a2 << endl;
+//                cout << a1 << "  " << a2 << endl;
                 if (a1 == 2 || a2 == 2) {
                     Log.Log(2, "Turning Inside Circle %f", WM->getMyAngleToBall());
                     if (curAct != 2) {

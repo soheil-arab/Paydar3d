@@ -32,120 +32,119 @@ using namespace std;
 
 ///~ argument arg is name of execution file
 void printHelp(char arg[]);
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
 
-        /// create a connection
-//        ConnectionManager *sockClient = new ConnectionManager ;
-        connection *sockClient = new connection;
-        ///~ WorldModel to Save World Info
-        WorldModel *WM = new WorldModel;
-        /// ~ Class Decide For Decition making
-        Decide     *DC = new Decide(WM);
-        /// ~ Parser To Parse Server Strings
-        Parser     *P  = new Parser(WM);
+    /// create a connection
+    //        ConnectionManager *sockClient = new ConnectionManager ;
+    connection* sockClient = new connection;
+    ///~ WorldModel to Save World Info
+    WorldModel* WM = new WorldModel;
+    /// ~ Class Decide For Decition making
+    Decide* DC = new Decide(WM);
+    /// ~ Parser To Parse Server Strings
+    Parser* P = new Parser(WM);
 
-        /// ~ Localizer class
-        Localize *localize = new Localize(WM);
+    /// ~ Localizer class
+    Localize* localize = new Localize(WM);
 
-        ///~  Default Team Name is Robotoos3D
-        WM->setOurName("PaYdar3D");
-        ///~ Default Player is Attacker (Number 9)
-        WM->setMyNum(9);
-        ///~ standing Z is 0.54q
-        WM->setZ(0.54);
-        ///~ By Default Agent Connect To Local Host
-        string ip = "127.0.0.1";
-        ///~ Default Server Port is 3100
-        int port = 3100 ;
-        for (int i = 1; i < argc; i++)
-        {
-            ///~ Print Help
-            if (!strcmp(argv[i], "--help"))
-            {
-                printHelp(argv[0]);
-                exit ( 0 );
-            }
-            ///~ Set Ip
-            if (!strcmp(argv[i], "--ip"))
-            {
-                ip = argv[++i];
-            }
-            ///~ Set Port
-            else if (!strcmp(argv[i], "--port"))
-            {
-                port = atoi(argv[++i]);
-            }
-            ///~ Set Team Name
-            else if (!strcmp(argv[i], "--name"))
-            {
-                WM->setOurName(argv[++i]);
-            }
-            ///~ Set Agent Number
-            else if (!strcmp(argv[i], "--num"))
-            {
-                WM->setMyNum(atoi(argv[++i]));
-            }
-            ///~ if Option is Illegal Giva an Error
-            else
-            {
-                cerr << "Unkown Input :\" " << argv[i] << " \" ?" << endl;
-                cerr << "Use --help Option To See Arguments" << endl;
-                exit(1);
-            }
+    ///~  Default Team Name is Robotoos3D
+    WM->setOurName("PaYdar3D");
+    ///~ Default Player is Attacker (Number 9)
+    WM->setMyNum(9);
+    ///~ standing Z is 0.54q
+    WM->setZ(0.54);
+    ///~ By Default Agent Connect To Local Host
+    string ip = "127.0.0.1";
+    ///~ Default Server Port is 3100
+    int port = 3100;
+    for (int i = 1; i < argc; i++) {
+        ///~ Print Help
+        if (!strcmp(argv[i], "--help")) {
+            printHelp(argv[0]);
+            exit(0);
         }
-        /// connect To Server
-        try
-        {
-//        sockClient->connect_to(ip.c_str(),port);
-        sockClient->connect_to(ip.c_str(),port);
+        ///~ Set Ip
+        if (!strcmp(argv[i], "--ip")) {
+            ip = argv[++i];
+        }
+        ///~ Set Port
+        else if (!strcmp(argv[i], "--port")) {
+            port = atoi(argv[++i]);
+        }
+        ///~ Set Team Name
+        else if (!strcmp(argv[i], "--name")) {
+            WM->setOurName(argv[++i]);
+        }
+        ///~ Set Agent Number
+        else if (!strcmp(argv[i], "--num")) {
+            WM->setMyNum(atoi(argv[++i]));
+        }
+        ///~ if Option is Illegal Giva an Error
+        else {
+            cerr << "Unkown Input :\" " << argv[i] << " \" ?" << endl;
+            cerr << "Use --help Option To See Arguments" << endl;
+            exit(1);
+        }
+    }
+    /// connect To Server
+    try
+    {
+        //        sockClient->connect_to(ip.c_str(),port);
+        sockClient->connect_to(ip.c_str(), port);
         /// send scene Message
-//        sockClient->Receive();
-        sockClient->send("(scene rsg/agent/nao/nao.rsg)");
+        //        sockClient->Receive();
+        int num = WM->getMyNum();
 
+        if ( num == 8 || num == 9 || num == 10 || num == 11  || num == 2 || num == 3 || num == 4 )
+        {
+            sockClient->send ("(scene rsg/agent/nao/nao_hetero.rsg 0)");
+        } else if ( num == 7  || num == 6 )
+        {
+            sockClient->send ("(scene rsg/agent/naotoe/naotoe_hetero.rsg 0)");
+        } else
+        {
+            sockClient->send ("(scene rsg/agent/nao/nao_hetero.rsg 2)");
+        }
         string get;
         sockClient->receive(get);
 
         stringstream ss;
-        usleep (500);
+        usleep(500);
         /// init Agent and Send number and our team name (Robotoos3D)
-        ss << "(init (unum " << WM->getMyNum () << ")(teamname " << WM->getOurName() << "))" ;
+        ss << "(init (unum " << WM->getMyNum() << ")(teamname " << WM->getOurName() << "))";
         sockClient->send(ss.str());
-        string dec ;
-        timespec *start, *end;
+        string dec;
+        timespec* start, *end;
         start = new timespec;
         end = new timespec;
 
-        while (1)
-        {
+        while (1) {
             dec.clear();
 
             sockClient->receive(get);
 
             clock_gettime(CLOCK_REALTIME, start); // Works on Linux
-
+////////////
             P->Parse(get);
-//            cout << WM->getJointAngle("rle6") << " " << WM->getJointAngle("lle6") << endl;
-
             WM->Localize();
-            localize->test();
+//            localize->test();
             dec = DC->decide();
+////////////
             clock_gettime(CLOCK_REALTIME, end); // Works on Linux
 
-            if (   ( end->tv_nsec - start->tv_nsec  )/1000000000.0 > 0.02  )
-            {
-                cout <<"Rinesh Happend : " <<( end->tv_nsec - start->tv_nsec  )/1000000000.0 << "   " << get << endl;
-//                exit(0);
+            if ((end->tv_nsec - start->tv_nsec) / 1000000000.0 > 0.02) {
+                cout << "Rinesh Happend : " << (end->tv_nsec - start->tv_nsec) / 1000000000.0 << endl;
+                //                exit(0);
             }
-            sockClient->send(dec) ;
+            sockClient->send(dec);
         }
         ///~ Close Connection
-
     }
-    catch (exception &e)
+    catch (exception& e)
     {
         sockClient->disconnect();
-        cout << e.what() << endl;       /// if any exception happend Handle it & Print Error
+        cout << e.what() << endl; /// if any exception happend Handle it & Print Error
     }
     return 0;
 }
@@ -160,5 +159,5 @@ void printHelp(char arg[])
          << "\n    --name : team name"
          << "\n    --num : player Number"
          << "\n    --port : Connecting port"
-         <<endl;
+         << endl;
 }

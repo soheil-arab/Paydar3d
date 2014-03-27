@@ -570,9 +570,16 @@ string Skill::moveJoints(KDL::JntArray left, KDL::JntArray right, double p) {
   KDL::JntArray curLeft(6), curRight(6);
   KDL::JntArray diffLeft(6), diffRight(6);
 
+  string s1, s2;
+  stringstream ss;
+
+  string sc;
+
   for (int i = 0; i < 6; ++i) {
-    curRight(i) = WM->getJointAngle(WM->num2Str(2 + 2 * i + 1));
-    curLeft(i) = WM->getJointAngle(WM->num2Str(2 + 2 * i));
+    string rightStr = WM->num2Str(2 + 2 * i + 1) ;
+    string leftStr = WM->num2Str(2 + 2 * i);
+    curRight(i) = WM->getJointAngle(rightStr);
+    curLeft(i) = WM->getJointAngle(leftStr);
 
     diffRight(i) = (right(i)) - Deg2Rad(curRight(i));
 
@@ -581,36 +588,33 @@ string Skill::moveJoints(KDL::JntArray left, KDL::JntArray right, double p) {
     diffLeft(i) = (left(i)) - Deg2Rad(curLeft(i));
     diffLeft(i) = Rad2Deg(diffLeft(i));
     diffLeft(i) = fabs(diffLeft(i)) < 0.1 ? 0 : diffLeft(i) * p;
-  }
 
-  string sc;
-
-  for (int jid = 0; jid < 6; jid++) {
-    string s1, s2;
-    stringstream ss;
-    ss << diffRight(jid);
+    ss.str("");
+    ss << diffRight(i);
     s1 = ss.str();
     ss.str("");
-    ss << diffLeft(jid);
+    ss << diffLeft(i);
     s2 = ss.str();
-    sc += "(" + WM->num2Str(2 + 2 * jid + 1) + " " + s1 + ")";
-    sc += "(" + WM->num2Str(2 + 2 * jid) + " " + s2 + ")";
+    sc += "(" + rightStr + " " + s1 + ")";
+    sc += "(" + leftStr + " " + s2 + ")";
   }
 
-  double A1 = 15, A2 = 30, fi = 0, B1 = -90 + A1, B2 = A2;
-  static double TT, ww, ta = 0;
-  static int Tint = 30;
-  TT = Tint * 0.02;
-  ww = (2 * M_PI) / TT;
-  sc = sc + moveJoint("lae1",
-                      B1 + A1 * sin(ww * ta + fi) - WM->getJointAngle("lae1")) +
-       moveJoint("rae1",
-                 B1 + -1 * A1 * sin(ww * ta + fi) - WM->getJointAngle("rae1")) +
-       moveJoint("lae4", -1 * B2 + -1 * A2 * sin(ww * ta + fi) -
-                             WM->getJointAngle("lae4")) +
-       moveJoint("rae4",
-                 B2 + -1 * A2 * sin(ww * ta + fi) - WM->getJointAngle("rae4"));
-  ta += .02;
+
+
+//  double A1 = 15, A2 = 30, fi = 0, B1 = -90 + A1, B2 = A2;
+//  static double TT, ww, ta = 0;
+//  static int Tint = 30;
+//  TT = Tint * 0.02;
+//  ww = (2 * M_PI) / TT;
+//  sc = sc + moveJoint("lae1",
+//                      B1 + A1 * sin(ww * ta + fi) - WM->getJointAngle("lae1")) +
+//       moveJoint("rae1",
+//                 B1 + -1 * A1 * sin(ww * ta + fi) - WM->getJointAngle("rae1")) +
+//       moveJoint("lae4", -1 * B2 + -1 * A2 * sin(ww * ta + fi) -
+//                             WM->getJointAngle("lae4")) +
+//       moveJoint("rae4",
+//                 B2 + -1 * A2 * sin(ww * ta + fi) - WM->getJointAngle("rae4"));
+//  ta += .02;
 
   return sc;
 }

@@ -49,6 +49,7 @@ Parser::Parser(WorldModel *wm)
 
 void Parser::parseHingeJoint(string &msg)
 {
+//    cout << msg << endl;
     /*
      * Angle Parse
      */
@@ -63,9 +64,15 @@ void Parser::parseHingeJoint(string &msg)
         stringstream edame(msg.substr(pos));
 
         edame >> temp >> temp >> name >> temp >> angle;
-        wm_lock->lock();
+        if ( name == "llj7" || name == "rlj7")
+        {
+            pos = msg.find("HJ", pos + 1);
+            i--;
+            continue;
+        }
+        //wm_lock->lock();
         WM->setJointAngle(name, angle);
-        wm_lock->unlock();
+        //wm_lock->unlock();
         pos = msg.find("HJ", pos + 1);
     }
 }
@@ -79,9 +86,9 @@ void Parser::parseLines(string &msg)
         stringstream edame(msg.substr(pos));
         double x1,y1,z1,x2,y2,z2;
         edame>>temp>>temp>>x1>>y1>>z1>>temp>>x2>>y2>>z2;
-        wm_lock->lock();
+        //wm_lock->lock();
         WM->setSeenLines(line (Vector3f(x1,y1,z1),Vector3f(x2,y2,z2),WM->serverTime));
-        wm_lock->unlock();
+        //wm_lock->unlock();
         pos=msg.find("L",pos+1);
     }
 }
@@ -91,17 +98,17 @@ void Parser::parseSide(string &msg)
     int pos = msg.find(" left");
     if (pos != string::npos)
     {
-        wm_lock->lock();
+        //wm_lock->lock();
         WM->setTeamSide(Left);
-        wm_lock->unlock();
+        //wm_lock->unlock();
     }
 
     pos = msg.find(" right");
     if (pos != string::npos)
     {
-        wm_lock->lock();
+        //wm_lock->lock();
         WM->setTeamSide(Right);
-        wm_lock->unlock();
+        //wm_lock->unlock();
     }
 }
 
@@ -122,9 +129,9 @@ void Parser::parseFrp(string &msg)
               >> foot.f.x()
               >> foot.f.y()
               >> foot.f.z();
-        wm_lock->lock();
+        //wm_lock->lock();
         WM->setFootPress(name, foot);
-        wm_lock->unlock();
+        //wm_lock->unlock();
         pos = msg.find("FRP",pos+1);
     }
 
@@ -145,9 +152,9 @@ void Parser::parseHearMessage(string &msg)
 
         if (msg1.size() ==3 && msg1[0]==msg1[1] && msg1[1] == msg1[2]){
             msg1=msg1.substr(0,1);
-            wm_lock->lock();
+            //wm_lock->lock();
             WM->setLastMsg( msg1 , time );
-            wm_lock->unlock();
+            //wm_lock->unlock();
         }
         else
         {
@@ -161,9 +168,9 @@ void Parser::parseHearMessage(string &msg)
 
                 if (msg1.size() == 3 && msg1[0]==msg1[1] && msg1[1] == msg1[2]){
                     msg1=msg1.substr(0,1);
-                    wm_lock->lock();
+                    //wm_lock->lock();
                     WM->setLastMsg( msg1 , time );
-                    wm_lock->unlock();
+                    //wm_lock->unlock();
                 }
 
             }
@@ -180,10 +187,10 @@ void Parser::parseSense(string &msg)
         stringstream edame(msg.substr(pos));
         double x,y,z;
         edame >> temp >> x >> y >> z ;
-        wm_lock->lock();
+        //wm_lock->lock();
         WM->setSense(true);
         WM->sensedPos = Vector3f(x,y,z);
-        wm_lock->unlock();
+        //wm_lock->unlock();
     }
 
     pos = msg.find("myorien");
@@ -192,10 +199,10 @@ void Parser::parseSense(string &msg)
         stringstream edame(msg.substr(pos));
         double ang;
         edame >> temp >> ang ;
-        wm_lock->lock();
+        //wm_lock->lock();
         WM->setSense(true);
         WM->myOrien = ang;
-        wm_lock->unlock();
+        //wm_lock->unlock();
     }
 }
 
@@ -214,36 +221,36 @@ void Parser::parseFlags(string &msg)
     {
         stringstream edame(msg.substr(pos));
         edame >> temp >> temp >> goal.dist >> goal.theta >> goal.phi;
-        wm_lock->lock();
+        //wm_lock->lock();
         WM->setFlagPos("G1L", goal);
-        wm_lock->unlock();
+        //wm_lock->unlock();
     }
     pos = msg.find("G2L");
     if (pos != string::npos)
     {
         stringstream edame(msg.substr(pos));
         edame >> temp >> temp >> goal.dist >> goal.theta >> goal.phi;
-        wm_lock->lock();
+        //wm_lock->lock();
         WM->setFlagPos("G2L", goal);
-        wm_lock->unlock();
+        //wm_lock->unlock();
     }
     pos = msg.find("G1R");
     if (pos != string::npos)
     {
         stringstream edame(msg.substr(pos));
         edame >> temp >> temp >> goal.dist >> goal.theta >> goal.phi;
-        wm_lock->lock();
+        //wm_lock->lock();
         WM->setFlagPos("G1R", goal);
-        wm_lock->unlock();
+        //wm_lock->unlock();
     }
     pos = msg.find("G2R");
     if (pos != string::npos)
     {
         stringstream edame(msg.substr(pos));
         edame >> temp >> temp >> goal.dist >> goal.theta >> goal.phi;
-        wm_lock->lock();
+        //wm_lock->lock();
         WM->setFlagPos("G2R", goal);
-        wm_lock->unlock();
+        //wm_lock->unlock();
     }
 
     /*
@@ -255,36 +262,36 @@ void Parser::parseFlags(string &msg)
     {
         stringstream edame(msg.substr(pos));
         edame >> temp >> temp >> flag.dist >> flag.theta >> flag.phi;
-        wm_lock->lock();
+        //wm_lock->lock();
         WM->setFlagPos("F1L", flag);
-        wm_lock->unlock();
+        //wm_lock->unlock();
     }
     pos = msg.find("F2L");
     if (pos != string::npos)
     {
         stringstream edame(msg.substr(pos));
         edame >> temp >> temp >> flag.dist >> flag.theta >> flag.phi;
-        wm_lock->lock();
+        //wm_lock->lock();
         WM->setFlagPos("F2L", flag);
-        wm_lock->unlock();
+        //wm_lock->unlock();
     }
     pos = msg.find("F1R");
     if (pos != string::npos)
     {
         stringstream edame(msg.substr(pos));
         edame >> temp >> temp >> flag.dist >> flag.theta >> flag.phi;
-        wm_lock->lock();
+        //wm_lock->lock();
         WM->setFlagPos("F1R", flag);
-        wm_lock->unlock();
+        //wm_lock->unlock();
     }
     pos = msg.find("F2R");
     if (pos != string::npos)
     {
         stringstream edame(msg.substr(pos));
         edame >> temp >> temp >> flag.dist >> flag.theta >> flag.phi;
-        wm_lock->lock();
+        //wm_lock->lock();
         WM->setFlagPos("F2R", flag);
-        wm_lock->unlock();
+        //wm_lock->unlock();
     }
 }
 
@@ -311,39 +318,39 @@ void Parser::parsePlayers(string &msg)
         edame >> name ;
         if ( name != WM->getOurName() )
         {
-            wm_lock->lock();
+            //wm_lock->lock();
             WM->setOppName( name );
-            wm_lock->unlock();
+            //wm_lock->unlock();
         }
         edame >> temp >> num >> place >> temp >> ppol.dist >> ppol.theta >> ppol.phi ;
         if ( place == "head" )
         {
             if ( name == WM->getOurName() )
             {
-                wm_lock->lock();
+                //wm_lock->lock();
                 WM->setOurPlayerPos ( num , ppol ) ;
-                wm_lock->unlock();
+                //wm_lock->unlock();
             }
             else
             {
-                wm_lock->lock();
+                //wm_lock->lock();
                 WM->setOppPlayerPos ( num , ppol ) ;
-                wm_lock->unlock();
+                //wm_lock->unlock();
             }
         }
         else
         {
             if ( name == WM->getOurName() )
             {
-                wm_lock->lock();
+                //wm_lock->lock();
                 WM->setOurPlayerPartPos ( num , place , ppol ) ;
-                wm_lock->unlock();
+                //wm_lock->unlock();
             }
             else
             {
-                wm_lock->lock();
+                //wm_lock->lock();
                 WM->setOppPlayerPartPos ( num , place , ppol ) ;
-                wm_lock->unlock();
+                //wm_lock->unlock();
             }
         }
 
@@ -363,9 +370,9 @@ void Parser::parseTime(string &msg)
     {
         stringstream edame(msg.substr(pos));
         edame >> temp >> temp >> time;
-        wm_lock->lock();
+        //wm_lock->lock();
         WM->setServerTime(time);
-        wm_lock->unlock();
+        //wm_lock->unlock();
     }
 }
 
@@ -381,9 +388,9 @@ void Parser::parseGameState(string &msg)
         {
             stringstream edame(msg.substr(pos));
             edame >> temp >> pm;
-            wm_lock->lock();
+            //wm_lock->lock();
             WM->setPlayMode(getPlayModeByString(pm));
-            wm_lock->unlock();
+            //wm_lock->unlock();
         }
     }
 
@@ -404,9 +411,9 @@ void Parser::parseGameState(string &msg)
             if (pos != string::npos && name.length() == 1)
             {
                 edame >> curr;
-                wm_lock->lock();
+                //wm_lock->lock();
                 WM->setTime(curr);
-                wm_lock->unlock();
+                //wm_lock->unlock();
                 break;
             }
         }
@@ -426,9 +433,9 @@ void Parser::parseGyroAndAccell(string &msg)
         Vector3f gyr;
         stringstream edame(msg.substr(pos));
         edame >> temp >> temp >> temp >> temp >> gyr.x() >> gyr.y() >> gyr.z();
-        wm_lock->lock();
+        //wm_lock->lock();
         WM->setGyro(gyr);
-        wm_lock->unlock();
+        //wm_lock->unlock();
     }
 
 
@@ -442,9 +449,9 @@ void Parser::parseGyroAndAccell(string &msg)
         Vector3f acc;
         stringstream edame(msg.substr(pos));
         edame >> temp >> temp >> temp >> temp >> acc.x() >> acc.y() >> acc.z();
-        wm_lock->lock();
+        //wm_lock->lock();
         WM->setACC(acc);
-        wm_lock->unlock();
+        //wm_lock->unlock();
     }
 
 }
@@ -473,9 +480,9 @@ void Parser::parseBall(string &msg)
             continue;
         }
         edame >> temp >> ball.dist >> ball.theta >> ball.phi;
-        wm_lock->lock();
+        //wm_lock->lock();
         WM->setBallPolarPos(ball);
-        wm_lock->unlock();
+        //wm_lock->unlock();
         break;
     }
 }
@@ -495,7 +502,7 @@ void Parser::Parse(string &msg)
     std::vector<std::thread> all_threads;
 
     all_threads.push_back(std::thread ( std::bind (&Parser::parseHingeJoint,this,msg) ));
-    all_threads.push_back(std::thread ( std::bind (&Parser::parseLines,this,msg) ));
+//    all_threads.push_back(std::thread ( std::bind (&Parser::parseLines,this,msg) ));
     all_threads.push_back(std::thread ( std::bind (&Parser::parseFlags,this,msg) ));
     all_threads.push_back(std::thread ( std::bind (&Parser::parsePlayers,this,msg) ));
     all_threads.push_back(std::thread ( std::bind (&Parser::parseTime,this,msg) ));

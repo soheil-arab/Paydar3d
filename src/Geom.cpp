@@ -1771,5 +1771,5 @@ VecPosition Triangle::IntersectionWithLine (Line l,bool &nr)
         return pos_c;
     }
     nr = false;
-    return NULL;
+    return pos_a;
 }
