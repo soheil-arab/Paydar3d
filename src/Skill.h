@@ -150,6 +150,12 @@ public :
   string TurnLib ( int &t , SideT side);
 
 
+
+  /// General Walk
+  ///
+
+  string GeneralWalk (int &t , double angle, bool &onePeriodFinished );
+
   string moveJoints(KDL::JntArray left,KDL::JntArray right , double p)  ;
 
 

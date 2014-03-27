@@ -125,6 +125,7 @@ int main(int argc, char *argv[])
             clock_gettime(CLOCK_REALTIME, start); // Works on Linux
 
             P->Parse(get);
+//            cout << WM->getJointAngle("rle6") << " " << WM->getJointAngle("lle6") << endl;
 
             WM->Localize();
             localize->test();
