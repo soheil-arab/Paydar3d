@@ -131,8 +131,6 @@ public:
   double getFieldWidth(){ return width; }
   void  brinBeMA();
   void setInitialGyro();
-  void RotateHead1 (double val);
-  void RotateHead2 (double val);
   void clearBodyRotate ();
   void setSeenLines(line);
   double    serverTime, Time;

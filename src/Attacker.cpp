@@ -17,8 +17,10 @@ string Decide::Attack()
 {
 
     static int ttt = 0;
-    //    return SK->SideTurn(ttt,Right);
-    //    return SK->WalkAngleLib(ttt,Right);
+//        return SK->SideTurn(ttt,Right);
+//        return SK->WalkAngleLib(ttt,Right);
+    bool onePeriod = false ;
+//    return SK->GeneralWalk(ttt,0,onePeriod);
     stringstream ss("");
     myPos = WM->getMyPos();
     ballPos = WM->getBallPos();
@@ -190,11 +192,11 @@ string Decide::Attack()
 
             if (WM->getMyAngleToBall() > 0) {
                 Log.Log(2, "Walking Angle L");
-                return SK->GeneralWalk(libT, 20, isPFin);
+                return SK->GeneralWalk(libT, 10, isPFin);
                 //            return SK->WalkAngleLib(libT, Left);
             } else {
                 Log.Log(2, "Walking Angle R");
-                return SK->GeneralWalk(libT, -20, isPFin);
+                return SK->GeneralWalk(libT, -10, isPFin);
                 //            return SK->WalkAngleLib(libT, Right);
             }
         }
@@ -255,12 +257,12 @@ string Decide::Attack()
             if (curAct == 7) {
                 if (WM->getMyAngleToBall() > 0) {
                     Log.Log(2, "Walking Angle L");
-                    return SK->GeneralWalk(libT, 20, isPFin);
+                    return SK->GeneralWalk(libT, 10, isPFin);
                     //            return SK->WalkAngleLib(libT, Left);
                 } else {
 
                     Log.Log(2, "Walking Angle R");
-                    return SK->GeneralWalk(libT, -20, isPFin);
+                    return SK->GeneralWalk(libT, -10, isPFin);
                     //            return SK->WalkAngleLib(libT, Right);
                 }
             } else if (curAct == 8) {
@@ -299,12 +301,12 @@ string Decide::Attack()
             } else if (curAct == 7) {
                 if (WM->getMyAngleToBall() > 0) {
                     Log.Log(2, "Walking Angle L To Go To Walk");
-                    return SK->GeneralWalk(libT, 20, isPFin);
+                    return SK->GeneralWalk(libT, 10, isPFin);
                     //            return SK->WalkAngleLib(libT, Left);
                 } else {
 
                     Log.Log(2, "Walking Angle R To Go To Walk");
-                    return SK->GeneralWalk(libT, -20, isPFin);
+                    return SK->GeneralWalk(libT, -10, isPFin);
                     //            return SK->WalkAngleLib(libT, Right);
                 }
             }

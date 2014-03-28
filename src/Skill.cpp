@@ -105,6 +105,28 @@ Skill::Skill(WorldModel*wm) {
         }
     f.close();
 
+    f.open("ACT/diveL.txt");
+    if (!f) {
+        cerr << "Could'nt Open File" << endl;
+    }
+    f >> x >> y;
+    for (int i = 0; i < x; i++)
+        for (int j = 0; j < y; j++) {
+            f >> diveL[i][j];
+        }
+    f.close();
+
+    f.open("ACT/diveR.txt");
+    if (!f) {
+        cerr << "Could'nt Open File" << endl;
+    }
+    f >> x >> y;
+    for (int i = 0; i < x; i++)
+        for (int j = 0; j < y; j++) {
+            f >> diveR[i][j];
+        }
+    f.close();
+
     rHipYawPitch = KDL::Joint(KDL::Vector(0, 0, 0), KDL::Vector(-0.707, 0.0, 0.707), KDL::Joint::RotAxis);
     rHipRoll = KDL::Joint(KDL::Vector(0, 0, 0), KDL::Vector(0, 1, 0), KDL::Joint::RotAxis);
     rHipPitch = KDL::Joint(KDL::Vector(0, -0.01, 0.04) + KDL::Vector(0, 0.01, -0.04), KDL::Vector(1, 0, 0), KDL::Joint::RotAxis);
@@ -379,6 +401,21 @@ string Skill::standUp(SideT s, bool &done, double &t) {
         return act(standupF, standupF[0][0], standupF[1][0], t, done);
     } else {
         return StandUpBack(done);
+    }
+}
+
+/////////////////////////////////////////////////////////////////////
+
+string Skill::dive(SideT s, bool &done, double &t)
+{
+    if (done) {
+        t = 0;
+        return "";
+    }
+    if (s == Right) {
+        return act(diveR, diveR[0][0], diveR[1][0], t, done);
+    } else {
+        return act(diveL, diveL[0][0], diveL[1][0], t, done);
     }
 }
 /////////////////////////////////////////////////////////////////////

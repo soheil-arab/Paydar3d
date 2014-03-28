@@ -68,6 +68,14 @@ string Act::doCurrentAct()
     {
         return ACS->DP ( s,done ,t);
     }
+    else if ( curr == Di)
+    {
+        if ( s == Left)
+            return ACS->dive(s,done,t);
+        else
+            return ACS->dive(s,done,t);
+    }
+
 }
 
 ///~ Return Wheter Current Act Finished Or No

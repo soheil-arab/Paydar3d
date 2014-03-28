@@ -69,8 +69,7 @@ unordered_map<string, Vector3f> WorldModel::getFlagGlobal() {
 }
 
 void WorldModel::resetLastSeenLines() {
-    if (!lines_we_see.empty())
-        lines_we_see.clear();
+    lines_we_see.clear();
 }
 
 vector<line> WorldModel::getLastSeenLines() {
@@ -133,16 +132,6 @@ bool WorldModel::isServerBeamed() {
 }
 
 ///~ Our Team Localization
-
-void WorldModel::RotateHead1(double val) {
-    headR.RotateZ(-Deg2Rad(val));
-
-}
-
-void WorldModel::RotateHead2(double val) {
-    headR.RotateY(Deg2Rad(val));
-}
-
 
 //this function will rotate an orirentation around an axis with specified angle, the angle should be in radian
 
@@ -1595,6 +1584,13 @@ string WorldModel::uniquee(string x) {
         opos = x.find(")", pos);
         send += x.substr(pos, opos - pos + 1);
     }
+
+    pos = x.rfind("(say");
+    if (pos != string::npos) {
+        opos = x.find(")", pos);
+        send += x.substr(pos, opos - pos + 1);
+    }
+
     return send;
 }
 

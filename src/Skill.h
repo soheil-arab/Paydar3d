@@ -101,7 +101,7 @@ public :
   string turn(SideT ,bool &);
   string DP(SideT s,bool &done,double &t);
   string standUp(SideT ,bool &,double &);
-  string dive(SideT ,bool &,double &);
+  string dive(SideT s, bool &done, double &t);
   string walk(bool &,bool=false,double k=0.4444);
   string walk1(bool &,bool=false);
   string backWalk(bool &,bool=false);
