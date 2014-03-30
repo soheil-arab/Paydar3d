@@ -1803,3 +1803,35 @@ bool Decide::shouldPlay2()
     }
     return true;
 }
+
+
+
+
+string Decide::moveToPosLib(VecPosition InitPos, VecPosition FinalPos, double InitAng, double FinalAng, int &t) {
+    double thresh=30/(1+InitPos.getDistanceTo(FinalPos));
+    double situation=fabs(InitAng-FinalAng)/(InitPos.getDistanceTo(FinalPos));
+//    cout << InitPos << "      " << FinalPos << endl;
+//    cout << "Threshold: "<< thresh << "      Situation: " << situation << "      Ang: " << FinalAng - InitAng<< endl;
+    double A = 0.01;
+    double ang ;
+    if (fabs(FinalAng-InitAng) < thresh ) {
+        ang = 0;
+    } else if (InitAng > 0 ) {
+        ang = -10;
+    } else {
+        ang = 10;
+    }
+
+    if ( t < 500 )
+        ang = -10 ;
+    else
+        ang = 10 ;
+
+//        if (FinalPos.x < InitPos.x) {
+
+//    }
+    Log.Log(2 , "ang %f" , ang);
+//    return SK->GeneralWalk(t,0, A);
+
+}
+

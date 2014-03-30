@@ -1,4 +1,4 @@
-/*
+//*
         Attacker Decision Making
  */
 
@@ -17,10 +17,19 @@ string Decide::Attack()
 {
 
     static int ttt = 0;
-//        return SK->SideTurn(ttt,Right);
-//        return SK->WalkAngleLib(ttt,Right);
-    bool onePeriod = false ;
-//    return SK->GeneralWalk(ttt,0,onePeriod);
+    static double deg = 0;
+    static double A = 0.01;
+
+    //    if (ttt%1000 >= 500) {
+    //        deg = 10;
+    //        A += 0.002;
+    //    } else {
+    //        deg = -10;
+    //        A -= 0.002;
+    //    }
+    //    return SK->GeneralWalk(ttt,deg,A);
+    //    return SK->SideTurn(ttt,Right);
+    //    return SK->WalkAngleLib(ttt,Right);
     stringstream ss("");
     myPos = WM->getMyPos();
     ballPos = WM->getBallPos();
@@ -44,6 +53,36 @@ string Decide::Attack()
     static int curAct = 0;
     static int libT = 0;
     static bool isPFin = false;
+
+    //    Line meaBall = Line::makeLineFromTwoPoints(me,ball);
+    //    Line betTangent = meaBall.getTangentLine((me+ball)/2.0);
+    //    Line myaAngle = Line::makeLineFromPositionAndAngle(me,VecPosition::normalizeAngle( myAngle+90));
+    //    VecPosition inter = myaAngle.getIntersection(betTangent);
+    //    double R = inter.getDistanceTo(me);
+    //    double b = 0.05;
+
+    //    RVDraw::instance()->drawCircle(salt::Vector3f(inter.getX(),inter.getY(),0),R,BLUE,45456452);
+
+    //    double t0 = 2.0*atan2(((b*b-R*R+sqrt(2.0*R*R*b*b+R*R*R*R))/(b*b)-1.0)*b/R,sqrt(
+    //  2.0)/b*sqrt(b*b-R*R+sqrt(2.0*R*R*b*b+R*R*R*R)));
+
+    //    double t0 = 2.0*atan(b/R/2.0);
+    //    double t0 = (ball-me).getDirection();
+
+    //    if ( t0 > 30 )
+    //        t0 = 30 ;
+    //    else if ( t0 < -30)
+    //        t0 = -30 ;
+
+    if (ttt % 1200 < 300) {
+        return SK->GeneralWalk(ttt, 0, 0, 0.01);
+    } else if (ttt % 1200 < 600) {
+        return SK->GeneralWalk(ttt, 0, 90, 0.02);
+    } else if (ttt % 1200 < 900) {
+        return SK->GeneralWalk(ttt, 0, 180, 0.01);
+    } else {
+        return SK->GeneralWalk(ttt, 45, 45, 0.01);
+    }
 
     if (shouldPlay2()) {
         did = false;
@@ -99,7 +138,6 @@ string Decide::Attack()
         libT = 0;
         return SK->sefr(did, tt, false);
     } else if (shouldPlay() && closest == WM->getMyNum() && WM->getMyNum() != 10 && WM->getMyNum() != 11) {
-
         VecPosition oppositeTirak, thisTirak;
         if (ball.getY() > 0) {
             oppositeTirak.setY(-1.05);
@@ -119,6 +157,14 @@ string Decide::Attack()
         Line l2 = Line::makeLineFromTwoPoints(ball, thisTirak);
         Line meBall = Line::makeLineFromTwoPoints(ball, me);
         Line goalLine = Line::makeLineFromTwoPoints(thisTirak, oppositeTirak);
+
+        double firstAngle, secondAngle;
+        firstAngle = (thisTirak - ball).getDirection();
+        secondAngle = (oppositeTirak - ball).getDirection();
+        double ang = fabs(myAngle - firstAngle) > fabs(myAngle - secondAngle) ? firstAngle : secondAngle;
+        if (firstAngle >= ang && ang >= secondAngle || firstAngle <= ang && ang <= secondAngle)
+            ang = 0;
+        return moveToPosLib(me, ball, myAngle, ang, libT);
 
         VecPosition meGoal = meBall.getIntersection(goalLine);
         Circle ballCircle(ball, 0.042);
@@ -163,8 +209,10 @@ string Decide::Attack()
             temp.str(), salt::Vector3f(myPos.x(), myPos.y(), myPos.z() + 0.2),
             BLACK, 11);
 
-        double thresh = max(20, min(20, me.getDistanceTo(ball) * 20));
+        //        double thresh = max(20, min(20, me.getDistanceTo(ball) * 20));
+        double thresh = 30 / (1 + me.getDistanceTo(ball));
 
+        cout << "KIR: " << thresh << endl;
         if (shouldClear(x, y, s, tri)) {
 
             if (curAct != 1) {
@@ -187,16 +235,16 @@ string Decide::Attack()
                 return SK->TurnLib(libT, Right);
             }
         }
-        if (curAct == 7 && fabs(WM->getMyAngleToBall()) > 10 && !c.isInside(me)) {
+        if (curAct == 7 && fabs(WM->getMyAngleToBall()) > 10 && !c.isInside(me) && fabs(WM->getMyAngleToBall()) < 50) {
             Log.Log(2, "Completing Angle Walk");
 
             if (WM->getMyAngleToBall() > 0) {
                 Log.Log(2, "Walking Angle L");
-                return SK->GeneralWalk(libT, 10, isPFin);
+                //                return SK->GeneralWalk(libT, 10, isPFin);
                 //            return SK->WalkAngleLib(libT, Left);
             } else {
                 Log.Log(2, "Walking Angle R");
-                return SK->GeneralWalk(libT, -10, isPFin);
+                //                return SK->GeneralWalk(libT, -10, isPFin);
                 //            return SK->WalkAngleLib(libT, Right);
             }
         }
@@ -216,7 +264,6 @@ string Decide::Attack()
                 int a1 = lineFromLeftSide.getCircleIntersectionPoints(ballCircle, &tmp1, &tmp2);
                 int a2 = lineFromRightSide.getCircleIntersectionPoints(ballCircle, &tmp1, &tmp2);
 
-//                cout << a1 << "  " << a2 << endl;
                 if (a1 == 2 || a2 == 2) {
                     Log.Log(2, "Turning Inside Circle %f", WM->getMyAngleToBall());
                     if (curAct != 2) {
@@ -231,7 +278,7 @@ string Decide::Attack()
                     }
                 }
             }
-            if (fabs(WM->getMyAngleToBall()) > 60) {
+            if (fabs(WM->getMyAngleToBall()) > 50) {
                 Log.Log(2, "Turning OutSide Circle %f", WM->getMyAngleToBall());
                 if (curAct != 2) {
                     curAct = 2;
@@ -257,18 +304,18 @@ string Decide::Attack()
             if (curAct == 7) {
                 if (WM->getMyAngleToBall() > 0) {
                     Log.Log(2, "Walking Angle L");
-                    return SK->GeneralWalk(libT, 10, isPFin);
+                    //                    return SK->GeneralWalk(libT, 10, isPFin);
                     //            return SK->WalkAngleLib(libT, Left);
                 } else {
 
                     Log.Log(2, "Walking Angle R");
-                    return SK->GeneralWalk(libT, -10, isPFin);
+                    //                    return SK->GeneralWalk(libT, -10, isPFin);
                     //            return SK->WalkAngleLib(libT, Right);
                 }
             } else if (curAct == 8) {
                 Log.Log(2, "Walk To Go To Walk Angle");
 
-                return SK->GeneralWalk(libT, 0, isPFin);
+                //                return SK->GeneralWalk(libT, 0, isPFin);
             }
         } else if (c.isInside(me) && !tri.isInside(me) && fabs(meGoal.getY()) > 0.9) {
             Log.Log(2, "Side Turn");
@@ -297,16 +344,16 @@ string Decide::Attack()
             if (curAct == 8) {
                 Log.Log(2, "Walk");
 
-                return SK->GeneralWalk(libT, 0, isPFin);
+                //                return SK->GeneralWalk(libT, 0, isPFin);
             } else if (curAct == 7) {
                 if (WM->getMyAngleToBall() > 0) {
                     Log.Log(2, "Walking Angle L To Go To Walk");
-                    return SK->GeneralWalk(libT, 10, isPFin);
+                    //                    return SK->GeneralWalk(libT, 10, isPFin);
                     //            return SK->WalkAngleLib(libT, Left);
                 } else {
 
                     Log.Log(2, "Walking Angle R To Go To Walk");
-                    return SK->GeneralWalk(libT, -10, isPFin);
+                    //                    return SK->GeneralWalk(libT, -10, isPFin);
                     //            return SK->WalkAngleLib(libT, Right);
                 }
             }

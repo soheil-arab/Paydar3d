@@ -1,6 +1,6 @@
 #include "Skill.h"
 
-string Skill::SideWalkLib(int& t, SideT side)
+string Skill::GeneralWalk(int& t, double angToTurn, double angToGo, double A)
 {
     t++;
 
@@ -26,11 +26,15 @@ string Skill::SideWalkLib(int& t, SideT side)
     static bool d2 = false;
     static double standingTime = 0;
 
-    static double bb = 0.1;
+    static bool onePeriodFinished = true;
 
-    newSpeedController(bb, t, SW);
+    //  cout <<"Speed: " << speed << "     Acc: " << acc << endl;
 
-    if (t == 1 && WM->getJointAngle("lle4") > -5) {
+    if (t == 1) {
+        speed = 0;
+    }
+
+    if (t == 1 && WM->getJointAngle("lle4") > -5) { //Bug khoresh malase!
         d2 = false;
         standingTime = 0;
     }
@@ -48,300 +52,66 @@ string Skill::SideWalkLib(int& t, SideT side)
     static KDL::JntArray JRLeg(nj2);
     static KDL::JntArray JRLegInit(nj2);
 
-    static double T = 10 * 0.02;
-    static double w = (2 * M_PI) / T;
-    double a = 0.05 * bb, b = -0.015 * bb;
-    double a1 = a, b1 = b;
-    double x1 = a * cos(w * t * 0.02), y1 = b * sin(w * t * 0.02);
-    double x2 = a1 * cos(w * t * 0.02 + M_PI), y2 = b1 * sin(w * t * 0.02 + M_PI);
+    static double angleToGo = Deg2Rad(angToGo);
+    static double angleToTurn = Deg2Rad(angToTurn);
+    static bool walkMethodChange = false;
 
-    lLegFKSolver->JntToCart(jointpositionsl, lAnkleStanding);
-
-    KDL::Frame lfrm(KDL::Vector(lAnkleStanding.p.x() + x1, lAnkleStanding.p.y(),
-                                lAnkleStanding.p.z() + y1));
-
-    rLegFKSolver->JntToCart(jointpositionsr, rHipStanding);
-    KDL::Frame rfrm(KDL::Vector(rHipStanding.p.x() + x2, rHipStanding.p.y(),
-                                rHipStanding.p.z() + y2));
-
-    int solvedl = lLegIksolverPosJ->CartToJnt(JLLegInit, lfrm, JLLeg);
-    int solvedr = rLegIksolverPosJ->CartToJnt(JRLegInit, rfrm, JRLeg);
-
-    JLLegInit = JLLeg;
-    JRLegInit = JRLeg;
-
-    if (solvedl != 0 || solvedr != 0)
-        return "";
-
-    return moveJoints(JLLeg, JRLeg, 0.2);
-    return "";
-}
-
-//////////////////
-
-string Skill::WalkLib(int& t, SideT side)
-{
-    t++;
-
-    unsigned int nj2 = lLeg.getNrOfSegments();
-
-    KDL::JntArray jointpositionsl = KDL::JntArray(nj2);
-    KDL::JntArray jointpositionsr = KDL::JntArray(nj2);
-
-    jointpositionsl(0) = Deg2Rad(0);
-    jointpositionsl(1) = Deg2Rad(-0.5);
-    jointpositionsl(2) = Deg2Rad(20);
-    jointpositionsl(3) = Deg2Rad(-60);
-    jointpositionsl(4) = Deg2Rad(40);
-    jointpositionsl(5) = Deg2Rad(0.5);
-
-    jointpositionsr(0) = Deg2Rad(0);
-    jointpositionsr(1) = Deg2Rad(-0.5);
-    jointpositionsr(2) = Deg2Rad(20);
-    jointpositionsr(3) = Deg2Rad(-60);
-    jointpositionsr(4) = Deg2Rad(40);
-    jointpositionsr(5) = Deg2Rad(0.5);
-
-    static bool d2 = false;
-    static double standingTime = 0;
-    static double bb = 0.1;
-
-    newSpeedController(bb, t, W);
-
-    if (t == 1 && WM->getJointAngle("lle4") > -5) {
-        d2 = false;
-        standingTime = 0;
+    if (fabs(Rad2Deg(angleToGo) - angToGo) > 45 && !walkMethodChange) {
+        walkMethodChange = true;
     }
 
-    if (!d2) {
-        return Standing(d2, standingTime);
-    }
+    if (walkMethodChange) {
+        if (onePeriodFinished && speed < 0.7) {
 
-    KDL::Frame rHipStanding;
-    KDL::Frame lAnkleStanding;
-
-    static KDL::JntArray JLLeg(nj2);
-    static KDL::JntArray JLLegInit(nj2);
-
-    static KDL::JntArray JRLeg(nj2);
-    static KDL::JntArray JRLegInit(nj2);
-
-    static double T = 10 * 0.02;
-    static double w = (2 * M_PI) / T;
-    double a = 0.05 * bb, b = -0.015 * bb;
-    double a1 = a, b1 = b;
-    double x1 = a * cos(w * t * 0.02), y1 = b * sin(w * t * 0.02);
-    double x2 = a1 * cos(w * t * 0.02 + M_PI), y2 = b1 * sin(M_PI + w * t * 0.02);
-
-    lLegFKSolver->JntToCart(jointpositionsl, lAnkleStanding);
-
-    KDL::Frame lfrm(KDL::Vector(lAnkleStanding.p.x(), lAnkleStanding.p.y() + x1,
-                                lAnkleStanding.p.z() + y1));
-
-    rLegFKSolver->JntToCart(jointpositionsr, rHipStanding);
-    KDL::Frame rfrm(KDL::Vector(rHipStanding.p.x(), rHipStanding.p.y() + x2,
-                                rHipStanding.p.z() + y2));
-
-    int solvedl = lLegIksolverPosJ->CartToJnt(JLLegInit, lfrm, JLLeg);
-    JLLegInit = JLLeg;
-
-    int solvedr = rLegIksolverPosJ->CartToJnt(JRLegInit, rfrm, JRLeg);
-    JRLegInit = JRLeg;
-
-    if (solvedl != 0 || solvedr != 0)
-        return "";
-
-    return moveJoints(JLLeg, JRLeg, 0.2);
-}
-
-//////////////////////////////
-
-string Skill::SideTurn(int& t, SideT side)
-{
-    t++;
-
-    unsigned int nj2 = lLeg.getNrOfSegments();
-
-    KDL::JntArray jointpositionsl = KDL::JntArray(nj2);
-    KDL::JntArray jointpositionsr = KDL::JntArray(nj2);
-
-    jointpositionsl(0) = Deg2Rad(0);
-    jointpositionsl(1) = Deg2Rad(-0.5);
-    jointpositionsl(2) = Deg2Rad(30);
-    jointpositionsl(3) = Deg2Rad(-70);
-    jointpositionsl(4) = Deg2Rad(50);
-    jointpositionsl(5) = Deg2Rad(0.5);
-
-    jointpositionsr(0) = Deg2Rad(0);
-    jointpositionsr(1) = Deg2Rad(-0.5);
-    jointpositionsr(2) = Deg2Rad(30);
-    jointpositionsr(3) = Deg2Rad(-70);
-    jointpositionsr(4) = Deg2Rad(50);
-    jointpositionsr(5) = Deg2Rad(0.5);
-
-    static bool d2 = false;
-    static double standingTime = 0;
-    static double bb = 0.1;
-
-    newSpeedController(bb, t, ST);
-
-    if (t == 1 && WM->getJointAngle("lle4") > -5) {
-        d2 = false;
-        standingTime = 0;
-    }
-
-    if (!d2) {
-        return Standing(d2, standingTime);
-    }
-
-    KDL::Frame rHipStanding;
-    KDL::Frame lAnkleStanding;
-
-    static KDL::JntArray JLLeg(nj2);
-    static KDL::JntArray JLLegInit(nj2);
-
-    static KDL::JntArray JRLeg(nj2);
-    static KDL::JntArray JRLegInit(nj2);
-
-    double theta = Deg2Rad(10);
-
-    int Period = 18;
-    static double T = Period * 0.02;
-    static double w = (2 * M_PI) / T;
-    double a = 0.06 * bb, b = -0.02 * bb;
-    double a1 = a, b1 = b;
-    double x1 = a * cos(w * t * 0.02) * cos(theta),
-           y1 = a * cos(w * t * 0.02) * sin(theta), z1 = b * sin(w * t * 0.02);
-    double x2 = a1 * cos(w * t * 0.02 + M_PI) * cos(theta),
-           y2 = a1 * cos(w * t * 0.02 + M_PI) * sin(theta),
-           z2 = b1 * sin(w * t * 0.02 + M_PI);
-
-    if (side == Left) {
-        x1 *= -1;
-        x2 *= -1;
-    }
-
-    KDL::Rotation lLegRot;
-    KDL::Rotation rHipRot = KDL::Rotation::RotZ(0);
-
-    int AllTime = Period / 2;
-
-    if (side == Right) {
-        if (t % (2 * AllTime) < AllTime) {
-            lLegRot = KDL::Rotation::RotZ(
-                ((2 * AllTime - (t % (2 * AllTime))) * theta) / (double)AllTime);
+            angleToGo = Deg2Rad(angToGo);
+            angleToTurn = Deg2Rad(angToTurn);
+            walkMethodChange = false;
         } else {
-            lLegRot = KDL::Rotation::RotZ((t % (2 * AllTime)) * theta / (double)AllTime);
-        }
-    } else {
-        if (t % (2 * AllTime) < AllTime) {
-            lLegRot = KDL::Rotation::RotZ((t % (2 * AllTime)) * theta / (double)AllTime);
-
-        } else {
-
-            lLegRot = KDL::Rotation::RotZ(
-                ((2 * AllTime - (t % (2 * AllTime))) * theta) / (double)AllTime);
+            A = -0.01;
         }
     }
 
-    lLegFKSolver->JntToCart(jointpositionsl, lAnkleStanding);
+    newSpeedController(A);
+    double cof = fabs(cos(angleToGo)) * 1 + fabs(sin(angleToGo)) * 0.8;
+    double bb = speed*cof;
 
-    KDL::Frame lfrm(lLegRot, KDL::Vector(lAnkleStanding.p.x() + x1,
-                                         lAnkleStanding.p.y() + y1,
-                                         lAnkleStanding.p.z() + z1));
 
-    rLegFKSolver->JntToCart(jointpositionsr, rHipStanding);
-    KDL::Frame rfrm(rHipRot,
-                    KDL::Vector(rHipStanding.p.x() + x2, rHipStanding.p.y() + y2,
-                                rHipStanding.p.z() + z2));
-
-    int solvedl = lLegIksolverPosJ->CartToJnt(JLLegInit, lfrm, JLLeg);
-    JLLegInit = JLLeg;
-
-    int solvedr = rLegIksolverPosJ->CartToJnt(JRLegInit, rfrm, JRLeg);
-    JRLegInit = JRLeg;
-
-    JLLeg(2) += Deg2Rad(10);
-    JRLeg(2) += Deg2Rad(10);
-    if (solvedl != 0 || solvedr != 0)
-        return "";
-    return moveJoints(JLLeg, JRLeg, 0.2);
-}
-
-//////////////////////////////
-
-string Skill::WalkAngleLib(int& t, SideT side)
-{
-
-    t++;
-
-    unsigned int nj2 = lLeg.getNrOfSegments();
-
-    KDL::JntArray jointpositionsl = KDL::JntArray(nj2);
-    KDL::JntArray jointpositionsr = KDL::JntArray(nj2);
-
-    jointpositionsl(0) = Deg2Rad(0);
-    jointpositionsl(1) = Deg2Rad(0);
-    jointpositionsl(2) = Deg2Rad(20);
-    jointpositionsl(3) = Deg2Rad(-60);
-    jointpositionsl(4) = Deg2Rad(40);
-    jointpositionsl(5) = Deg2Rad(0);
-
-    jointpositionsr(0) = Deg2Rad(0);
-    jointpositionsr(1) = Deg2Rad(0);
-    jointpositionsr(2) = Deg2Rad(20);
-    jointpositionsr(3) = Deg2Rad(-60);
-    jointpositionsr(4) = Deg2Rad(40);
-    jointpositionsr(5) = Deg2Rad(0);
-
-    static bool d2 = false;
-    static double standingTime = 0;
-
-    static double bb = 0.1;
-
-    newSpeedController(bb, t, WA);
-
-    if (t == 1 && WM->getJointAngle("lle4") > -5) {
-        d2 = false;
-        standingTime = 0;
-    }
-
-    if (!d2) {
-        return Standing(d2, standingTime);
-    }
-
-    KDL::Frame rHipStanding;
-    KDL::Frame lAnkleStanding;
-
-    static KDL::JntArray JLLeg(nj2);
-    static KDL::JntArray JLLegInit(nj2);
-
-    static KDL::JntArray JRLeg(nj2);
-    static KDL::JntArray JRLegInit(nj2);
-
-    double theta = Deg2Rad(30);
 
     int Period = 10;
-    static double T = Period * 0.02;
-    static double w = (2 * M_PI) / T;
+    double T = Period * 0.02;
+    double w = (2 * M_PI) / T;
     double a = 0.05 * bb, b = -0.015 * bb;
     double a1 = a, b1 = b;
-    double x1 = -a * cos(w * t * 0.02) * sin(theta),
-           y1 = a * cos(w * t * 0.02) * cos(theta), z1 = b * sin(w * t * 0.02);
-    double x2 = -a1 * cos(w * t * 0.02 + M_PI) * sin(theta),
-           y2 = a1 * cos(w * t * 0.02 + M_PI) * cos(theta),
+    double x1 = -a * cos(w * t * 0.02) * sin((angleToGo)),
+           y1 = a * cos(w * t * 0.02) * cos((angleToGo)), z1 = b * sin(w * t * 0.02);
+    double x2 = -a1 * cos(w * t * 0.02 + M_PI) * sin((angleToGo)),
+           y2 = a1 * cos(w * t * 0.02 + M_PI) * cos((angleToGo)),
            z2 = b1 * sin(w * t * 0.02 + M_PI);
 
     KDL::Rotation lLegRot;
     KDL::Rotation rHipRot = KDL::Rotation::RotZ(0);
 
+    static int ii = 0;
+    RVDraw::instance()->drawVector3f(WM->getMyPos(), RED, ii++);
     int AllTime = Period / 2;
 
-    if (t % (2 * AllTime) < AllTime) {
-        lLegRot = KDL::Rotation::RotZ((t % (2 * AllTime)) * theta / (double)AllTime);
+    if (angleToTurn > 0) {
+        if (t % (2 * AllTime) < AllTime) {
+            lLegRot = KDL::Rotation::RotZ((t % (2 * AllTime)) * fabs(angleToTurn) / (double)AllTime);
+
+        } else {
+
+            lLegRot = KDL::Rotation::RotZ(
+                ((2 * AllTime - (t % (2 * AllTime))) * fabs(angleToTurn)) / (double)AllTime);
+        }
+
     } else {
-        lLegRot = KDL::Rotation::RotZ(
-            ((2 * AllTime - (t % (2 * AllTime))) * theta) / (double)AllTime);
+        if (t % (2 * AllTime) < AllTime) {
+            lLegRot = KDL::Rotation::RotZ(
+                ((2 * AllTime - (t % (2 * AllTime))) * fabs(angleToTurn)) / (double)AllTime);
+        } else {
+            lLegRot = KDL::Rotation::RotZ((t % (2 * AllTime)) * fabs(angleToTurn) / (double)AllTime);
+        }
     }
 
     lLegFKSolver->JntToCart(jointpositionsl, lAnkleStanding);
@@ -361,13 +131,17 @@ string Skill::WalkAngleLib(int& t, SideT side)
     int solvedr = rLegIksolverPosJ->CartToJnt(JRLegInit, rfrm, JRLeg);
     JRLegInit = JRLeg;
 
+    if (t % Period == 0) {
+        onePeriodFinished = true;
+    } else {
+        onePeriodFinished = false;
+    }
+
     if (solvedl != 0 || solvedr != 0)
         return "";
-    if (side == Right)
-        return moveJoints(JLLeg, JRLeg, 0.2);
-    else if (side == Left)
-        return moveJoints(JRLeg, JLLeg, 0.2);
+    return moveJoints(JLLeg, JRLeg, 0.2);
 }
+
 //////////////////////////////
 
 string Skill::TurnLib(int& t, SideT side)
@@ -398,7 +172,7 @@ string Skill::TurnLib(int& t, SideT side)
 
     static double bb = 0.1;
 
-    newSpeedController(bb, t, TU);
+    //    newSpeedController(bb, t, TU);
 
     if (t == 1 && WM->getJointAngle("lle4") > -5) {
         d2 = false;
@@ -464,111 +238,6 @@ string Skill::TurnLib(int& t, SideT side)
     else if (side == Left)
         return moveJoints(JRLeg, JLLeg, 0.2);
 }
-//////////////////////////////
-string Skill::GeneralWalk(int& t, double angle, bool& onePeriodFinished)
-{
-    t++;
-
-    unsigned int nj2 = lLeg.getNrOfSegments();
-
-    KDL::JntArray jointpositionsl = KDL::JntArray(nj2);
-    KDL::JntArray jointpositionsr = KDL::JntArray(nj2);
-
-    jointpositionsl(0) = Deg2Rad(0);
-    jointpositionsl(1) = Deg2Rad(-0.5);
-    jointpositionsl(2) = Deg2Rad(30);
-    jointpositionsl(3) = Deg2Rad(-70);
-    jointpositionsl(4) = Deg2Rad(50);
-    jointpositionsl(5) = Deg2Rad(0.5);
-
-    jointpositionsr(0) = Deg2Rad(0);
-    jointpositionsr(1) = Deg2Rad(-0.5);
-    jointpositionsr(2) = Deg2Rad(30);
-    jointpositionsr(3) = Deg2Rad(-70);
-    jointpositionsr(4) = Deg2Rad(50);
-    jointpositionsr(5) = Deg2Rad(0.5);
-
-    static bool d2 = false;
-    static double standingTime = 0;
-
-    static double bb = 0.1;
-
-    newSpeedController(bb, t, WA);
-
-    if (t == 1 && WM->getJointAngle("lle4") > -5) {
-        d2 = false;
-        standingTime = 0;
-    }
-
-    if (!d2) {
-        return Standing(d2, standingTime);
-    }
-
-    KDL::Frame rHipStanding;
-    KDL::Frame lAnkleStanding;
-
-    static KDL::JntArray JLLeg(nj2);
-    static KDL::JntArray JLLegInit(nj2);
-
-    static KDL::JntArray JRLeg(nj2);
-    static KDL::JntArray JRLegInit(nj2);
-
-    double theta = Deg2Rad(fabs(angle));
-
-    int Period = 18;
-    static double T = Period * 0.02;
-    static double w = (2 * M_PI) / T;
-    double a = 0.06 * bb, b = -0.02 * bb;
-    double a1 = a, b1 = b;
-    double x1 = -a * cos(w * t * 0.02) * sin(theta),
-           y1 = a * cos(w * t * 0.02) * cos(theta), z1 = b * sin(w * t * 0.02);
-    double x2 = -a1 * cos(w * t * 0.02 + M_PI) * sin(theta),
-           y2 = a1 * cos(w * t * 0.02 + M_PI) * cos(theta),
-           z2 = b1 * sin(w * t * 0.02 + M_PI);
-
-    KDL::Rotation lLegRot;
-    KDL::Rotation rHipRot = KDL::Rotation::RotZ(0);
-
-    int AllTime = Period / 2;
-
-    if (t % (2 * AllTime) < AllTime) {
-        lLegRot = KDL::Rotation::RotZ((t % (2 * AllTime)) * theta / (double)AllTime);
-    } else {
-        lLegRot = KDL::Rotation::RotZ(
-            ((2 * AllTime - (t % (2 * AllTime))) * theta) / (double)AllTime);
-    }
-
-    lLegFKSolver->JntToCart(jointpositionsl, lAnkleStanding);
-
-    KDL::Frame lfrm(lLegRot, KDL::Vector(lAnkleStanding.p.x() + x1,
-                                         lAnkleStanding.p.y() + y1,
-                                         lAnkleStanding.p.z() + z1));
-
-    rLegFKSolver->JntToCart(jointpositionsr, rHipStanding);
-    KDL::Frame rfrm(rHipRot,
-                    KDL::Vector(rHipStanding.p.x() + x2, rHipStanding.p.y() + y2,
-                                rHipStanding.p.z() + z2));
-
-    int solvedl = lLegIksolverPosJ->CartToJnt(JLLegInit, lfrm, JLLeg);
-    JLLegInit = JLLeg;
-
-    int solvedr = rLegIksolverPosJ->CartToJnt(JRLegInit, rfrm, JRLeg);
-    JRLegInit = JRLeg;
-
-    if (t % AllTime == 0) {
-        onePeriodFinished = true;
-    } else {
-        onePeriodFinished = false;
-    }
-    JLLeg(2) += Deg2Rad(10);
-    JRLeg(2) += Deg2Rad(10);
-    if (solvedl != 0 || solvedr != 0)
-        return "";
-    if (angle < 0)
-        return moveJoints(JLLeg, JRLeg, 0.2);
-    else
-        return moveJoints(JRLeg, JLLeg, 0.2);
-}
 
 //////////////////////////////
 
@@ -626,27 +295,63 @@ string Skill::moveJoints(KDL::JntArray left, KDL::JntArray right, double p)
 
 //////////////////////////////
 
-void Skill::newSpeedController(double& bb, int t, Command comm)
+void Skill::newSpeedController(double A)
 {
-    VecPosition ball(WM->getBallPos().x(), WM->getBallPos().y());
-    VecPosition me(WM->getMyPos().x(), WM->getMyPos().y());
+    //    double maxAccDifferent = 0.00005;
+    //    if (fabs(acc - A) > maxAccDifferent) {
+    //        if (acc - A > 0) {
+    //            acc += -maxAccDifferent;
+    //        } else {
+    //            acc += maxAccDifferent;
+    //        }
+    //    } else {
+    acc = A;
+    //    }
+    speed += acc;
+    speed = max(speed, 0.2);
+    speed = min(speed, 1.2);
+    //  VecPosition ball(WM->getBallPos().x(), WM->getBallPos().y());
+    //  VecPosition me(WM->getMyPos().x(), WM->getMyPos().y());
 
-    if (comm == W || comm == WA) {
-        bb = 0.1 + (t - 1) * 0.010;
-        bb = min(bb, 1);
-        if (me.getDistanceTo(ball) < 1) {
-            bb = min(bb, 0.8);
-        }
-    } else if (comm == TU) {
-        bb = 0.4 + (t - 1) * 0.02;
-        bb = min(bb, 1);
-    } else if (comm == ST) {
-        bb = 0.1 + (t - 1) * 0.01;
-        bb = min(bb, 0.5);
-    } else {
-        bb = 0.01 + (t - 1) * 0.02;
-        bb = min(bb, 1);
-    }
+    //  if (comm == W || comm == WA) {
+    //    bb = 0.1 + (t - 1) * 0.015;
+    //    bb = min(bb, 1.2);
+    //    if (me.getDistanceTo(ball) < 1) {
+    //      bb = min(bb, 0.8);
+    //    }
+    //  } else if (comm == TU) {
+    //    bb = 0.4 + (t - 1) * 0.02;
+    //    bb = min(bb, 1);
+    //  } else if (comm == ST) {
+    //    bb = 0.2 + (t - 1) * 0.04;
+    //    bb = min(bb, 1);
+    //  } else {
+    //    bb = 0.01 + (t - 1) * 0.02;
+    //    bb = min(bb, 1);
+    //  }
 }
+
+//void Skill::newSpeedController(double& bb, int t, Command comm)
+//{
+//    VecPosition ball(WM->getBallPos().x(), WM->getBallPos().y());
+//    VecPosition me(WM->getMyPos().x(), WM->getMyPos().y());
+
+//    if (comm == W || comm == WA) {
+//        bb = 0.1 + (t - 1) * 0.010;
+//        bb = min(bb, 1);
+//        if (me.getDistanceTo(ball) < 1) {
+//            bb = min(bb, 0.8);
+//        }
+//    } else if (comm == TU) {
+//        bb = 0.4 + (t - 1) * 0.02;
+//        bb = min(bb, 1);
+//    } else if (comm == ST) {
+//        bb = 0.1 + (t - 1) * 0.01;
+//        bb = min(bb, 0.5);
+//    } else {
+//        bb = 0.01 + (t - 1) * 0.02;
+//        bb = min(bb, 1);
+//    }
+//}
 
 ///////////////////////////////////////

@@ -57,6 +57,10 @@ private :
   double Turn10[12][24];
   double Turn10R[24][24];  
 
+  double speed=0.0;
+  double acc=0;
+
+
 
 
   /// IK_ENGINE_VARS
@@ -138,23 +142,10 @@ public :
 
     //// WALK_FUNCS
     ///
-  string SideWalkLib(int &t,SideT side);
-  string WalkLib(int &t,SideT side);
-  string WalkAngleLib(int &t,SideT side);
   string SideTurn(int &t,SideT side);
-  void newSpeedController ( double &bb , int t , Command comm);
-
-
-  /// new Turn Func
-  ///
+  string GeneralWalk(int &t, double angToTurn,double angToGo, double A);
+  void newSpeedController(double A);
   string TurnLib ( int &t , SideT side);
-
-
-
-  /// General Walk
-  ///
-
-  string GeneralWalk (int &t , double angle, bool &onePeriodFinished );
 
   string moveJoints(KDL::JntArray left,KDL::JntArray right , double p)  ;
 

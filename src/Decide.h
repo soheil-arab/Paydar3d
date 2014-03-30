@@ -64,5 +64,6 @@ public:
   bool shouldPlay2();
   string mvPos(VecPosition,bool,double&,double ang,bool);
   bool startShoot();
+  string moveToPosLib(VecPosition InitPos, VecPosition FinalPos, double InitAng, double FinalAng, int &t);
 };
 #endif
