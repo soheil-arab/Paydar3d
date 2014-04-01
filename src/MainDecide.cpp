@@ -9,7 +9,7 @@ Decide::Decide(WorldModel *wm)
     beamed = false;
     ACT = new Act(WM, SK);
     //Log.AddLevel (1); // Goalie Debug
-    Log.AddLevel (2); // Attacker Debug
+//    Log.AddLevel (2); // Attacker Debug
     //Log.AddLevel (3); // Deffender Debug
     //Log.AddLevel (4); // Middle Debug
     //Log.AddLevel (5); // Bools Debug
@@ -30,18 +30,20 @@ string Decide::decide()
     {
         ss += goalie();
     }
-    if (WM->getMyNum() == 2 || WM->getMyNum() == 3  || WM->getMyNum() == 4 || WM->getMyNum()==5)
-    {
-        ss += Deffend();
-    }
-    if ( WM->getMyNum() == 6 || WM->getMyNum() == 7 )
-    {
-        ss+= Middle();
-    }
-    if (WM->getMyNum() == 8 || WM->getMyNum() == 9 || WM->getMyNum()==11 || WM->getMyNum()==10)
-    {
+//    if (WM->getMyNum() == 2 || WM->getMyNum() == 3  || WM->getMyNum() == 4 || WM->getMyNum()==5)
+//    {
+//        ss += Deffend();
+//    }
+//    if ( WM->getMyNum() == 6 || WM->getMyNum() == 7 )
+//    {
+//        ss+= Middle();
+//    }
+//    if (WM->getMyNum() == 8 || WM->getMyNum() == 9 || WM->getMyNum()==11 || WM->getMyNum()==10)
+//    {
+    else{
         ss += Attack();
     }
+//    }
 //    ss +=SK->updatem ( true );
     ss = WM->uniquee ( ss );
     return ss;

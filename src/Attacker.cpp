@@ -15,8 +15,6 @@
 
 string Decide::Attack()
 {
-
-
     static int ttt = 0;
     static double deg = 0;
     static double A = 0.01;
@@ -28,7 +26,7 @@ string Decide::Attack()
     //        deg = -10;
     //        A -= 0.002;
     //    }
-//        return SK->GeneralWalk(ttt,0,0,0.01);
+    //        return SK->GeneralWalk(ttt,0,0,0.01);
     //    return SK->SideTurn(ttt,Right);
     //    return SK->WalkAngleLib(ttt,Right);
     stringstream ss("");
@@ -58,16 +56,15 @@ string Decide::Attack()
         did = false;
         tt = 0;
     }
-    if (ttt % 1200 < 300) {
-        cout << "set -15" << endl;
-        return SK->GeneralWalk(ttt, -15,-15, 0.01);
-    } else if (ttt % 1200 < 600) {
-        return SK->GeneralWalk(ttt, 15, 15, 0.02);
-    } else if (ttt % 1200 < 900) {
-        return SK->GeneralWalk(ttt, 15, 15, 0.01);
-    } else {
-        return SK->GeneralWalk(ttt, -20, -20, 0.01);
-    }
+//        if (ttt % 1200 < 300) {
+//            return SK->GeneralWalk(ttt, 30,30, 0.01);
+//        } else if (ttt % 1200 < 600) {
+//            return SK->GeneralWalk(ttt, -30, -30, 0.02);
+//        } else if (ttt % 1200 < 900) {
+//            return SK->GeneralWalk(ttt, 30, 30, 0.01);
+//        } else {
+//            return SK->GeneralWalk(ttt, -30, -30, 0.01);
+//        }
 
     ///////////////////// Place Your Code Here ///////////////////////
     if (canBeam() && !set && !beam) {
@@ -118,7 +115,7 @@ string Decide::Attack()
         tFinal = 0;
         libT = 0;
         return SK->sefr(did, tt, false);
-    } else if (shouldPlay() && closest == WM->getMyNum() && WM->getMyNum() != 10 && WM->getMyNum() != 11) {
+    } else if (shouldPlay() && closest == WM->getMyNum()) {
         VecPosition oppositeTirak, thisTirak;
         if (ball.getY() > 0) {
             oppositeTirak.setY(-1.05);
@@ -186,26 +183,34 @@ string Decide::Attack()
             temp.str(), salt::Vector3f(myPos.x(), myPos.y(), myPos.z() + 0.2),
             BLACK, 11);
 
-        Rect safeArea(VecPosition(-13.0, 8), VecPosition(13.0, -8));
+        VecPosition behindPos = /*ball*/ VecPosition::givePosition(ball, (VecPosition(15, 0) - ball).getDirection(), -0.2);
+        double angToGoToBehindPos = WM->getMyAngleTo(salt::Vector3f(behindPos.getX(), behindPos.getY(), 0));
+        double angToTurnToBehindPos = WM->getMyAngle() - (VecPosition(15, 0) - behindPos).getDirection();
+        double angToGoToBall = WM->getMyAngleTo(salt::Vector3f(ball.getX(), ball.getY(), 0));
+        double angToTurnToBall = WM->getMyAngle() - (VecPosition(15, 0) - ball).getDirection();
 
-//        return SK->GeneralWalk(libT,20,20,0.01);
-//        if (safeArea.isInside(ball)) {
-            cout << WM->getMyAngleToBall() << endl;
-//            return SK->GeneralWalk(libT,30,30,0.01);
-            if ( fabs(WM->getMyAngleToBall()) > 30 )
-            {
-                if ( WM->getMyAngleToBall() > 0)
-                    return SK->GeneralWalk(libT,30,30,0.01);
-                else
-                    return SK->GeneralWalk(libT,-30,-30,0.01);
-            } else {
-                return SK->GeneralWalk(libT,0,0,0.01);
-            }
-//        } else {
+//        if (shouldClear(x, y, s,tri)) {
+//            ACT->setCurrentAct(K, s, x, y);
+//            tFinal = 0;
+//        }
+        if (fabs(angToTurnToBall) < 7) {
+            angToTurnToBall = 0;
+        }
+        if (fabs(angToTurnToBehindPos) < 7) {
+            angToTurnToBehindPos = 0;
+        }
 
+//        if (angToTurnToBall * angToGoToBall < 0) {
+//            angToGoToBall *= -1;
 //        }
 
-
+        if (me.getDistanceTo(behindPos) > 0.15) {
+            //                cout << angToGoToBehindPos << "  " << angToTurnToBehindPos << endl;
+            return SK->GeneralWalk(libT, angToTurnToBehindPos, angToGoToBehindPos, 0.01);
+        } else {
+            ////                cout << angToGoToBall << "  " << angToTurnToBall << endl;
+            return SK->GeneralWalk(libT, angToTurnToBall, angToGoToBall, 0.01);
+        }
 
     } else if (me.getDistanceTo(attackpositioning()) > 0.1 && shouldPlay2() && WM->getMyNum() != 10 && WM->getMyNum() != 11) {
         salt::Vector3f vec(attackpositioning().getX(), attackpositioning().getY(),

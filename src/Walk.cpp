@@ -59,31 +59,56 @@ string Skill::GeneralWalk(int& t, double angToTurn, double angToGo, double A)
     static double angleToGo = Deg2Rad(angToGo);
     static double angleToTurn = Deg2Rad(angToTurn);
     static bool walkMethodChange = false;
-    static int phase = 0;
-    static bool halfStepHappend = false;
+    static bool isNimWalkStarted = false;
 
-//    cout << Rad2Deg(angleToTurn) << endl;
-    if (t % AllTime == AllTime - 1) {
+    static int phase;
+    static int lastPhase;
+
+    if (angleToTurn > -0.05) {
+        if (t == 1) {
+            lastPhase = 1;
+        }
+        phase = 1;
+    } else {
+        if (t == 1) {
+            lastPhase = 0;
+        }
+        phase = 0;
+    }
+
+    if (lastPhase != phase) {
+        t += AllTime;
+        lastPhase = phase;
+    }
+    //        if (t % Period == Period - 1) {
+    //            onePeriodFinished = true;
+    //        } else {
+    //            onePeriodFinished = false;
+    //        }
+
+    cout << Rad2Deg(angleToGo) << "  " << Rad2Deg(angleToTurn) << endl;
+    cout << angToGo << "  " << angToTurn << endl;
+
+    if (t % AllTime == 0) {
         double alpha = Rad2Deg(angleToTurn);
 
-        if (t % Period == Period - 1) {
-            //                cout << "Kire meymoon sefr shod" << endl;
-            if (angToTurn < 0 == phase) {
-//                cout << "need nim wlak" << endl;
+        if (t % Period == 0) {
+            cout << "sare period" << endl;
+            if (angToTurn < -0.05 == phase) {
+                cout << phase << "  " << angToGo << "  " << angToTurn << " need nim wlak" << endl;
                 angleToTurn = 0;
-                halfStepHappend = true;
+                //                                        angleToGo = ( angleToGo + Deg2Rad( angToGo )) / 2.0 ;
+                angleToGo = Deg2Rad(angToGo);
+                isNimWalkStarted = true;
+                //                angleToGo = 0;
             } else {
                 onePeriodFinished = true;
             }
         } else if (fabs(angToTurn * alpha) < 0.5) {
-            if (t % Period == AllTime - 1) {
-                //                cout << "One Period Finished !!! And Roll back time ." << endl;
+            if (t % Period == AllTime && isNimWalkStarted) {
                 onePeriodFinished = true;
-                if (halfStepHappend) {
-                    t += AllTime;
-                    phase = (phase + 1) % 2;
-                    halfStepHappend = false;
-                }
+                isNimWalkStarted = false;
+//                cout << "setting one period finished " << endl;
             }
         } else {
             onePeriodFinished = false;
@@ -94,22 +119,23 @@ string Skill::GeneralWalk(int& t, double angToTurn, double angToGo, double A)
     }
 
     //    cout <<  "And The angle of the turn :" << angleToTurn << " will embrace the world's in gray "<< endl;
-    if (fabs(Rad2Deg(angleToGo) - angToGo) > 45 && !walkMethodChange) {
+    double alpha = Rad2Deg(angleToGo);
+    double angDiff = min(360 - fabs(alpha - angToGo), fabs(alpha - angToGo));
+    if (angDiff > 45 && !walkMethodChange) {
         walkMethodChange = true;
     }
 
     if (walkMethodChange) {
-        if (onePeriodFinished && speed < 0.7) {
+        if (onePeriodFinished && speed < max(45.0 * 0.8 / angDiff, 0.25)) {
 
             angleToGo = Deg2Rad(angToGo);
             angleToTurn = Deg2Rad(angToTurn);
             walkMethodChange = false;
         } else {
-            A = -0.01;
+            A = -0.015;
         }
     } else {
         if (onePeriodFinished) {
-            //            cout << "Kire meymoon setttttttttt shod : " << angToTurn     << endl;
             angleToGo = Deg2Rad(angToGo);
             angleToTurn = Deg2Rad(angToTurn);
         }
@@ -127,12 +153,6 @@ string Skill::GeneralWalk(int& t, double angToTurn, double angToGo, double A)
     double a1 = a, b1 = b;
     double x1, x2, y1, y2, z1, z2;
 
-    if (t == 1) {
-        if (angleToTurn > -0.05)
-            phase = 1;
-        else
-            phase = 0;
-    }
     x1 = -a * cos(w * t * 0.02 + (phase + 1) * M_PI) * sin((angleToGo)),
     y1 = a * cos(w * t * 0.02 + (phase + 1) * M_PI) * cos((angleToGo)),
     z1 = b * sin(w * t * 0.02 + (phase + 1) * M_PI);
@@ -146,10 +166,12 @@ string Skill::GeneralWalk(int& t, double angToTurn, double angToGo, double A)
     KDL::Rotation lLegRot = KDL::Rotation::RotZ(0);
     KDL::Rotation rHipRot = KDL::Rotation::RotZ(0);
 
-    if (angleToTurn > 0) {
+    if (angleToTurn < -0.05) {
         if (t % (2 * AllTime) < AllTime) {
+            //            cout << (t % (2 * AllTime)) * fabs(angleToTurn) / (double)AllTime << endl;
             lLegRot = KDL::Rotation::RotZ((t % (2 * AllTime)) * fabs(angleToTurn) / (double)AllTime);
         } else {
+            //            cout << ((2 * AllTime - (t % (2 * AllTime))) * fabs(angleToTurn)) / (double)AllTime << endl;
             lLegRot = KDL::Rotation::RotZ(
                 ((2 * AllTime - (t % (2 * AllTime))) * fabs(angleToTurn)) / (double)AllTime);
         }
@@ -184,7 +206,7 @@ string Skill::GeneralWalk(int& t, double angToTurn, double angToGo, double A)
     int solvedr = rLegIksolverPosJ->CartToJnt(JRLegInit, rfrm, JRLeg);
     JRLegInit = JRLeg;
 
-    //    cout << "--------------" << endl;
+    cout << "--------------" << endl;
     if (solvedl != 0 || solvedr != 0)
         return "";
     return moveJoints(JLLeg, JRLeg, 0.2);
@@ -357,13 +379,13 @@ void Skill::newSpeedController(double A)
     //    }
     speed += acc;
     speed = max(speed, 0.2);
-    speed = min(speed, 1.1);
+    speed = min(speed, 1.2);
     //  VecPosition ball(WM->getBallPos().x(), WM->getBallPos().y());
     //  VecPosition me(WM->getMyPos().x(), WM->getMyPos().y());
 
     //  if (comm == W || comm == WA) {
     //    bb = 0.1 + (t - 1) * 0.015;
-    //    bb = min(bb, 1.2);
+    //    bb = min(bb, 1);
     //    if (me.getDistanceTo(bralWall) < 1) {
     //      bb = min(bb, 0.8);
     //    }
