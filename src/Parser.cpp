@@ -499,7 +499,7 @@ void Parser::Parse(string &msg)
     std::vector<std::thread> all_threads;
 
     all_threads.push_back(std::thread ( std::bind (&Parser::parseHingeJoint,this,msg) ));
-//    all_threads.push_back(std::thread ( std::bind (&Parser::parseLines,this,msg) ));
+    all_threads.push_back(std::thread ( std::bind (&Parser::parseLines,this,msg) ));
     all_threads.push_back(std::thread ( std::bind (&Parser::parseFlags,this,msg) ));
     all_threads.push_back(std::thread ( std::bind (&Parser::parsePlayers,this,msg) ));
     all_threads.push_back(std::thread ( std::bind (&Parser::parseTime,this,msg) ));

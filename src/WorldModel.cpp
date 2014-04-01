@@ -78,6 +78,11 @@ void WorldModel::resetLastSeenLines()
     lines_we_see.clear();
 }
 
+void WorldModel::setGyroPos(Vector3f pos)
+{
+    gyroPos = pos;
+}
+
 vector<line> WorldModel::getLastSeenLines()
 {
     vector<line> lastSeenLines;

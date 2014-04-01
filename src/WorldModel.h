@@ -42,6 +42,8 @@ public:
   void setFootPress(string, FootRes);
   void setMyNum(int);
   void setLastMsg(string, double);
+  unordered_map<string,Vector3f> getLastFlagSeen();
+  void setGyroPos(Vector3f pos);
 
   void setMyPos(Vector3f);
   void setBallPos(Vector3f);
@@ -90,6 +92,7 @@ public:
   Vector3f translate(Vector3f);
   Vector3f translate(Vector3f,Matrix T);
   Vector3f translate(Vector3f,Vector3f);
+  Vector3f gyroPos;
   int      getNrOfUs();
   int      getNrOfThem();
   bool     getSense();

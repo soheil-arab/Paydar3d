@@ -132,6 +132,7 @@ int main(int argc, char* argv[])
 
             clock_gettime(CLOCK_REALTIME, start); // Works on Linux
             WM->Localize();
+//            localize->erfanKiriestLocalize();
             clock_gettime(CLOCK_REALTIME, end); // Works on Linux
             localizeTime = (end->tv_nsec - start->tv_nsec) / 1000000000.0 ;
 

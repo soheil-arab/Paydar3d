@@ -16,6 +16,9 @@ class line{
         Vector3f getBegin();
         Vector3f getEnd();
         string toString();
+        line line_PolarToCartesian();
+        double getLength();
+
 
 
 
