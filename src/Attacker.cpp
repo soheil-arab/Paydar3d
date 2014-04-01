@@ -15,6 +15,7 @@
 
 string Decide::Attack()
 {
+
     static int ttt = 0;
     static double deg = 0;
     static double A = 0.01;
@@ -56,15 +57,15 @@ string Decide::Attack()
         did = false;
         tt = 0;
     }
-//        if (ttt % 1200 < 300) {
-//            return SK->GeneralWalk(ttt, 30,30, 0.01);
-//        } else if (ttt % 1200 < 600) {
-//            return SK->GeneralWalk(ttt, -30, -30, 0.02);
-//        } else if (ttt % 1200 < 900) {
-//            return SK->GeneralWalk(ttt, 30, 30, 0.01);
-//        } else {
-//            return SK->GeneralWalk(ttt, -30, -30, 0.01);
-//        }
+    //        if (ttt % 1200 < 300) {
+    //            return SK->GeneralWalk(ttt, 30,30, 0.01);
+    //        } else if (ttt % 1200 < 600) {
+    //            return SK->GeneralWalk(ttt, -30, -30, 0.02);
+    //        } else if (ttt % 1200 < 900) {
+    //            return SK->GeneralWalk(ttt, 30, 30, 0.01);
+    //        } else {
+    //            return SK->GeneralWalk(ttt, -30, -30, 0.01);
+    //        }
 
     ///////////////////// Place Your Code Here ///////////////////////
     if (canBeam() && !set && !beam) {
@@ -94,6 +95,10 @@ string Decide::Attack()
 
     /////////////////////////////////////////////////////////////
     int closest = parseBallPos();
+    static int jjj = 0 ;
+//    RVDraw::instance()->drawVector3f(myPos,RED,jjj++);
+//    cout << myPos << endl;
+
 
     if (!ACT->isDone()) {
         ss << ACT->doCurrentAct();
@@ -116,72 +121,72 @@ string Decide::Attack()
         libT = 0;
         return SK->sefr(did, tt, false);
     } else if (shouldPlay() && closest == WM->getMyNum()) {
-        VecPosition oppositeTirak, thisTirak;
-        if (ball.getY() > 0) {
-            oppositeTirak.setY(-1.05);
-            thisTirak.setY(1.05);
-        } else {
-            oppositeTirak.setY(1.05);
-            thisTirak.setY(-1.05);
-        }
+        //        VecPosition oppositeTirak, thisTirak;
+        //        if (ball.getY() > 0) {
+        //            oppositeTirak.setY(-1.05);
+        //            thisTirak.setY(1.05);
+        //        } else {
+        //            oppositeTirak.setY(1.05);
+        //            thisTirak.setY(-1.05);
+        //        }
 
-        thisTirak.setY(thisTirak.getY() + sign(thisTirak.getY()) * (ball.getDistanceTo(goal) - 1.9) * 8.0 / 15.0);
-        oppositeTirak.setY(oppositeTirak.getY() + sign(oppositeTirak.getY()) * (ball.getDistanceTo(goal) - 1.9) * 8.5 / 15.0);
+        //        thisTirak.setY(thisTirak.getY() + sign(thisTirak.getY()) * (ball.getDistanceTo(goal) - 1.9) * 8.0 / 15.0);
+        //        oppositeTirak.setY(oppositeTirak.getY() + sign(oppositeTirak.getY()) * (ball.getDistanceTo(goal) - 1.9) * 8.5 / 15.0);
 
-        oppositeTirak.setX(15);
-        thisTirak.setX(15);
+        //        oppositeTirak.setX(15);
+        //        thisTirak.setX(15);
 
-        Line l1 = Line::makeLineFromTwoPoints(ball, oppositeTirak);
-        Line l2 = Line::makeLineFromTwoPoints(ball, thisTirak);
-        Line meBall = Line::makeLineFromTwoPoints(ball, me);
-        Line goalLine = Line::makeLineFromTwoPoints(thisTirak, oppositeTirak);
+        //        Line l1 = Line::makeLineFromTwoPoints(ball, oppositeTirak);
+        //        Line l2 = Line::makeLineFromTwoPoints(ball, thisTirak);
+        //        Line meBall = Line::makeLineFromTwoPoints(ball, me);
+        //        Line goalLine = Line::makeLineFromTwoPoints(thisTirak, oppositeTirak);
 
-        double firstAngle, secondAngle;
-        firstAngle = (thisTirak - ball).getDirection();
-        secondAngle = (oppositeTirak - ball).getDirection();
+        //        double firstAngle, secondAngle;
+        //        firstAngle = (thisTirak - ball).getDirection();
+        //        secondAngle = (oppositeTirak - ball).getDirection();
 
-        VecPosition meGoal = meBall.getIntersection(goalLine);
-        Circle ballCircle(ball, 0.042);
+        //        VecPosition meGoal = meBall.getIntersection(goalLine);
+        //        Circle ballCircle(ball, 0.042);
 
-        double horizonAngleLeft = VecPosition::normalizeAngle(WM->getMyAngle() + 90);
-        double horizonAngleRight = VecPosition::normalizeAngle(WM->getMyAngle() - 90);
+        //        double horizonAngleLeft = VecPosition::normalizeAngle(WM->getMyAngle() + 90);
+        //        double horizonAngleRight = VecPosition::normalizeAngle(WM->getMyAngle() - 90);
 
-        VecPosition myLeftSide = VecPosition::givePosition(me, horizonAngleLeft, 0.1);
-        VecPosition myRightSide = VecPosition::givePosition(me, horizonAngleRight, 0.1);
+        //        VecPosition myLeftSide = VecPosition::givePosition(me, horizonAngleLeft, 0.1);
+        //        VecPosition myRightSide = VecPosition::givePosition(me, horizonAngleRight, 0.1);
 
-        Line lineFromLeftSide = Line::makeLineFromPositionAndAngle(myLeftSide, myAngle);
-        Line lineFromRightSide = Line::makeLineFromPositionAndAngle(myRightSide, myAngle);
+        //        Line lineFromLeftSide = Line::makeLineFromPositionAndAngle(myLeftSide, myAngle);
+        //        Line lineFromRightSide = Line::makeLineFromPositionAndAngle(myRightSide, myAngle);
 
-        Circle c(ball, 0.5);
+        //        Circle c(ball, 0.5);
 
-        VecPosition i11, i12, i21, i22, finalPos1, finalPos2;
+        //        VecPosition i11, i12, i21, i22, finalPos1, finalPos2;
 
-        l1.getCircleIntersectionPoints(c, &i11, &i12);
-        l2.getCircleIntersectionPoints(c, &i21, &i22);
+        //        l1.getCircleIntersectionPoints(c, &i11, &i12);
+        //        l2.getCircleIntersectionPoints(c, &i21, &i22);
 
-        if (i11.getDistanceTo(oppositeTirak) > i12.getDistanceTo(oppositeTirak))
-            finalPos1 = i11;
-        else
-            finalPos1 = i12;
+        //        if (i11.getDistanceTo(oppositeTirak) > i12.getDistanceTo(oppositeTirak))
+        //            finalPos1 = i11;
+        //        else
+        //            finalPos1 = i12;
 
-        if (i21.getDistanceTo(thisTirak) > i22.getDistanceTo(thisTirak))
-            finalPos2 = i21;
-        else
-            finalPos2 = i22;
+        //        if (i21.getDistanceTo(thisTirak) > i22.getDistanceTo(thisTirak))
+        //            finalPos2 = i21;
+        //        else
+        //            finalPos2 = i22;
 
-        stringstream temp;
-        temp << WM->getMyAngleToBall();
-        Triangle tri(ball, finalPos1, finalPos2);
-        RVDraw::instance()->drawLine(oppositeTirak, finalPos1, RED, 5);
-        RVDraw::instance()->drawLine(thisTirak, finalPos2, RED, 6);
-        RVDraw::instance()->drawLine(finalPos1, finalPos2, RED, 7);
-        RVDraw::instance()->drawCircle(ballPos, c.getRadius(), GREEN, 8);
-        RVDraw::instance()->drawLine(me, ball, YELLO, 9);
-        RVDraw::instance()->drawLine(
-            me, VecPosition::givePosition(me, WM->getMyAngle(), 1), BLUE, 10);
-        RVDraw::instance()->drawAnnotation(
-            temp.str(), salt::Vector3f(myPos.x(), myPos.y(), myPos.z() + 0.2),
-            BLACK, 11);
+        //        stringstream temp;
+        //        temp << WM->getMyAngleToBall();
+        //        Triangle tri(ball, finalPos1, finalPos2);
+        //        RVDraw::instance()->drawLine(oppositeTirak, finalPos1, RED, 5);
+        //        RVDraw::instance()->drawLine(thisTirak, finalPos2, RED, 6);
+        //        RVDraw::instance()->drawLine(finalPos1, finalPos2, RED, 7);
+        //        RVDraw::instance()->drawCircle(ballPos, c.getRadius(), GREEN, 8);
+        //        RVDraw::instance()->drawLine(me, ball, YELLO, 9);
+        //        RVDraw::instance()->drawLine(
+        //            me, VecPosition::givePosition(me, WM->getMyAngle(), 1), BLUE, 10);
+        //        RVDraw::instance()->drawAnnotation(
+//                    temp.str(), salt::Vector3f(myPos.x(), myPos.y(), myPos.z() + 0.2),
+        //            BLACK, 11);
 
         VecPosition behindPos = /*ball*/ VecPosition::givePosition(ball, (VecPosition(15, 0) - ball).getDirection(), -0.2);
         double angToGoToBehindPos = WM->getMyAngleTo(salt::Vector3f(behindPos.getX(), behindPos.getY(), 0));
@@ -189,33 +194,41 @@ string Decide::Attack()
         double angToGoToBall = WM->getMyAngleTo(salt::Vector3f(ball.getX(), ball.getY(), 0));
         double angToTurnToBall = WM->getMyAngle() - (VecPosition(15, 0) - ball).getDirection();
 
-//        if (shouldClear(x, y, s,tri)) {
-//            ACT->setCurrentAct(K, s, x, y);
-//            tFinal = 0;
-//        }
+        //        if (shouldClear(x, y, s)) {
+        //            ACT->setCurrentAct(K, s, x, y);
+        //            tFinal = 0;
+        //        }
         if (fabs(angToTurnToBall) < 7) {
             angToTurnToBall = 0;
         }
         if (fabs(angToTurnToBehindPos) < 7) {
             angToTurnToBehindPos = 0;
         }
-
-//        if (angToTurnToBall * angToGoToBall < 0) {
-//            angToGoToBall *= -1;
-//        }
+        if (fabs(angToGoToBall) < 7) {
+            angToGoToBall = 0;
+        }
+        if (fabs(angToGoToBehindPos) < 7) {
+            angToGoToBehindPos = 0;
+        }
 
         if (me.getDistanceTo(behindPos) > 0.15) {
-            //                cout << angToGoToBehindPos << "  " << angToTurnToBehindPos << endl;
-            return SK->GeneralWalk(libT, angToTurnToBehindPos, angToGoToBehindPos, 0.01);
+            return SK->GeneralWalk(libT, angToTurnToBehindPos, angToGoToBehindPos, 0.015);
         } else {
-            ////                cout << angToGoToBall << "  " << angToTurnToBall << endl;
-            return SK->GeneralWalk(libT, angToTurnToBall, angToGoToBall, 0.01);
+            return SK->GeneralWalk(libT, angToTurnToBall, angToGoToBall, 0.015);
         }
 
     } else if (me.getDistanceTo(attackpositioning()) > 0.1 && shouldPlay2() && WM->getMyNum() != 10 && WM->getMyNum() != 11) {
-        salt::Vector3f vec(attackpositioning().getX(), attackpositioning().getY(),
-                           0);
-        return moveToPosP(false, attackpositioning(), tFinal);
+        VecPosition poss;
+        if (WM->getMyNum() == 2 || WM->getMyNum() == 3 || WM->getMyNum() == 4 || WM->getMyNum() == 5 || WM->getMyNum() == 6 )
+            poss = defendpositioning();
+        else if ( WM->getMyNum() == 7)
+            poss = middlepositioning();
+        else if (WM->getMyNum() == 8 || WM->getMyNum() == 9 || WM->getMyNum() == 11 || WM->getMyNum() == 10)
+            poss = attackpositioning();
+
+        double angToGoPoss = WM->getMyAngleTo(salt::Vector3f(poss.getX(), poss.getY(), 0));
+        double angToTurnToPoss = WM->getMyAngle() - (ball - poss).getDirection();
+        return SK->GeneralWalk(libT, angToTurnToPoss, angToGoPoss, 0.01);
     } else if (fabs(WM->getMyAngleTo(WM->getBallPos())) > 15 && shouldPlay2()) {
         if (WM->getMyAngleTo(WM->getBallPos()) > 0) {
             Log.Log(2, "Turn Left !");

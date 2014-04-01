@@ -118,6 +118,7 @@ int main(int argc, char* argv[])
         timespec* start, *end;
         start = new timespec;
         end = new timespec;
+        double parseTime, localizeTime, decideTime;
 
         while (1) {
             dec.clear();
@@ -125,16 +126,23 @@ int main(int argc, char* argv[])
             sockClient->receive(get);
 
             clock_gettime(CLOCK_REALTIME, start); // Works on Linux
-////////////
             P->Parse(get);
-            WM->Localize();
-//            localize->test();
-            dec = DC->decide();
-////////////
             clock_gettime(CLOCK_REALTIME, end); // Works on Linux
+            parseTime = (end->tv_nsec - start->tv_nsec) / 1000000000.0;
 
-            if ((end->tv_nsec - start->tv_nsec) / 1000000000.0 > 0.02) {
-                cout << "Rinesh Happend : " << (end->tv_nsec - start->tv_nsec) / 1000000000.0 << endl;
+            clock_gettime(CLOCK_REALTIME, start); // Works on Linux
+            WM->Localize();
+            clock_gettime(CLOCK_REALTIME, end); // Works on Linux
+            localizeTime = (end->tv_nsec - start->tv_nsec) / 1000000000.0 ;
+
+            clock_gettime(CLOCK_REALTIME, start); // Works on Linux
+            dec = DC->decide();
+            clock_gettime(CLOCK_REALTIME, end); // Works on Linux
+            decideTime = (end->tv_nsec - start->tv_nsec) / 1000000000.0 ;
+
+            if (parseTime + localizeTime + decideTime > 0.02) {
+                cout <<  "p : " << parseTime << " l: " << localizeTime << " d: " << decideTime << endl;
+//                cout << "Rinesh Happend : " << (end->tv_nsec - start->tv_nsec) / 1000000000.0 << endl;
                 //                exit(0);
             }
             sockClient->send(dec);

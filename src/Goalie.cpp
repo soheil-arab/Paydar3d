@@ -91,7 +91,7 @@ string Decide::goalie()
         tFinal=0;
         ss<<ACT->doCurrentAct();
     }
-    else if ( WM->shouldDive(s) && ball.getX()>10)
+    else if ( WM->shouldDive(s) && ball.getX()<-10)
     {
         tFinal=0;
         ACT->setCurrentAct(Di,s);

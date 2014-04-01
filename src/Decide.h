@@ -24,7 +24,7 @@ public:
   string Deffend();
   string Middle();
   bool canShoot(double &dx, double &dy,string &side);
-  bool shouldClear(double&, double&,SideT&,Triangle t);
+  bool shouldClear(double&, double&,SideT&);
   bool shouldShoot(double&, double&,SideT&);
   bool canBackShoot(string &);
   bool shouldTurn90(string &);

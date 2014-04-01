@@ -158,12 +158,10 @@ void Parser::parseHearMessage(string &msg)
         }
         else
         {
-
             pos = msg.find("hear",pos+1);
             if (pos != string::npos)
             {
                 stringstream edame(msg.substr(pos));
-
                 edame >> temp >> time >> temp >> msg1 ;
 
                 if (msg1.size() == 3 && msg1[0]==msg1[1] && msg1[1] == msg1[2]){
@@ -172,7 +170,6 @@ void Parser::parseHearMessage(string &msg)
                     WM->setLastMsg( msg1 , time );
                     //wm_lock->unlock();
                 }
-
             }
         }
     }
