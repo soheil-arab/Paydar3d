@@ -2,7 +2,7 @@
 #define LOCALIZE_H
 #include "WorldModel.h"
 #include "Math.h"
-#define EIGEN2_SUPPORT
+//#define EIGEN2_SUPPORT
 #include <eigen3/Eigen/Core>
 
 using namespace std;

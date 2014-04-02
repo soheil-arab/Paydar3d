@@ -80,7 +80,7 @@ void Parser::parseHingeJoint(string &msg)
 void Parser::parseLines(string &msg)
 {
     string temp;
-    int pos=msg.find("L");
+    int pos=msg.find(" L");
     while(pos !=string::npos)
     {
         stringstream edame(msg.substr(pos));
@@ -89,7 +89,7 @@ void Parser::parseLines(string &msg)
         //wm_lock->lock();
         WM->setSeenLines(line (Vector3f(x1,y1,z1),Vector3f(x2,y2,z2),WM->serverTime));
         //wm_lock->unlock();
-        pos=msg.find("L",pos+1);
+        pos=msg.find(" L",pos+1);
     }
 }
 
@@ -496,24 +496,38 @@ void Parser::Parse(string &msg)
         if ( msg[i]=='(' || msg[i]==')')
             msg[i]=' ';
 
-    std::vector<std::thread> all_threads;
+//    std::vector<std::thread> all_threads;
 
-    all_threads.push_back(std::thread ( std::bind (&Parser::parseHingeJoint,this,msg) ));
-    all_threads.push_back(std::thread ( std::bind (&Parser::parseLines,this,msg) ));
-    all_threads.push_back(std::thread ( std::bind (&Parser::parseFlags,this,msg) ));
-    all_threads.push_back(std::thread ( std::bind (&Parser::parsePlayers,this,msg) ));
-    all_threads.push_back(std::thread ( std::bind (&Parser::parseTime,this,msg) ));
-    all_threads.push_back(std::thread ( std::bind (&Parser::parseGameState,this,msg) ));
-    all_threads.push_back(std::thread ( std::bind (&Parser::parseGyroAndAccell,this,msg) ));
-    all_threads.push_back(std::thread ( std::bind (&Parser::parseBall,this,msg) ));
-    all_threads.push_back(std::thread ( std::bind (&Parser::parseSide,this,msg) ));
-    all_threads.push_back(std::thread ( std::bind (&Parser::parseFrp,this,msg) ));
-    all_threads.push_back(std::thread ( std::bind (&Parser::parseHearMessage,this,msg) ));
-    all_threads.push_back(std::thread ( std::bind (&Parser::parseSense,this,msg) ));
+    parseHingeJoint(msg);
+    parseTime(msg);
+    parseGameState(msg);
+    parseLines(msg);
+    parseFlags(msg);
+    parsePlayers(msg);
+    parseGyroAndAccell(msg);
+    parseBall(msg);
+    parseSide(msg);
+    parseFrp(msg);
+    parseHearMessage(msg);
+    parseSense(msg);
 
 
-    for ( auto &i : all_threads )
-    {
-        i.join();
-    }
+//    all_threads.push_back(std::thread ( std::bind (&Parser::parseHingeJoint,this,msg) ));
+//    all_threads.push_back(std::thread ( std::bind (&Parser::parseLines,this,msg) ));
+//    all_threads.push_back(std::thread ( std::bind (&Parser::parseFlags,this,msg) ));
+//    all_threads.push_back(std::thread ( std::bind (&Parser::parsePlayers,this,msg) ));
+//    all_threads.push_back(std::thread ( std::bind (&Parser::parseTime,this,msg) ));
+//    all_threads.push_back(std::thread ( std::bind (&Parser::parseGameState,this,msg) ));
+//    all_threads.push_back(std::thread ( std::bind (&Parser::parseGyroAndAccell,this,msg) ));
+//    all_threads.push_back(std::thread ( std::bind (&Parser::parseBall,this,msg) ));
+//    all_threads.push_back(std::thread ( std::bind (&Parser::parseSide,this,msg) ));
+//    all_threads.push_back(std::thread ( std::bind (&Parser::parseFrp,this,msg) ));
+//    all_threads.push_back(std::thread ( std::bind (&Parser::parseHearMessage,this,msg) ));
+//    all_threads.push_back(std::thread ( std::bind (&Parser::parseSense,this,msg) ));
+
+
+//    for ( auto &i : all_threads )
+//    {
+//        i.join();
+//    }
 }

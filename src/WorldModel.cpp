@@ -86,10 +86,12 @@ void WorldModel::setGyroPos(Vector3f pos)
 vector<line> WorldModel::getLastSeenLines()
 {
     vector<line> lastSeenLines;
-    for (int i = 0; i < lines_we_see.size(); i++) {
-        if (lines_we_see[i].time_we_saw_it == serverTime)
-            lastSeenLines.push_back(lines_we_see[i]);
+    for(int i=0;i<lines_we_see.size();i++)
+    {
+        if(lines_we_see[i].time_we_saw_it==serverTime)
+            lastSeenLines.insert(lastSeenLines.end(),lines_we_see[i]);
     }
+
     return lastSeenLines;
 }
 
@@ -97,7 +99,6 @@ vector<line> WorldModel::getLastSeenLines()
 
 void WorldModel::setSeenLines(line l)
 {
-
     if (l.getLength() > 1)
         lines_we_see.push_back(l);
 }
@@ -132,19 +133,29 @@ double WorldModel::getBallLastSeen()
 
 bool WorldModel::isServerBeamed()
 {
-    static Vector3f lastPos = getMyPos();
+    static Vector3f lastPos=getMyPos();
+    static Vector3f lastGyroPos=gyroPos;
 
-    for (unordered_map<string, Polar>::iterator i = flagPolar.begin(); i != flagPolar.end(); i++) {
-        if (flagLastSeen[i->first] != serverTime) {
+    for (unordered_map<string, Polar>::iterator i = flagPolar.begin(); i != flagPolar.end(); i++)
+    {
+        if (flagLastSeen [ i->first ] != serverTime)
+        {
             continue;
         }
-        if (fabs((i->second.dist) - (lastPos - flagGlobal[i->first]).Length()) > 1) {
-            lastPos = getMyPos();
+        if(fabs((i->second.dist)-(lastPos-flagGlobal[i->first]).Length())>1){
+            lastPos=getMyPos();
             return true;
         }
+        if(fabs((i->second.dist)-(lastGyroPos-flagGlobal[i->first]).Length())>1){
+            lastGyroPos=gyroPos;
+            return true;
+        }
+
     }
-    lastPos = getMyPos();
+    lastPos=getMyPos();
+    lastGyroPos=gyroPos;
     return false;
+
 }
 
 ///~ Our Team Localization
@@ -244,7 +255,9 @@ void WorldModel::brinBeMA()
     int numberOfFlags = 0;
 
     Vector3f myPos(0, 0, 0);
+
     for (unordered_map<string, Vector3f>::iterator i = flag.begin(); i != flag.end(); i++) {
+        cout << serverTime << "  " << flagLastSeen[i->first] << endl;
         if (flagLastSeen[i->first] != serverTime) {
             continue;
         }
@@ -254,6 +267,8 @@ void WorldModel::brinBeMA()
 
         myPos += poss;
         numberOfFlags++;
+//        cout << "asdasd" << endl;
+
     }
 
     /**
@@ -263,6 +278,7 @@ void WorldModel::brinBeMA()
     //    posN++;
 
     if (numberOfFlags) {
+
         Localed = true;
         myPos /= numberOfFlags;
         //        if(myPos.z()<=0.04)
@@ -316,18 +332,18 @@ void WorldModel::brinBeMA()
         }
     }
 
-    if (getLastSeenLines().size() > 0 && Time > 20)
+//    if (getLastSeenLines().size() > 0 && Time > 20)
         //    if(lines_we_see.size()>0 && Time>20)
-    {
-        int size = getLastSeenLines().size();
+//    {
+//        int size = getLastSeenLines().size();
 
-        for (int i = 0; i < size; i++) {
-            line l = getLastSeenLines()[size - i - 1];
-            if (l.time_we_saw_it == serverTime) {
+//        for (int i = 0; i < size; i++) {
+//            line l = getLastSeenLines()[size - i - 1];
+//            if (l.time_we_saw_it == serverTime) {
                 //                RVDraw::instance()->drawLine(sensedPos+headRotate.Rotate(PolarToCartecian(l.begin)),sensedPos+headRotate.Rotate(PolarToCartecian(l.end)),RED,2*size+i);
-            }
-        }
-    }
+//            }
+//        }
+//    }
 }
 
 //kalman filter

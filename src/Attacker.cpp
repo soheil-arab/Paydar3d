@@ -15,6 +15,10 @@
 
 string Decide::Attack()
 {
+    static int aaa = 0 ;
+//    cout << WM->getMyPos() << endl;
+//    cout << WM->getBallPos() << endl;
+////   cout << WM->getBallPos() << endl;
 
     static int ttt = 0;
     static double deg = 0;
@@ -33,6 +37,10 @@ string Decide::Attack()
     stringstream ss("");
     myPos = WM->getMyPos();
     ballPos = WM->getBallPos();
+//    cout << myPos << "  " << ballPos << endl;
+    static int K = 0 ;
+    RVDraw::instance()->drawVector3f(salt::Vector3f(-myPos.x(),-myPos.y(),myPos.z()),RED,K++,3);
+    RVDraw::instance()->drawVector3f(salt::Vector3f(-ballPos.x(),-ballPos.y(),ballPos.z()),RED,K++,3);
     VecPosition me(myPos.x(), myPos.y());
     VecPosition ball(ballPos.x(), ballPos.y());
     VecPosition goal(15, 0);
@@ -95,10 +103,9 @@ string Decide::Attack()
 
     /////////////////////////////////////////////////////////////
     int closest = parseBallPos();
-    static int jjj = 0 ;
-//    RVDraw::instance()->drawVector3f(myPos,RED,jjj++);
-//    cout << myPos << endl;
-
+    static int jjj = 0;
+    //    RVDraw::instance()->drawVector3f(myPos,RED,jjj++);
+    //    cout << myPos << endl;
 
     if (!ACT->isDone()) {
         ss << ACT->doCurrentAct();
@@ -185,9 +192,10 @@ string Decide::Attack()
         //        RVDraw::instance()->drawLine(
         //            me, VecPosition::givePosition(me, WM->getMyAngle(), 1), BLUE, 10);
         //        RVDraw::instance()->drawAnnotation(
-//                    temp.str(), salt::Vector3f(myPos.x(), myPos.y(), myPos.z() + 0.2),
+        //                    temp.str(), salt::Vector3f(myPos.x(), myPos.y(), myPos.z() + 0.2),
         //            BLACK, 11);
 
+        //        cout << me << "  " << ball << endl;
         VecPosition behindPos = /*ball*/ VecPosition::givePosition(ball, (VecPosition(15, 0) - ball).getDirection(), -0.2);
         double angToGoToBehindPos = WM->getMyAngleTo(salt::Vector3f(behindPos.getX(), behindPos.getY(), 0));
         double angToTurnToBehindPos = WM->getMyAngle() - (VecPosition(15, 0) - behindPos).getDirection();
@@ -217,18 +225,33 @@ string Decide::Attack()
             return SK->GeneralWalk(libT, angToTurnToBall, angToGoToBall, 0.015);
         }
 
-    } else if (me.getDistanceTo(attackpositioning()) > 0.1 && shouldPlay2() && WM->getMyNum() != 10 && WM->getMyNum() != 11) {
+    } else if (shouldPlay2()) {
         VecPosition poss;
-        if (WM->getMyNum() == 2 || WM->getMyNum() == 3 || WM->getMyNum() == 4 || WM->getMyNum() == 5 || WM->getMyNum() == 6 )
+        if (WM->getMyNum() == 2 || WM->getMyNum() == 3 || WM->getMyNum() == 4 || WM->getMyNum() == 5 || WM->getMyNum() == 6)
             poss = defendpositioning();
-        else if ( WM->getMyNum() == 7)
-            poss = middlepositioning();
+//        else if (WM->getMyNum() == 7)
+//            poss = middlepositioning();
         else if (WM->getMyNum() == 8 || WM->getMyNum() == 9 || WM->getMyNum() == 11 || WM->getMyNum() == 10)
             poss = attackpositioning();
 
-        double angToGoPoss = WM->getMyAngleTo(salt::Vector3f(poss.getX(), poss.getY(), 0));
-        double angToTurnToPoss = WM->getMyAngle() - (ball - poss).getDirection();
-        return SK->GeneralWalk(libT, angToTurnToPoss, angToGoPoss, 0.01);
+        if (me.getDistanceTo(poss) > 0.2) {
+            double angToGoPoss = WM->getMyAngleTo(salt::Vector3f(poss.getX(), poss.getY(), 0));
+            double angToTurnToPoss = WM->getMyAngle() - (ball - poss).getDirection();
+            return SK->GeneralWalk(libT, angToTurnToPoss, angToGoPoss, 0.01);
+        }else if (fabs(WM->getMyAngleTo(WM->getBallPos())) > 15 && shouldPlay2()) {
+            if (WM->getMyAngleTo(WM->getBallPos()) > 0) {
+                Log.Log(2, "Turn Left !");
+                return SK->finalAction("turnL", tFinal);
+            } else {
+                Log.Log(2, "Turn Right !");
+                return SK->finalAction("turnR", tFinal);
+            }
+        } else if (!(WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Right || WM->getPlayMode() == PM_BeforeKickOff)) {
+            Log.Log(2, "Darja Mizadam !");
+//            return SK->finalAction("darja", tFinal);
+            return "";
+        }
+
     } else if (fabs(WM->getMyAngleTo(WM->getBallPos())) > 15 && shouldPlay2()) {
         if (WM->getMyAngleTo(WM->getBallPos()) > 0) {
             Log.Log(2, "Turn Left !");
@@ -240,7 +263,6 @@ string Decide::Attack()
     } else if (!(WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Right || WM->getPlayMode() == PM_BeforeKickOff)) {
         Log.Log(2, "Darja Mizadam !");
         return SK->finalAction("darja", tFinal);
-        return "";
     }
     return ss.str();
 }

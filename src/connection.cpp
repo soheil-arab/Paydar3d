@@ -59,6 +59,8 @@ void connection::send( string message )
 	unsigned int len = htonl( message.size() );
 	string strPrefix( (const char*)&len, 4 );
 	string str = strPrefix + message;
+
+//    cout << str << endl;
     if ( write( socket_descriptor, str.data(), str.size() ) < 1 )
     {
         cerr << "failed to write" << endl;
@@ -89,7 +91,7 @@ void connection::receive( string &message )
 		int t=readed_bytes;
 		readed_bytes += read(socket_descriptor, buffer+readed_bytes+4, 
 			sizeof(buffer) - readed_bytes - 4);
-        if ( t==readed_bytes)
+        if ( t==readed_bytes )
         {
             cerr << "Readed Byte Zero" << endl;
             exit(0);

@@ -121,8 +121,6 @@ int main(int argc, char* argv[])
         double parseTime, localizeTime, decideTime;
 
         while (1) {
-            dec.clear();
-
             sockClient->receive(get);
 
             clock_gettime(CLOCK_REALTIME, start); // Works on Linux
@@ -133,6 +131,7 @@ int main(int argc, char* argv[])
             clock_gettime(CLOCK_REALTIME, start); // Works on Linux
             WM->Localize();
 //            localize->erfanKiriestLocalize();
+//            localize->test();
             clock_gettime(CLOCK_REALTIME, end); // Works on Linux
             localizeTime = (end->tv_nsec - start->tv_nsec) / 1000000000.0 ;
 

@@ -1,7 +1,8 @@
 #include "Skill.h"
 #include "Skill.h"
 
-Skill::Skill(WorldModel*wm) {
+Skill::Skill(WorldModel* wm)
+{
     WM = wm;
     f.open("ACT/standupB.txt");
     if (!f) {
@@ -15,7 +16,6 @@ Skill::Skill(WorldModel*wm) {
     f.close();
     fill1(standupF, "standupF");
     fill1(standupB, "standupB");
-
 
     f.open("ACT/standingK.txt");
     if (!f) {
@@ -141,7 +141,6 @@ Skill::Skill(WorldModel*wm) {
     rLeg.addSegment(KDL::Segment("rAnklePitch", rAnklePitch, KDL::Frame(KDL::Vector(0, -0.01, -0.055))));
     rLeg.addSegment(KDL::Segment("rAnkleRoll", rAnkleRoll, KDL::Frame(KDL::Vector(0, 0.0, 0.0))));
 
-
     lHipYawPitch = KDL::Joint(KDL::Vector(0, 0, 0), KDL::Vector(-0.707, 0.0, -0.707), KDL::Joint::RotAxis);
     lHipRoll = KDL::Joint(KDL::Vector(0, 0, 0), KDL::Vector(0, 1, 0), KDL::Joint::RotAxis);
     lHipPitch = KDL::Joint(KDL::Vector(0, -0.01, 0.04) + KDL::Vector(0, 0.01, -0.04), KDL::Vector(1, 0, 0), KDL::Joint::RotAxis);
@@ -155,7 +154,6 @@ Skill::Skill(WorldModel*wm) {
     lLeg.addSegment(KDL::Segment("lKneePitch", lKneePitch, KDL::Frame(KDL::Vector(0, 0.005, -0.125))));
     lLeg.addSegment(KDL::Segment("lAnklePitch", lAnklePitch, KDL::Frame(KDL::Vector(0, -0.01, -0.055))));
     lLeg.addSegment(KDL::Segment("lAnkleRoll", lAnkleRoll, KDL::Frame(KDL::Vector(0, 0.0, 0.0))));
-
 
     unsigned int nj2 = lLeg.getNrOfSegments();
 
@@ -184,7 +182,6 @@ Skill::Skill(WorldModel*wm) {
     rLegJMin(4) = Deg2Rad(-45);
     rLegJMin(5) = Deg2Rad(-25);
 
-
     KDL::JntArray rLegJMax = KDL::JntArray(nj2);
 
     rLegJMax(0) = Deg2Rad(1);
@@ -201,19 +198,20 @@ Skill::Skill(WorldModel*wm) {
     rLegFKSolver = new KDL::ChainFkSolverPos_recursive(rLeg);
     rLegIkSolverVel = new KDL::ChainIkSolverVel_wdls(rLeg, 0.01, 100); //Inverse velocity solver, from Cartesian to joint space
     rLegIksolverPosJ = new KDL::ChainIkSolverPos_NR_JL(rLeg, rLegJMin, rLegJMax, *rLegFKSolver, *rLegIkSolverVel, 100, 0.01);
-
 }
 
 ////////////////////////////////////////////////////////////////////
 
-string Skill::moveJoint(string j, double val) {
+string Skill::moveJoint(string j, double val)
+{
     stringstream message;
     message << "(" << j << " " << val * 0.872664626 << ")";
     return message.str();
 }
 ///////////////////////////////////////////////////////////////////
 
-string Skill::moveJointTo(string j, double val, double speed) {
+string Skill::moveJointTo(string j, double val, double speed)
+{
     speed = fabs(speed);
     if (fabs(WM->getJointAngle(j) - val) < 0.1) {
         return "";
@@ -228,7 +226,8 @@ string Skill::moveJointTo(string j, double val, double speed) {
 }
 /////////////////////////////////////////////////////////////////////
 
-void Skill::fill1(double action[24][24], string fileName) {
+void Skill::fill1(double action[24][24], string fileName)
+{
 
     string path = "./ACT/" + fileName + ".txt";
     ifstream fin;
@@ -255,7 +254,8 @@ void Skill::fill1(double action[24][24], string fileName) {
 }
 /////////////////////////////////////////////////////////////////////
 
-string Skill::act(double a[][24], double &time) {
+string Skill::act(double a[][24], double& time)
+{
     int m = a[0][0];
     int n = a[1][0];
 
@@ -284,7 +284,8 @@ string Skill::act(double a[][24], double &time) {
 }
 /////////////////////////////////////////////////////////////////////
 
-string Skill::StandUpFront(bool &done) {
+string Skill::StandUpFront(bool& done)
+{
     stringstream ss;
     done = false;
     bool did = false;
@@ -303,13 +304,11 @@ string Skill::StandUpFront(bool &done) {
         islied = false;
     }
 
-    if (WM->getJointAngle("lae1")>-89 and islied == false) {
+    if (WM->getJointAngle("lae1") > -89 and islied == false) {
         stringstream ss;
         ss << fix() << moveJointTo("rae1", -90, -4) << moveJointTo("lae1", -90, -4);
-        return ss . str();
-
+        return ss.str();
     }
-
 
     islied = true;
     bool dd;
@@ -327,7 +326,8 @@ string Skill::StandUpFront(bool &done) {
 
 /////////////////////////////////////////////////////////////////////
 
-string Skill::act(double a[][24], int m, int n, double &time, bool &t) {
+string Skill::act(double a[][24], int m, int n, double& time, bool& t)
+{
     if (t) {
         return "";
     }
@@ -356,7 +356,8 @@ string Skill::act(double a[][24], int m, int n, double &time, bool &t) {
 }
 //////////////////////////////////////////////////////////////////////
 
-string Skill::fix() {
+string Skill::fix()
+{
     stringstream ss;
     for (int i = 0; i < 22; i++) {
         ss << fix(WM->num2Str(i));
@@ -365,7 +366,8 @@ string Skill::fix() {
 }
 //////////////////////////////////////////////////////////////////////
 
-string Skill::feh(bool a, double s) {
+string Skill::feh(bool a, double s)
+{
     stringstream ss("");
     for (int i = 0; i < 22; i++)
         if (fabs(WM->getJointAngle(WM->num2Str(i))) > 0.2 && ((i != 14 && i != 15) || a)) {
@@ -376,7 +378,8 @@ string Skill::feh(bool a, double s) {
 
 //////////////////////////set////////////////////////////////////////
 
-string Skill::set(string j, double ang, int cycle) {
+string Skill::set(string j, double ang, int cycle)
+{
     stringstream ss;
     double speed = (ang) / cycle;
     if (speed > 7) {
@@ -387,12 +390,14 @@ string Skill::set(string j, double ang, int cycle) {
 }
 /////////////////////////////////////////////////////////////////////
 
-string Skill::fix(string j) {
+string Skill::fix(string j)
+{
     return moveJoint(j, 0);
 }
 /////////////////////////////////////turn//////////////////////////////////
 
-string Skill::standUp(SideT s, bool &done, double &t) {
+string Skill::standUp(SideT s, bool& done, double& t)
+{
     if (done) {
         t = 0;
         return "";
@@ -406,7 +411,7 @@ string Skill::standUp(SideT s, bool &done, double &t) {
 
 /////////////////////////////////////////////////////////////////////
 
-string Skill::dive(SideT s, bool &done, double &t)
+string Skill::dive(SideT s, bool& done, double& t)
 {
     if (done) {
         t = 0;
@@ -420,7 +425,8 @@ string Skill::dive(SideT s, bool &done, double &t)
 }
 /////////////////////////////////////////////////////////////////////
 
-string Skill::DP(SideT s, bool &done, double &t) {
+string Skill::DP(SideT s, bool& done, double& t)
+{
     if (done) {
         t = 0;
         return "";
@@ -433,7 +439,8 @@ string Skill::DP(SideT s, bool &done, double &t) {
 }
 ///////////////////////////////////////////////////////////////////////
 
-string Skill::sefr(bool &done, double &t, bool b) {
+string Skill::sefr(bool& done, double& t, bool b)
+{
     if (done) {
         t = 0;
         return "";
@@ -446,7 +453,8 @@ string Skill::sefr(bool &done, double &t, bool b) {
 }
 ////////////////////////////////////////////////////////////////////////
 
-string Skill::Standing(bool &done, double &t) {
+string Skill::Standing(bool& done, double& t)
+{
     if (done) {
         t = 0;
         return "";
@@ -455,7 +463,8 @@ string Skill::Standing(bool &done, double &t) {
 }
 //////////////////////////////////////////////////////////////////////
 
-string Skill::Standing2(bool &done, double &t) {
+string Skill::Standing2(bool& done, double& t)
+{
     if (done) {
         t = 0;
         return "";
@@ -464,7 +473,8 @@ string Skill::Standing2(bool &done, double &t) {
 }
 ///////////////////////////////////////////////////////////////////////
 
-string Skill::StandingBack(bool &done, double &t) {
+string Skill::StandingBack(bool& done, double& t)
+{
     if (done) {
         t = 0;
         return "";
@@ -473,7 +483,8 @@ string Skill::StandingBack(bool &done, double &t) {
 }
 ////////////////////////////////////////////////////////////////////////
 
-string Skill::beam(double x, double y, double ang) {
+string Skill::beam(double x, double y, double ang)
+{
 
     stringstream message;
     message << "(beam " << x << " " << y << " " << ang << ")";
@@ -485,7 +496,8 @@ string Skill::beam(double x, double y, double ang) {
 ///                             Say Ball Pos
 ///~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-string Skill::sayBallPos() {
+string Skill::sayBallPos()
+{
     stringstream ss;
     ss << "(say " << WM->getClosestOurToBall() << WM->getClosestOurToBall() << WM->getClosestOurToBall() << ")";
     return ss.str();
@@ -495,7 +507,8 @@ string Skill::sayBallPos() {
 ///                             Beam
 ///~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-string Skill::whereBeam(bool &stand, double &stan) {
+string Skill::whereBeam(bool& stand, double& stan)
+{
 
     stringstream ss("");
     if (WM->getMyNum() == 9) {
@@ -509,7 +522,6 @@ string Skill::whereBeam(bool &stand, double &stan) {
                 ss << beam(-1.6, 0.0, 0);
             }
         } else {
-
             if (WM->getPlayMode() == PM_KickOff_Right || WM->getPlayMode() == PM_Goal_Left) {
                 ss << beam(-0.19, 0, 0);
             } else {
@@ -530,135 +542,41 @@ string Skill::whereBeam(bool &stand, double &stan) {
                 ss << beam(-2.6, 0.7, 0);
             }
         }
-    } else if (WM->getMyNum() == 6) {
-        if (WM->getTeamSide() == Left) {
-            if (WM->getPlayMode() == PM_BeforeKickOff || WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Right) {
-                ss << beam(-13, 3, 0);
-            } else {
-                ss << beam(-13, 3, 0);
-            }
-        } else {
-            if (WM->getPlayMode() == PM_KickOff_Right || WM->getPlayMode() == PM_Goal_Left) {
-                ss << beam(-13, 3, 0);
-            } else {
-                ss << beam(-13, 3, 0);
-            }
-        }
-    } else if (WM->getMyNum() == 4) {
-        if (WM->getTeamSide() == Left) {
-            if (WM->getPlayMode() == PM_BeforeKickOff || WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Right) {
-                ss << beam(-9, 4, 0);
-            } else {
-                ss << beam(-9, 4, 0);
-            }
-        } else {
-            if (WM->getPlayMode() == PM_KickOff_Right || WM->getPlayMode() == PM_Goal_Left) {
-                ss << beam(-9, 4, 0);
-            } else {
-                ss << beam(-9, 4, 0);
-            }
-        }
-    } else if (WM->getMyNum() == 2) {
-        if (WM->getTeamSide() == Left) {
-            if (WM->getPlayMode() == PM_BeforeKickOff || WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Right) {
-                ss << beam(-10.0, 1.2, 0);
-            } else {
-                ss << beam(-10.0, 1.2, 0);
-            }
-        } else {
-            if (WM->getPlayMode() == PM_KickOff_Right || WM->getPlayMode() == PM_Goal_Left) {
-                ss << beam(-10, 1.2, 0);
-            } else {
-                ss << beam(-10, 1.2, 0);
-            }
-        }
-    } else if (WM->getMyNum() == 5) {
-        if (WM->getTeamSide() == Left) {
-            if (WM->getPlayMode() == PM_BeforeKickOff || WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Right) {
-                ss << beam(-9, -4, 0);
-            } else {
-                ss << beam(-9, -4, 0);
-            }
-        } else {
-            if (WM->getPlayMode() == PM_KickOff_Right || WM->getPlayMode() == PM_Goal_Left) {
-                ss << beam(-9, -4, 0);
-            } else {
-                ss << beam(-9, -4, 0);
-            }
-        }
     } else if (WM->getMyNum() == 3) {
-        if (WM->getTeamSide() == Left) {
-            if (WM->getPlayMode() == PM_BeforeKickOff || WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Right) {
-                ss << beam(-10.0, -1.2, 0);
-            } else {
-                ss << beam(-10.0, -1.2, 0);
-            }
-        } else {
-            if (WM->getPlayMode() == PM_KickOff_Right || WM->getPlayMode() == PM_Goal_Left) {
-                ss << beam(-10.0, -1.6, 0);
-            } else {
-                ss << beam(-10.0, -1.6, 0);
-            }
-        }
-    } else if (WM->getMyNum() == 11) {
-        if (WM->getTeamSide() == Left) {
-            if (WM->getPlayMode() == PM_BeforeKickOff || WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Right) {
-                ss << beam(-7, 0, 0);
-            } else {
-                ss << beam(-7, 0, 0);
-            }
-        } else {
-            if (WM->getPlayMode() == PM_KickOff_Right || WM->getPlayMode() == PM_Goal_Left) {
-                ss << beam(-7, 0, 0);
-            } else {
-                ss << beam(-7, 0, 0);
-            }
-        }
-    } else if (WM->getMyNum() == 10) {
-        if (WM->getTeamSide() == Left) {
-            if (WM->getPlayMode() == PM_BeforeKickOff || WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Right) {
-                ss << beam(-6, 2, 0);
-            } else {
-                ss << beam(-6, 2, 0);
-            }
-        } else {
-            if (WM->getPlayMode() == PM_KickOff_Right || WM->getPlayMode() == PM_Goal_Left) {
-                ss << beam(-6, 2, 0);
-            } else {
-                ss << beam(-6, 2, 0);
-            }
-        }
+        ss << beam(-13, -4, 0);
+    } else if (WM->getMyNum() == 2) {
+        ss << beam(-13, 0, 0);
+    } else if (WM->getMyNum() == 4) {
+        ss << beam(-13, 4, 0);
+    } else if (WM->getMyNum() == 5) {
+        ss << beam(-11, -1, 0);
+    } else if (WM->getMyNum() == 6) {
+        ss << beam(-11, 1, 0);
     } else if (WM->getMyNum() == 7) {
-        if (WM->getTeamSide() == Left) {
-            if (WM->getPlayMode() == PM_BeforeKickOff || WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Right) {
-                ss << beam(-13, -3, 0);
-            } else {
-                ss << beam(-13, -3, 0);
-            }
-        } else {
-            if (WM->getPlayMode() == PM_KickOff_Right || WM->getPlayMode() == PM_Goal_Left) {
-                ss << beam(-13, -3, 0);
-            } else {
-                ss << beam(-13, -3, 0);
-            }
-        }
+        ss << beam(-7, -1, 0);
+    } else if (WM->getMyNum() == 10) {
+        ss << beam(-3, 5, 0);
+    } else if (WM->getMyNum() == 11) {
+        ss << beam(-3, -5, 0);
+    } else if (WM->getMyNum() == 1) {
+        ss << beam(-14.5, 0, 0);
     }
-    return ss.str();
 
+    return ss.str();
 }
 //////////////////////////////////////////////////////////////////////
 
-string Skill::updatem(bool checkBall) {
+string Skill::updatem(bool checkBall)
+{
     static int level = 0;
     if (level == 6 || (WM->seeEnoughFlag() && (WM->seeBall() || !checkBall))) {
         level = 0;
         return fix("he1") + fix("he2");
     }
-    double theta = 2 * (level % 2 - 0.5)*120.0;
-    double phi = (level / 2 - 1)*45;
+    double theta = 2 * (level % 2 - 0.5) * 120.0;
+    double phi = (level / 2 - 1) * 45;
 
-    if (fabs(WM->getJointAngle("he1") - theta) < 5 &&
-            fabs(WM->getJointAngle("he2") - phi) < 5) {
+    if (fabs(WM->getJointAngle("he1") - theta) < 5 && fabs(WM->getJointAngle("he2") - phi) < 5) {
         level++;
     }
 
@@ -668,7 +586,8 @@ string Skill::updatem(bool checkBall) {
 }
 //////////////////////////////////////////////////////////////////////
 
-string Skill::StandUpBack(bool &done) {
+string Skill::StandUpBack(bool& done)
+{
     stringstream ss;
     done = false;
     bool did = false;
@@ -689,10 +608,10 @@ string Skill::StandUpBack(bool &done) {
         return fix();
     }
     return act(standupB, tmp);
-
 }
 
-string Skill::ToRightSide(int i, bool &done) {
+string Skill::ToRightSide(int i, bool& done)
+{
     done = false;
     stringstream ss;
     static int cmd = 0;
@@ -714,7 +633,8 @@ string Skill::ToRightSide(int i, bool &done) {
     return ss.str();
 }
 
-string Skill::ToLeftSide(int i, bool &done) {
+string Skill::ToLeftSide(int i, bool& done)
+{
     done = false;
     stringstream ss;
     static int cmd = 0;
@@ -724,11 +644,10 @@ string Skill::ToLeftSide(int i, bool &done) {
     if (cmd < 3) {
         ss << fix() << moveJoint("lle2", -1.1) << moveJoint("rle2", -1.1) << moveJoint("lle6", 1.1) << moveJoint("rle6", 1.01);
     } else if (cmd < 19) {
-        ss << fix() << moveJoint("rle2", i*-1);
+        ss << fix() << moveJoint("rle2", i * -1);
     } else if (doneS == false) {
         ss << sefr(doneS, tt, false);
-    }
-    else {
+    } else {
         done = true;
         cmd = 0;
         doneS = false;
@@ -738,7 +657,8 @@ string Skill::ToLeftSide(int i, bool &done) {
 }
 ///////////////////////////////////////////////////////////////////
 
-VecPosition Skill::FK_FOOT_HIP(double le4, double le5) {
+VecPosition Skill::FK_FOOT_HIP(double le4, double le5)
+{
     double l3 = 0.12;
     double l4 = 0.10;
     double h, w;
@@ -754,7 +674,8 @@ VecPosition Skill::FK_FOOT_HIP(double le4, double le5) {
 }
 /////////////////////////////////////////////////////////////////////
 
-bool Skill::IK_ALL(VecPosition Hip, VecPosition RAnkle, double &rle3, double &rle4, double &rle5, double &lle3, double &lle4, double &lle5, double P) {
+bool Skill::IK_ALL(VecPosition Hip, VecPosition RAnkle, double& rle3, double& rle4, double& rle5, double& lle3, double& lle4, double& lle5, double P)
+{
     double l3 = 0.12;
     double l4 = 0.10;
     double Hx = Hip.getX(), Hz = Hip.getY();
@@ -809,11 +730,11 @@ bool Skill::IK_ALL(VecPosition Hip, VecPosition RAnkle, double &rle3, double &rl
     }
     rle5 = P - rle3 - rle4;
     return true;
-
 }
 ///////////////////////////////////////////////////////////////////
 
-bool Skill::isPossible(double l4) {
+bool Skill::isPossible(double l4)
+{
     if (l4 < 0 && l4 > -130) {
         return true;
     }
@@ -821,8 +742,9 @@ bool Skill::isPossible(double l4) {
 }
 ///////////////////////////////////////////////////////////////////
 
-string Skill::shootR(bool &canshoot, bool &done, double &tFinal) {
-//    return shootR2(done);
+string Skill::shootR(bool& canshoot, bool& done, double& tFinal)
+{
+    //    return shootR2(done);
     WM->setZ(0.54);
     stringstream ss("");
     VecPosition me(WM->getMyPos().x(), WM->getMyPos().y());
@@ -926,8 +848,9 @@ string Skill::shootR(bool &canshoot, bool &done, double &tFinal) {
 }
 ///////////////////////////////////////////////////////////////////
 
-string Skill::shootL(bool &canshoot, bool &done, double &tFinal) {
-//    return shootL2(done);
+string Skill::shootL(bool& canshoot, bool& done, double& tFinal)
+{
+    //    return shootL2(done);
     WM->setZ(0.54);
     stringstream ss;
     VecPosition me(WM->getMyPos().x(), WM->getMyPos().y());
@@ -985,7 +908,6 @@ string Skill::shootL(bool &canshoot, bool &done, double &tFinal) {
         return ss.str();
     }
 
-
     t += 0.02;
     if (t < 0.3) {
         ss << moveJoint("lle2", 1) << moveJoint("rle2", 1) << moveJoint("lle6", -1) << moveJoint("rle6", -1);
@@ -1027,13 +949,15 @@ string Skill::shootL(bool &canshoot, bool &done, double &tFinal) {
 }
 ////////////////////////////////////////////////////////////////////
 
-bool Skill::nazdik(string type) {
+bool Skill::nazdik(string type)
+{
     if (type == "turnL" || type == "turnR" || type == "sideWalkR" || type == "sideWalkL" || type == "sideTurnL" || type == "sideTurnR")
         return true;
     return false;
 }
 
-string Skill::finalAction(string type, double &t, double maxV) {
+string Skill::finalAction(string type, double& t, double maxV)
+{
     WM->setZ(0.51);
     VecPosition ball(WM->getBallPos().x(), WM->getBallPos().y());
     VecPosition me(WM->getMyPos().x(), WM->getMyPos().y());
@@ -1049,12 +973,12 @@ string Skill::finalAction(string type, double &t, double maxV) {
 
     static double w = (2 * M_PI) / T;
     double a = 0.05 * dd, b = -0.017 * bb;
-    if (nazdik(type)) b = -0.014;
+    if (nazdik(type))
+        b = -0.014;
 
     double a1 = a / 2, b1 = b / 2;
     double x1 = a * cos(w * t), y1 = b * sin(w * t);
     double x2 = H.getX() + a1 * cos(w * t), y2 = H.getY() + b1 * sin(w * t);
-
 
     double lj1 = WM->getJointAngle("lle1");
     double rj1 = WM->getJointAngle("rle1");
@@ -1094,7 +1018,7 @@ string Skill::finalAction(string type, double &t, double maxV) {
     if (type == "walk") {
         if (IK_ALL(VecPosition(x2, y2), VecPosition(x1, y1), r3, r4, r5, l3, l4, l5)) {
             ss << moveJoint("lle3", (l3 - lj3) * P) << moveJoint("lle4", (l4 - lj4) * P) << moveJoint("lle5", (l5 - lj5) * P)
-                    << moveJoint("rle3", (r3 - rj3) * P) << moveJoint("rle4", (r4 - rj4) * P) << moveJoint("rle5", (r5 - rj5) * P);
+               << moveJoint("rle3", (r3 - rj3) * P) << moveJoint("rle4", (r4 - rj4) * P) << moveJoint("rle5", (r5 - rj5) * P);
             ss << moveJoint("rle1", (0 - rj1) * P) << moveJoint("lle1", (0 - lj1) * P) << moveJoint("rle2", (0 - rj2) * P) << moveJoint("lle2", (0 - lj2) * P) << moveJoint("rle6", (0 - rj6) * P) << moveJoint("lle6", (0 - lj6) * P);
         }
     } else if (type == "bwalk") {
@@ -1104,7 +1028,7 @@ string Skill::finalAction(string type, double &t, double maxV) {
         }
         if (IK_ALL(VecPosition(x2, y2), VecPosition(x1, y1), r3, r4, r5, l3, l4, l5)) {
             ss << moveJoint("lle3", (l3 - lj3) * P) << moveJoint("lle4", (l4 - lj4) * P) << moveJoint("lle5", (l5 - lj5) * P)
-                    << moveJoint("rle3", (r3 - rj3) * P) << moveJoint("rle4", (r4 - rj4) * P) << moveJoint("rle5", (r5 - rj5) * P);
+               << moveJoint("rle3", (r3 - rj3) * P) << moveJoint("rle4", (r4 - rj4) * P) << moveJoint("rle5", (r5 - rj5) * P);
             ss << moveJoint("rle1", (0 - rj1) * P) << moveJoint("lle1", (0 - lj1) * P) << moveJoint("rle2", (0 - rj2) * P) << moveJoint("lle2", (0 - lj2) * P) << moveJoint("rle6", (0 - rj6) * P) << moveJoint("lle6", (0 - lj6) * P);
         }
     } else if (type == "walkAngleL") {
@@ -1120,7 +1044,7 @@ string Skill::finalAction(string type, double &t, double maxV) {
             l22 = (-27 / 45) * d;
             l33 = (-10 / 45) * d;
             ss << moveJoint("lle3", (l3 - lj3 + (l33)) * P) << moveJoint("lle4", (l4 - lj4 - (2 * l33)) * P) << moveJoint("lle5", (l5 - lj5 + (l33)) * P)
-                    << moveJoint("rle3", (r3 - rj3) * P) << moveJoint("rle4", (r4 - rj4) * P) << moveJoint("rle5", (r5 - rj5) * P);
+               << moveJoint("rle3", (r3 - rj3) * P) << moveJoint("rle4", (r4 - rj4) * P) << moveJoint("rle5", (r5 - rj5) * P);
             ss << moveJoint("lle1", (l11 - lj1) * P) << moveJoint("rle1", (l11 - rj1) * P) << moveJoint("lle2", (l22 - lj2) * P);
             ss << moveJoint("rle2", (0 - rj2) * P) << moveJoint("rle6", (0 - rj6) * P) << moveJoint("lle6", (0 - lj6) * P);
         }
@@ -1136,7 +1060,7 @@ string Skill::finalAction(string type, double &t, double maxV) {
             l22 = (-27 / 45) * d;
             l33 = (-10 / 45) * d;
             ss << moveJoint("lle3", (l3 - lj3 + l33) * P) << moveJoint("lle4", (l4 - lj4) * P) << moveJoint("lle5", (l5 - lj5 + l33) * P)
-                    << moveJoint("rle3", (r3 - rj3) * P) << moveJoint("rle4", (r4 - rj4) * P) << moveJoint("rle5", (r5 - rj5) * P);
+               << moveJoint("rle3", (r3 - rj3) * P) << moveJoint("rle4", (r4 - rj4) * P) << moveJoint("rle5", (r5 - rj5) * P);
             ss << moveJoint("lle1", (l11 - lj1) * P) << moveJoint("rle1", (l11 - rj1) * P) << moveJoint("rle2", (l22 - rj2) * P);
             ss << moveJoint("lle2", (0 - lj2) * P) << moveJoint("rle6", (0 - rj6) * P) << moveJoint("lle6", (0 - lj6) * P);
         }
@@ -1152,7 +1076,7 @@ string Skill::finalAction(string type, double &t, double maxV) {
             l22 = (-27 / 45) * d;
             l33 = (-10 / 45) * d;
             ss << moveJoint("lle3", (l3 - lj3 + l33) * P) << moveJoint("lle4", (l4 - lj4) * P) << moveJoint("lle5", (l5 - lj5 + l33) * P)
-                    << moveJoint("rle3", (r3 - rj3) * P) << moveJoint("rle4", (r4 - rj4) * P) << moveJoint("rle5", (r5 - rj5) * P);
+               << moveJoint("rle3", (r3 - rj3) * P) << moveJoint("rle4", (r4 - rj4) * P) << moveJoint("rle5", (r5 - rj5) * P);
             ss << moveJoint("lle1", (l11 - lj1) * P) << moveJoint("rle1", (l11 - rj1) * P) << moveJoint("lle2", (l22 - lj2) * P);
             ss << moveJoint("rle2", (0 - rj2) * P) << moveJoint("rle6", (0 - rj6) * P) << moveJoint("lle6", (0 - lj6) * P);
         }
@@ -1168,7 +1092,7 @@ string Skill::finalAction(string type, double &t, double maxV) {
             l22 = (-27 / 45) * d;
             l33 = (-10 / 45) * d;
             ss << moveJoint("lle3", (l3 - lj3 + l33) * P) << moveJoint("lle4", (l4 - lj4) * P) << moveJoint("lle5", (l5 - lj5 + l33) * P)
-                    << moveJoint("rle3", (r3 - rj3) * P) << moveJoint("rle4", (r4 - rj4) * P) << moveJoint("rle5", (r5 - rj5) * P);
+               << moveJoint("rle3", (r3 - rj3) * P) << moveJoint("rle4", (r4 - rj4) * P) << moveJoint("rle5", (r5 - rj5) * P);
             ss << moveJoint("lle1", (l11 - lj1) * P) << moveJoint("rle1", (l11 - rj1) * P) << moveJoint("rle2", (l22 - rj2) * P);
             ss << moveJoint("lle2", (0 - lj2) * P) << moveJoint("rle6", (0 - rj6) * P) << moveJoint("lle6", (0 - lj6) * P);
         }
@@ -1183,7 +1107,7 @@ string Skill::finalAction(string type, double &t, double maxV) {
             l11 = d;
             l22 = (-25 / 45) * d;
             ss << moveJoint("lle3", (l3 - lj3) * P) << moveJoint("lle4", (l4 - lj4) * P) << moveJoint("lle5", (l5 - lj5) * P)
-                    << moveJoint("rle3", (r3 - rj3) * P) << moveJoint("rle4", (r4 - rj4) * P) << moveJoint("rle5", (r5 - rj5) * P);
+               << moveJoint("rle3", (r3 - rj3) * P) << moveJoint("rle4", (r4 - rj4) * P) << moveJoint("rle5", (r5 - rj5) * P);
             ss << moveJoint("lle1", (l11 - lj1) * P) << moveJoint("rle1", (l11 - rj1) * P) << moveJoint("rle2", (l22 - rj2) * P);
             ss << moveJoint("lle2", (0 - lj2) * P) << moveJoint("rle6", (0 - rj6) * P) << moveJoint("lle6", (0 - lj6) * P);
         }
@@ -1198,7 +1122,7 @@ string Skill::finalAction(string type, double &t, double maxV) {
             l11 = d;
             l22 = (-25 / 45) * d;
             ss << moveJoint("lle3", (l3 - lj3) * P) << moveJoint("lle4", (l4 - lj4) * P) << moveJoint("lle5", (l5 - lj5) * P)
-                    << moveJoint("rle3", (r3 - rj3) * P) << moveJoint("rle4", (r4 - rj4) * P) << moveJoint("rle5", (r5 - rj5) * P);
+               << moveJoint("rle3", (r3 - rj3) * P) << moveJoint("rle4", (r4 - rj4) * P) << moveJoint("rle5", (r5 - rj5) * P);
             ss << moveJoint("lle1", (l11 - lj1) * P) << moveJoint("rle1", (l11 - rj1) * P) << moveJoint("lle2", (l22 - lj2) * P) << moveJoint("lle6", (l22 - lj6) * P);
             ss << moveJoint("rle2", (0 - rj2) * P) << moveJoint("rle6", (0 - rj6) * P) << moveJoint("lle6", (0 - lj6) * P);
         }
@@ -1214,7 +1138,7 @@ string Skill::finalAction(string type, double &t, double maxV) {
             l11 = d / 2.5;
             l22 = -d;
             ss << moveJoint("lle3", (l3 - lj3) * P) << moveJoint("lle4", (l4 - lj4) * P) << moveJoint("lle5", (l5 - lj5) * P)
-                    << moveJoint("rle3", (r3 - rj3) * P) << moveJoint("rle4", (r4 - rj4) * P) << moveJoint("rle5", (r5 - rj5) * P);
+               << moveJoint("rle3", (r3 - rj3) * P) << moveJoint("rle4", (r4 - rj4) * P) << moveJoint("rle5", (r5 - rj5) * P);
             ss << moveJoint("lle2", (l22 - lj2) * P) << moveJoint("rle2", -(l22 + rj2) * P) << moveJoint("lle6", -(l22 + lj6) * P) << moveJoint("rle6", (l22 - rj6) * P) << moveJoint("lle1", (l11 - lj1) * P);
             ss << moveJoint("rle1", (0 - rj1) * P);
         }
@@ -1230,7 +1154,7 @@ string Skill::finalAction(string type, double &t, double maxV) {
             l11 = -d / 2.5;
             l22 = -d;
             ss << moveJoint("lle3", (l3 - lj3) * P) << moveJoint("lle4", (l4 - lj4) * P) << moveJoint("lle5", (l5 - lj5) * P)
-                    << moveJoint("rle3", (r3 - rj3) * P) << moveJoint("rle4", (r4 - rj4) * P) << moveJoint("rle5", (r5 - rj5) * P);
+               << moveJoint("rle3", (r3 - rj3) * P) << moveJoint("rle4", (r4 - rj4) * P) << moveJoint("rle5", (r5 - rj5) * P);
             ss << moveJoint("rle2", (l22 - rj2) * P) << moveJoint("lle2", -(l22 + lj2) * P) << moveJoint("rle6", -(l22 + rj6) * P) << moveJoint("lle6", (l22 - lj6) * P) << moveJoint("rle1", (l11 - rj1) * P);
             ss << moveJoint("lle1", (0 - lj1) * P);
         }
@@ -1246,7 +1170,7 @@ string Skill::finalAction(string type, double &t, double maxV) {
             l11 = d / 2.5;
             l22 = -d;
             ss << moveJoint("lle3", (l3 - lj3) * P) << moveJoint("lle4", (l4 - lj4) * P) << moveJoint("lle5", (l5 - lj5) * P)
-                    << moveJoint("rle3", (r3 - rj3) * P) << moveJoint("rle4", (r4 - rj4) * P) << moveJoint("rle5", (r5 - rj5) * P);
+               << moveJoint("rle3", (r3 - rj3) * P) << moveJoint("rle4", (r4 - rj4) * P) << moveJoint("rle5", (r5 - rj5) * P);
             ss << moveJoint("lle2", (l22 - lj2) * P) << moveJoint("rle2", -(l22 + rj2) * P) << moveJoint("lle6", -(l22 + lj6) * P) << moveJoint("rle6", (l22 - rj6) * P) << moveJoint("lle1", (l11 - lj1) * P);
             ss << moveJoint("rle1", (0 - rj1) * P);
         }
@@ -1262,7 +1186,7 @@ string Skill::finalAction(string type, double &t, double maxV) {
             l11 = -d / 2.5;
             l22 = -d;
             ss << moveJoint("lle3", (l3 - lj3) * P) << moveJoint("lle4", (l4 - lj4) * P) << moveJoint("lle5", (l5 - lj5) * P)
-                    << moveJoint("rle3", (r3 - rj3) * P) << moveJoint("rle4", (r4 - rj4) * P) << moveJoint("rle5", (r5 - rj5) * P);
+               << moveJoint("rle3", (r3 - rj3) * P) << moveJoint("rle4", (r4 - rj4) * P) << moveJoint("rle5", (r5 - rj5) * P);
             ss << moveJoint("rle2", (l22 - rj2) * P) << moveJoint("lle2", -(l22 + lj2) * P) << moveJoint("rle6", -(l22 + rj6) * P) << moveJoint("lle6", (l22 - lj6) * P) << moveJoint("rle1", (l11 - rj1) * P);
             ss << moveJoint("lle1", (0 - lj1) * P);
         }
@@ -1277,7 +1201,7 @@ string Skill::finalAction(string type, double &t, double maxV) {
             l11 = d / 2.5;
             l22 = -d;
             ss << moveJoint("lle3", (l3 - lj3) * P) << moveJoint("lle4", (l4 - lj4) * P) << moveJoint("lle5", (l5 - lj5) * P)
-                    << moveJoint("rle3", (r3 - rj3) * P) << moveJoint("rle4", (r4 - rj4) * P) << moveJoint("rle5", (r5 - rj5) * P);
+               << moveJoint("rle3", (r3 - rj3) * P) << moveJoint("rle4", (r4 - rj4) * P) << moveJoint("rle5", (r5 - rj5) * P);
             ss << moveJoint("lle2", (l22 - lj2) * P) << moveJoint("rle2", -(l22 + rj2) * P) << moveJoint("lle6", -(l22 + lj6) * P) << moveJoint("rle6", (l22 - rj6) * P) << moveJoint("lle1", (l11 - lj1) * P);
             ss << moveJoint("rle1", (0 - rj1) * P);
         }
@@ -1292,7 +1216,7 @@ string Skill::finalAction(string type, double &t, double maxV) {
             l11 = -d / 2.5;
             l22 = -d;
             ss << moveJoint("lle3", (l3 - lj3) * P) << moveJoint("lle4", (l4 - lj4) * P) << moveJoint("lle5", (l5 - lj5) * P)
-                    << moveJoint("rle3", (r3 - rj3) * P) << moveJoint("rle4", (r4 - rj4) * P) << moveJoint("rle5", (r5 - rj5) * P);
+               << moveJoint("rle3", (r3 - rj3) * P) << moveJoint("rle4", (r4 - rj4) * P) << moveJoint("rle5", (r5 - rj5) * P);
             ss << moveJoint("rle2", (l22 - rj2) * P) << moveJoint("lle2", -(l22 + lj2) * P) << moveJoint("rle6", -(l22 + rj6) * P) << moveJoint("lle6", (l22 - lj6) * P) << moveJoint("rle1", (l11 - rj1) * P);
             ss << moveJoint("lle1", (0 - lj1) * P);
         }
@@ -1311,8 +1235,8 @@ string Skill::finalAction(string type, double &t, double maxV) {
             l11 = -d / 2.5;
             l22 = -d;
             ss << moveJoint("lle3", (l3 - lj3) * P) << moveJoint("lle4", (l4 - lj4) * P) << moveJoint("lle5", (l5 - lj5) * P)
-                    << moveJoint("rle3", (r3 - rj3) * P) << moveJoint("rle4", (r4 - rj4) * P) << moveJoint("rle5", (r5 - rj5) * P);
-            ss << moveJoint("rle2", (l22 - rj2) * P) << moveJoint("lle2", (-(l22 + lj2)+(lf22 - lj2)) / 2 * P) << moveJoint("rle6", -(l22 + rj6) * P) << moveJoint("lle6", ((l22 - lj6)+(lf22 - lj6)) / 2 * P);
+               << moveJoint("rle3", (r3 - rj3) * P) << moveJoint("rle4", (r4 - rj4) * P) << moveJoint("rle5", (r5 - rj5) * P);
+            ss << moveJoint("rle2", (l22 - rj2) * P) << moveJoint("lle2", (-(l22 + lj2) + (lf22 - lj2)) / 2 * P) << moveJoint("rle6", -(l22 + rj6) * P) << moveJoint("lle6", ((l22 - lj6) + (lf22 - lj6)) / 2 * P);
             ss << moveJoint("lle1", (lf11 - lj1) * P) << moveJoint("rle1", (lf11 - rj1) * P);
             //ss<<moveJoint ( "lle1" , (0-lj1)*P);
         }
@@ -1330,8 +1254,8 @@ string Skill::finalAction(string type, double &t, double maxV) {
             l11 = d / 2.5;
             l22 = -d;
             ss << moveJoint("lle3", (l3 - lj3) * P) << moveJoint("lle4", (l4 - lj4) * P) << moveJoint("lle5", (l5 - lj5) * P)
-                    << moveJoint("rle3", (r3 - rj3) * P) << moveJoint("rle4", (r4 - rj4) * P) << moveJoint("rle5", (r5 - rj5) * P);
-            ss << moveJoint("lle2", (l22 - lj2) * P) << moveJoint("rle2", (-(l22 + rj2)+(lf22 - rj2)) / 2 * P) << moveJoint("lle6", -(l22 + lj6) * P) << moveJoint("rle6", ((l22 - rj6)+(lf22 - rj6)) / 2 * P);
+               << moveJoint("rle3", (r3 - rj3) * P) << moveJoint("rle4", (r4 - rj4) * P) << moveJoint("rle5", (r5 - rj5) * P);
+            ss << moveJoint("lle2", (l22 - lj2) * P) << moveJoint("rle2", (-(l22 + rj2) + (lf22 - rj2)) / 2 * P) << moveJoint("lle6", -(l22 + lj6) * P) << moveJoint("rle6", ((l22 - rj6) + (lf22 - rj6)) / 2 * P);
             ss << moveJoint("lle1", (lf11 - lj1) * P) << moveJoint("rle1", (lf11 - rj1) * P);
             //ss<<moveJoint ( "rle1" , (0-rj1)*P);
         }
@@ -1339,10 +1263,9 @@ string Skill::finalAction(string type, double &t, double maxV) {
 
         if (IK_ALL(VecPosition(x2, y2), VecPosition(x1, y1), r3, r4, r5, l3, l4, l5)) {
             ss << moveJoint("lle3", (l3 - lj3) * P) << moveJoint("lle4", (l4 - lj4) * P) << moveJoint("lle5", (l5 - lj5) * P)
-                    << moveJoint("rle3", (r3 - rj3) * P) << moveJoint("rle4", (r4 - rj4) * P) << moveJoint("rle5", (r5 - rj5) * P);
+               << moveJoint("rle3", (r3 - rj3) * P) << moveJoint("rle4", (r4 - rj4) * P) << moveJoint("rle5", (r5 - rj5) * P);
             ss << moveJoint("rle1", (0 - rj1) * P) << moveJoint("lle1", (0 - lj1) * P) << moveJoint("rle2", (0 - rj2) * P) << moveJoint("lle2", (0 - lj2) * P) << moveJoint("rle6", (0 - rj6) * P) << moveJoint("lle6", (0 - lj6) * P);
         }
-
     }
 
     double A1 = 15, A2 = 30, fi = 0, B1 = -90 + A1, B2 = A2;
@@ -1351,16 +1274,16 @@ string Skill::finalAction(string type, double &t, double maxV) {
     TT = Tint * 0.02;
     ww = (2 * M_PI) / TT;
     ss << moveJoint("lae1", B1 + A1 * sin(ww * ta + fi) - WM->getJointAngle("lae1"))
-            << moveJoint("rae1", B1 + -1 * A1 * sin(ww * ta + fi) - WM->getJointAngle("rae1"))
-            << moveJoint("lae4", -1 * B2 + -1 * A2 * sin(ww * ta + fi) - WM->getJointAngle("lae4"))
-            << moveJoint("rae4", B2 + -1 * A2 * sin(ww * ta + fi) - WM->getJointAngle("rae4"));
+       << moveJoint("rae1", B1 + -1 * A1 * sin(ww * ta + fi) - WM->getJointAngle("rae1"))
+       << moveJoint("lae4", -1 * B2 + -1 * A2 * sin(ww * ta + fi) - WM->getJointAngle("lae4"))
+       << moveJoint("rae4", B2 + -1 * A2 * sin(ww * ta + fi) - WM->getJointAngle("rae4"));
     ta += .02;
-
 
     return ss.str();
 }
 
-void Skill::speedControler(string type, double t, double &dd, double &bb, double &sd, double maxV) {
+void Skill::speedControler(string type, double t, double& dd, double& bb, double& sd, double maxV)
+{
     VecPosition ball(WM->getBallPos().x(), WM->getBallPos().y());
     VecPosition me(WM->getMyPos().x(), WM->getMyPos().y());
     if (t == 0) {
@@ -1402,16 +1325,16 @@ void Skill::speedControler(string type, double t, double &dd, double &bb, double
             bb -= 0.012;
         }
     } else if (type == "bwalkAngleL" || type == "bwalkAngleR") {
-        if (dd>-1) {
+        if (dd > -1) {
             dd -= 0.01;
         }
         if (bb > 1) {
             bb -= 0.005;
         }
     } else if (type == "bwalk" || type == "sideWithbWalkR" || type == "sideWithbWalkL") {
-        if (dd>-1) {
+        if (dd > -1) {
             dd -= 0.02;
-        } else if (dd>-1.5) {
+        } else if (dd > -1.5) {
             dd -= 0.005;
         }
         if (bb > 1) {
@@ -1447,7 +1370,8 @@ void Skill::speedControler(string type, double t, double &dd, double &bb, double
 }
 ////////////////////////////////
 
-string Skill::shootL2(bool &done) {
+string Skill::shootL2(bool& done)
+{
     static int t = 0;
     int t1 = 13, t2 = 28, t3 = 50, t4 = 70, t5 = 90;
     t++;
@@ -1568,7 +1492,6 @@ string Skill::shootL2(bool &done) {
 
         } else {
             ss << moveJoint("lle3", l3) << moveJoint("lle4", l4) << moveJoint("lle5", l5) << moveJoint("rle3", r3) << moveJoint("lle2", l2);
-
         }
         return ss.str();
     } else if (t > t5) {
@@ -1578,7 +1501,8 @@ string Skill::shootL2(bool &done) {
     return "";
 }
 
-string Skill::shootR2(bool &done) {
+string Skill::shootR2(bool& done)
+{
     static int t = 0;
     int t1 = 13, t2 = 28, t3 = 50, t4 = 70, t5 = 90;
     t++;
@@ -1699,7 +1623,6 @@ string Skill::shootR2(bool &done) {
 
         } else {
             ss << moveJoint("rle3", r3) << moveJoint("rle4", r4) << moveJoint("rle5", r5) << moveJoint("lle3", l3) << moveJoint("rle2", r2);
-
         }
         return ss.str();
         //        } else if (t == t4 + (t5-t4)/2 + 1) {
@@ -1713,9 +1636,6 @@ string Skill::shootR2(bool &done) {
         ballJoints = jointpositionsr;
         rLegFKSolver.JntToCart(ballJoints, rHipStanding);
         //        }
-
-
-
 
         //        jointpositionsl(0) = Deg2Rad(WM->getJointAngle("lle1")) ;
         //        jointpositionsl(1) = Deg2Rad(WM->getJointAngle("lle2")) ;
@@ -1762,7 +1682,6 @@ string Skill::shootR2(bool &done) {
         //        KDL::Rotation lLegRot ;
         KDL::Rotation rHipRot;
 
-
         double tt = double(t - 1 - t4) / double(t5 - 1 - t4);
         //        y2 = (-0.847293*tt*tt*tt*tt)+(0.538521*tt*tt*tt)+(0.864160*tt*tt)+(-0.262945*tt)+(-0.081479);
 
@@ -1774,8 +1693,6 @@ string Skill::shootR2(bool &done) {
 
         //        x21 = 0.51219222369278300669127921032252*sqrt(- 0.628524467312*y2*y2 + 0.077934318568*y2 + 0.013290952817) - 0.06868497719720220119730054210425*y2 + 0.017288024126302504824850747186016;
         //        x22 = 0.017288024126302504824850747186016 - 0.51219222369278300669127921032252*sqrt(- 0.628524467312*y2*y2 + 0.077934318568*y2 + 0.013290952817) - 0.06868497719720220119730054210425*y2;
-
-
 
         //        cout << rHipStanding.p << endl;
         //        salt::Vector3f start =  salt::Vector3f(-1.25496,-0.389516 ,-0.333869);
@@ -1792,7 +1709,6 @@ string Skill::shootR2(bool &done) {
         //        z2 = (rHipStanding.p.z())*(t-t2)/(double)(t5-t4) ;
         //        y2 = (rHipStanding.p.y())*(t-t2)/(double)(t5-t4) ;
         //        x2 = (rHipStanding.p.x())*(t-t2)/(double)(t5-t4) ;
-
 
         /*    if (t > t1 && t <= t2) {
         //        cout << t1 << endl;
@@ -1918,7 +1834,6 @@ string Skill::shootR2(bool &done) {
         //        cout << "Ans1: " << x2 << " " << y2 << " " << z22<< endl;
         //        cout << "Ans2: " << x2 << " " << y2 << " " << z21 << endl;
 
-
         //        return ss.str();
         //        KDL::Frame lfrm (  lLegRot , KDL::Vector( lAnkleStanding.p.x() ,lAnkleStanding.p.y(),lAnkleStanding.p.z())  );
 
@@ -1939,7 +1854,6 @@ string Skill::shootR2(bool &done) {
         //            }
         //            return "";
         //        }
-
 
         JRLegInit = JRLeg;
 
