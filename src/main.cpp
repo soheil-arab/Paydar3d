@@ -96,15 +96,12 @@ int main(int argc, char* argv[])
         //        sockClient->Receive();
         int num = WM->getMyNum();
 
-        if ( num == 8 || num == 9 || num == 10 || num == 11  || num == 2 || num == 3 || num == 4 )
-        {
-            sockClient->send ("(scene rsg/agent/nao/nao_hetero.rsg 0)");
-        } else if ( num == 7  || num == 6 )
-        {
-            sockClient->send ("(scene rsg/agent/naotoe/naotoe_hetero.rsg 0)");
-        } else
-        {
-            sockClient->send ("(scene rsg/agent/nao/nao_hetero.rsg 2)");
+        if (num == 8 || num == 9 || num == 7 || num == 6 || num == 2 || num == 3 || num == 4) {
+            sockClient->send("(scene rsg/agent/nao/nao_hetero.rsg 0)");
+        } else if (num == 10 || num == 11) {
+            sockClient->send("(scene rsg/agent/naotoe/naotoe_hetero.rsg 0)");
+        } else {
+            sockClient->send("(scene rsg/agent/nao/nao_hetero.rsg 2)");
         }
         string get;
         sockClient->receive(get);
@@ -129,20 +126,20 @@ int main(int argc, char* argv[])
             parseTime = (end->tv_nsec - start->tv_nsec) / 1000000000.0;
 
             clock_gettime(CLOCK_REALTIME, start); // Works on Linux
-//            WM->Localize();
+            //            WM->Localize();
             localize->erfanKiriestLocalize();
-//            localize->test();
+            //            localize->test();
             clock_gettime(CLOCK_REALTIME, end); // Works on Linux
-            localizeTime = (end->tv_nsec - start->tv_nsec) / 1000000000.0 ;
+            localizeTime = (end->tv_nsec - start->tv_nsec) / 1000000000.0;
 
             clock_gettime(CLOCK_REALTIME, start); // Works on Linux
             dec = DC->decide();
             clock_gettime(CLOCK_REALTIME, end); // Works on Linux
-            decideTime = (end->tv_nsec - start->tv_nsec) / 1000000000.0 ;
+            decideTime = (end->tv_nsec - start->tv_nsec) / 1000000000.0;
 
             if (parseTime + localizeTime + decideTime > 0.02) {
-                cout <<  "p : " << parseTime << " l: " << localizeTime << " d: " << decideTime << endl;
-//                cout << "Rinesh Happend : " << (end->tv_nsec - start->tv_nsec) / 1000000000.0 << endl;
+                cout << "p : " << parseTime << " l: " << localizeTime << " d: " << decideTime << endl;
+                //                cout << "Rinesh Happend : " << (end->tv_nsec - start->tv_nsec) / 1000000000.0 << endl;
                 //                exit(0);
             }
             sockClient->send(dec);

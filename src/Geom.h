@@ -186,6 +186,8 @@ class Circle
 public:
   Circle( );
   Circle( VecPosition pos, double dR );
+  Circle (VecPosition A, VecPosition B, VecPosition C);
+
 
   void        show                  ( ostream& os = cout );
 

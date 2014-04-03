@@ -83,15 +83,15 @@ string Decide::goalie()
     if(int(WM->getServerTime()*50)%2 )
         ss << SK->sayBallPos () ;
     //cout <<"close :"<<WM->getClosestOurToBall()<<endl;
-        //cout<<"goalie : "<<parseBallPos()<<endl;
-        //out<<"cycle:  "<<WM->getTime()<<" close:  "<<parseBallPos()<<endl;
+    //cout<<"goalie : "<<parseBallPos()<<endl;
+    //out<<"cycle:  "<<WM->getTime()<<" close:  "<<parseBallPos()<<endl;
     //////////////////////////////////////////////////////////////////
     if (!ACT->isDone())
     {
         tFinal=0;
         ss<<ACT->doCurrentAct();
     }
-    else if ( WM->shouldDive(s) && ball.getX()<-10)
+    else if ( WM->shouldDive(s) && ball.getX()<-8)
     {
         tFinal=0;
         ACT->setCurrentAct(Di,s);
@@ -104,16 +104,16 @@ string Decide::goalie()
     }
     else
     {
-//        if (shouldClear ( x,y,s ) )
-//        {
-//            tFinal=0;
-//            ACT->setCurrentAct(K,s,x,y);
-//        }
-        if (shouldPlay() && (r1.isInside(ball) || me.getDistanceTo(ball)<0.4) && WM->getClosestOurToBall()==WM->getMyNum())
+        if (shouldClear ( x,y,s ) )
         {
-            return moveToPosP(true,ball-VecPosition(0.2,0),tFinal);
+            tFinal=0;
+            ACT->setCurrentAct(K,s,x,y);
         }
-        else if (fabs(angleToFront)>12)
+//        if (shouldPlay() && (r1.isInside(ball) || me.getDistanceTo(ball)<0.0) && WM->getClosestOurToBall()==WM->getMyNum())
+//        {
+//            return moveToPosP(true,ball-VecPosition(0.2,0),tFinal);
+//        }
+        if (fabs(angleToFront)>12)
         {
             if(angleToFront>0)
             {

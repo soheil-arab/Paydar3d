@@ -345,7 +345,7 @@ int Decide::parseBallPos()
         //cout<<"hello\n ";
         return WM->getClosestOurToBall();
     }
-    return min(9, max(1, atoi(str.c_str())));
+    return  atoi(str.c_str());
 }
 
 bool Decide::shSide(string& side)
@@ -711,45 +711,18 @@ VecPosition Decide::defendpositioning()
     VecPosition ball(ballPos.x(), ballPos.y());
     VecPosition posgoal(-WM->getFieldLength() / 2, 0);
 
-    double bigCircleRad = 15;
-    double litCircleRad = 12;
     VecPosition CornerL(-WM->getFieldLength() / 2.0, -WM->getFieldWidth() / 2.0);
     VecPosition CornerR(-WM->getFieldLength() / 2.0, WM->getFieldWidth() / 2.0);
 
-    VecPosition NimCornerL(-WM->getFieldLength() / 2.0, -WM->getFieldWidth() / 4.0);
-    VecPosition NimCornerR(-WM->getFieldLength() / 2.0, WM->getFieldWidth() / 4.0);
+    VecPosition NimCornerL(-WM->getFieldLength() / 2.0, -(1.05 + 6.45*(ball.getX() + 15)/30));
+    VecPosition NimCornerR(-WM->getFieldLength() / 2.0, (1.05 + 6.45*(ball.getX() + 15)/30));
 
-    static Circle BCorner_l(CornerL, bigCircleRad);
-    static Circle BCorner_r(CornerR, bigCircleRad);
 
-    static Circle LCorner_l(CornerL, litCircleRad);
-    static Circle LCorner_r(CornerR, litCircleRad);
+    Circle littleCircle(CornerL, CornerR, VecPosition((ball.getX()-15)/2.0, 0) );
+    Circle bigCircle(CornerL, CornerR, VecPosition((ball.getX()-45)/4.0, 0));
 
-    VecPosition c1, c2, finalC;
-    int a = BCorner_l.getIntersectionPoints(BCorner_r, &c1, &c2);
-
-    if (a == 2) {
-        if (c1.getX() < c2.getX())
-            finalC = c1;
-        else
-            finalC = c2;
-    }
-
-    Circle bigCircle(finalC, bigCircleRad);
-
-    a = LCorner_l.getIntersectionPoints(LCorner_r, &c1, &c2);
-
-    if (a == 2) {
-        if (c1.getX() < c2.getX())
-            finalC = c1;
-        else
-            finalC = c2;
-    }
-
-    Circle littleCircle(finalC, litCircleRad);
-
-    VecPosition tir1 = (posgoal + VecPosition(0, 1.01));
-    VecPosition tir2 = (posgoal - VecPosition(0, 1.01));
+    VecPosition tir1 = (posgoal + VecPosition(0, 1.05));
+    VecPosition tir2 = (posgoal - VecPosition(0, 1.05));
 
     Line lineBallTir1 = Line::makeLineFromTwoPoints(tir1, ball);
     Line lineBallTir2 = Line::makeLineFromTwoPoints(tir2, ball);
@@ -780,13 +753,13 @@ VecPosition Decide::defendpositioning()
     VecPosition p1 = bigCircle.getCenter();
     VecPosition p2 = littleCircle.getCenter();
     //    cout << p1 << endl;
-//    RVDraw::instance()->drawCircle(Eigen::Vector3f(p1.getX(), p1.getY(), 0), bigCircleRad, RED, 78);
-//    RVDraw::instance()->drawCircle(Eigen::Vector3f(p2.getX(), p2.getY(), 0), litCircleRad, RED, 79);
-//    RVDraw::instance()->drawLine(ballPos, Eigen::Vector3f(tir1.getX(), tir1.getY(), 0), RED, 80);
-//    RVDraw::instance()->drawLine(ballPos, Eigen::Vector3f(tir2.getX(), tir2.getY(), 0), RED, 81);
-//    RVDraw::instance()->drawLine(ballPos, Eigen::Vector3f(posgoal.getX(), posgoal.getY(), 0), RED, 82);
-//    RVDraw::instance()->drawLine(ballPos, Eigen::Vector3f(NimCornerL.getX(), NimCornerL.getY(), 0), RED, 83);
-//    RVDraw::instance()->drawLine(ballPos, Eigen::Vector3f(NimCornerR.getX(), NimCornerR.getY(), 0), RED, 84);
+//    RVDraw::instance()->drawCircle(salt::Vector3f(p1.getX(), p1.getY(), 0), bigCircle.getRadius(), RED, 78);
+//    RVDraw::instance()->drawCircle(salt::Vector3f(p2.getX(), p2.getY(), 0), littleCircle.getRadius(), RED, 79);
+//    RVDraw::instance()->drawLine(salt::Vector3f(ballPos.x(), ballPos.y(),0), salt::Vector3f(tir1.getX(), tir1.getY(), 0), RED, 80);
+//    RVDraw::instance()->drawLine(salt::Vector3f(ballPos.x(), ballPos.y(),0), salt::Vector3f(tir2.getX(), tir2.getY(), 0), RED, 81);
+//    RVDraw::instance()->drawLine(salt::Vector3f(ballPos.x(), ballPos.y(),0), salt::Vector3f(posgoal.getX(), posgoal.getY(), 0), RED, 82);
+//    RVDraw::instance()->drawLine(salt::Vector3f(ballPos.x(), ballPos.y(),0), salt::Vector3f(NimCornerL.getX(), NimCornerL.getY(), 0), RED, 83);
+//    RVDraw::instance()->drawLine(salt::Vector3f(ballPos.x(), ballPos.y(),0), salt::Vector3f(NimCornerR.getX(), NimCornerR.getY(), 0), RED, 84);
 
     if (WM->getMyNum() == 6) {
         return finalPosBig1;
@@ -826,92 +799,107 @@ VecPosition Decide::defendpositioning()
         return finalPosLit3;
     }
 
-    //        Line l1 = Line::makeLineFromPositionAndAngle(posgoal, 90);
-    //        Line l2 = Line::makeLineFromPositionAndAngle(ball, (ball - VecPosition(-WM->getFieldLength() / 2, 0)).getDirection());
-    //        VecPosition intersect = l1.getIntersection(l2);
-    //        VecPosition end = VecPosition::givePosition(intersect, (ball - VecPosition(-WM->getFieldLength() / 2, 0)).getDirection(), intersect.getDistanceTo(ball) / 2.8);
-    //        if (end.getX() > -3.5)
-    //            end.setX(-3.5);
-    //        if (end.getX() < -WM->getFieldLength() / 2 + 1)
-    //            end.setX(-WM->getFieldLength() / 2 + 1);
-    //        if (end.getY() > WM->getFieldWidth() / 2 - 3)
-    //            end.setY(WM->getFieldWidth() / 2 - 3);
-    //        if (end.getY() < -WM->getFieldWidth() / 2 + 3)
-    //            end.setY(-WM->getFieldWidth() / 2 + 3);
-    //        VecPosition endp = VecPosition(end.getX(), end.getY() + 2.5);
-    //        VecPosition endm = VecPosition(end.getX(), end.getY() - 2.5);
-    //        VecPosition endj = VecPosition::givePosition(end, (ball - VecPosition(-11.5, 0)).getDirection(), 2);
-    //        VecPosition endjp = VecPosition::givePosition(endp, (ball - VecPosition(-11.5, 0)).getDirection(), 2);
-    //        VecPosition endjm = VecPosition::givePosition(endm, (ball - VecPosition(-11.5, 0)).getDirection(), 2);
-    //        if (ball.getY() < 0) {
-    //            if (WM->getMyNum() == 3 || WM->getMyNum() == 5) {
-    //                if (WM->getMyNum() == 3 && parseBallPos() == 5)
-    //                    return end;
-    //                else if (WM->getMyNum() == 5 && parseBallPos() == 3)
-    //                    return end;
-    //                else if (WM->getMyNum() == 3)
-    //                    return end;
-    //                else
-    //                    return endj;
-    //            } else if (WM->getMyNum() == 2 || WM->getMyNum() == 4) {
-    //                if (WM->getMyNum() == 2 && parseBallPos() == 4)
-    //                    return endp;
-    //                else if (WM->getMyNum() == 2 && parseBallPos() == 1)
-    //                    return endp;
-    //                else if (WM->getMyNum() == 2)
-    //                    return endp;
-    //                else
-    //                    return endjp;
-    //            }
-    //        } else {
-    //            if (WM->getMyNum() == 3 || WM->getMyNum() == 5) {
-    //                if (WM->getMyNum() == 3 && parseBallPos() == 5)
-    //                    return endm;
-    //                else if (WM->getMyNum() == 5 && parseBallPos() == 3)
-    //                    return endm;
-    //                else if (WM->getMyNum() == 3)
-    //                    return endm;
-    //                else
-    //                    return endjm;
-    //            } else if (WM->getMyNum() == 2 || WM->getMyNum() == 4) {
-    //                if (WM->getMyNum() == 2 && parseBallPos() == 4)
-    //                    return end;
-    //                else if (WM->getMyNum() == 2 && parseBallPos() == 1)
-    //                    return end;
-    //                else if (WM->getMyNum() == 2)
-    //                    return end;
-    //                else
-    //                    return endj;
-    //            }
-    //        }
 }
 
 VecPosition Decide::middlepositioning()
 {
     myPos = WM->getMyPos();
     ballPos = WM->getBallPos();
-    VecPosition me(myPos.x(), myPos.y());
+
     VecPosition ball(ballPos.x(), ballPos.y());
-    VecPosition posgoal(-WM->getFieldLength() / 2 + 3, 0);
-    Line l1 = Line::makeLineFromPositionAndAngle(posgoal, 90);
-    Line l2 = Line::makeLineFromPositionAndAngle(ball, (ball - VecPosition(-WM->getFieldLength() / 2, 0)).getDirection());
-    VecPosition intersect = l1.getIntersection(l2);
-    VecPosition end = VecPosition::givePosition(intersect, (ball - VecPosition(-WM->getFieldLength() / 2, 0)).getDirection(), intersect.getDistanceTo(ball) / 1.5);
-    if (end.getX() > 2)
-        end.setX(2);
-    if (end.getX() < -7)
-        end.setX(-7);
-    if (end.getY() > 5.5)
-        end.setY(5.5);
-    if (end.getY() < -5.5)
-        end.setY(-5.5);
-    VecPosition end2 = VecPosition(end.getX() + 2, end.getY());
-    //cout<<end<<"  hello   "<<end2 <<endl;
-    if (WM->getMyNum() == 6)
-        return end;
-    if (WM->getMyNum() == 7)
-        return end2;
+    VecPosition posgoal(WM->getFieldLength() / 2, 0);
+
+    VecPosition CornerL(WM->getFieldLength() / 2.0, -WM->getFieldWidth() / 2.0);
+    VecPosition CornerR(WM->getFieldLength() / 2.0, WM->getFieldWidth() / 2.0);
+
+    VecPosition NimCornerL(WM->getFieldLength() / 2.0, -(1.05 + 6.45*(ball.getX() + 15 + 10)/30));
+    VecPosition NimCornerR(WM->getFieldLength() / 2.0, (1.05 + 6.45*(ball.getX() + 15 + 10)/30));
+
+
+    Circle littleCircle(CornerL, CornerR, VecPosition(max(ball.getX()-4, -WM->getFieldLength()/3.0) , 0) );
+//    Circle bigCircle(CornerL, CornerR, VecPosition(max(ball.getX()-3, 0), 0));
+
+//    VecPosition tir1 = (posgoal + VecPosition(0, 1.05));
+//    VecPosition tir2 = (posgoal - VecPosition(0, 1.05));
+
+
+//    Line lineBallTir1 = Line::makeLineFromTwoPoints(tir1, ball);
+//    Line lineBallTir2 = Line::makeLineFromTwoPoints(tir2, ball);
+    Line LineBallCor1 = Line::makeLineFromTwoPoints(NimCornerL, ball);
+    Line LineBallCor2 = Line::makeLineFromTwoPoints(NimCornerR, ball);
+    Line lineBallgoal = Line::makeLineFromTwoPoints(posgoal, ball);
+
+    VecPosition pos11, pos12, pos32;
+    VecPosition pos21, pos22, pos31;
+
+//    lineBallTir1.getCircleIntersectionPoints(bigCircle, &pos11, &pos12);
+//    lineBallTir2.getCircleIntersectionPoints(bigCircle, &pos21, &pos22);
+
+//    VecPosition finalPosBig1, finalPosBig2;
+
+//    if (pos11.getX() < pos12.getX()) {
+//        finalPosBig1 = pos11;
+//    } else {
+//        finalPosBig1 = pos12;
+//    }
+
+//    if (pos21.getX() < pos22.getX()) {
+//        finalPosBig2 = pos21;
+//    } else {
+//        finalPosBig2= pos22;
+//    }
+
+//    VecPosition p1 = bigCircle.getCenter();
+//    VecPosition p2 = littleCircle.getCenter();
+    //    cout << p1 << endl;
+//    RVDraw::instance()->drawCircle(salt::Vector3f(p1.getX(), p1.getY(), 0), bigCircle.getRadius(), RED, 78);
+//    RVDraw::instance()->drawCircle(salt::Vector3f(p2.getX(), p2.getY(), 0), littleCircle.getRadius(), RED, 79);
+//    RVDraw::instance()->drawLine(salt::Vector3f(ballPos.x(), ballPos.y(),0), salt::Vector3f(tir1.getX(), tir1.getY(), 0), RED, 80);
+//    RVDraw::instance()->drawLine(salt::Vector3f(ballPos.x(), ballPos.y(),0), salt::Vector3f(tir2.getX(), tir2.getY(), 0), RED, 81);
+//    RVDraw::instance()->drawLine(salt::Vector3f(ballPos.x(), ballPos.y(),0), salt::Vector3f(posgoal.getX(), posgoal.getY(), 0), RED, 82);
+//    RVDraw::instance()->drawLine(salt::Vector3f(ballPos.x(), ballPos.y(),0), salt::Vector3f(NimCornerL.getX(), NimCornerL.getY(), 0), RED, 83);
+//    RVDraw::instance()->drawLine(salt::Vector3f(ballPos.x(), ballPos.y(),0), salt::Vector3f(NimCornerR.getX(), NimCornerR.getY(), 0), RED, 84);
+
+//    if (WM->getMyNum() == 9) {
+//        return finalPosBig1;
+//    } else if (WM->getMyNum() == 8) {
+//        return finalPosBig2;
+//    }
+
+    LineBallCor1.getCircleIntersectionPoints(littleCircle, &pos11, &pos12);
+    LineBallCor2.getCircleIntersectionPoints(littleCircle, &pos21, &pos22);
+    lineBallgoal.getCircleIntersectionPoints(littleCircle, &pos31, &pos32);
+
+    VecPosition finalPosLit1, finalPosLit2, finalPosLit3;
+
+    if (pos11.getX() < pos12.getX()) {
+        finalPosLit1 = pos11;
+    } else {
+        finalPosLit1 = pos12;
+    }
+
+    if (pos21.getX() < pos22.getX()) {
+        finalPosLit2 = pos21;
+    } else {
+        finalPosLit2 = pos22;
+    }
+
+    if (pos31.getX() < pos32.getX()) {
+        finalPosLit3 = pos31;
+    } else {
+        finalPosLit3 = pos32;
+    }
+
+    if (WM->getMyNum() == 10) {
+        return finalPosLit1;
+    } else if (WM->getMyNum() == 11) {
+        return finalPosLit2;
+    } else if (WM->getMyNum() == 7) {
+        return finalPosLit3;
+    }
+
 }
+
 
 VecPosition Decide::attackpositioning()
 {

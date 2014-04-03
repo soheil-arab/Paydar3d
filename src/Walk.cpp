@@ -42,7 +42,6 @@ string Skill::GeneralWalk(int& t, double angToTurn, double angToGo, double A)
         return Standing(d2, standingTime);
     }
 
-
     int AllTime = 5;
     int Period = 2 * AllTime;
 
@@ -85,48 +84,39 @@ string Skill::GeneralWalk(int& t, double angToTurn, double angToGo, double A)
     //            onePeriodFinished = false;
     //        }
 
-//    cout << Rad2Deg(angleToGo) << "  " << Rad2Deg(angleToTurn) << endl;
-//    cout << angToGo << "  " << angToTurn << endl;
+    //    cout << Rad2Deg(angleToGo) << "  " << Rad2Deg(angleToTurn) << endl;
+    //    cout << angToGo << "  " << angToTurn << endl;
 
     if (t % AllTime == 0) {
         double alpha = Rad2Deg(angleToTurn);
 
         if (t % Period == 0) {
-//            cout << "sare period" << endl;
-            if (angToTurn < -0.05 == phase ) {
-//                cout << phase << "  " << angToGo << "  " << angToTurn << " need nim wlak" << endl;
+            //            cout << "sare period" << endl;
+            if (angToTurn * angleToTurn < -0.05) {
                 angleToTurn = 0;
-                //                                        angleToGo = ( angleToGo + Deg2Rad( angToGo )) / 2.0 ;
                 angleToGo = Deg2Rad(angToGo);
                 isNimWalkStarted = true;
-                //                angleToGo = 0;
-            }else if (angToGo*angleToGo < -0.05  ) {
-
-                angleToGo = 0;
-                //                                        angleToGo = ( angleToGo + Deg2Rad( angToGo )) / 2.0 ;
+            } else if (angToGo * angleToGo < -0.05) {
+                if (fabs(angToGo) > 90) {
+                    angleToGo = Deg2Rad(180);
+                } else {
+                    angleToGo = 0;
+                }
                 angleToTurn = Deg2Rad(angToTurn);
                 isNimWalkStarted = true;
-                //                angleToGo = 0;
-            }
-
-            else {
+            } else {
                 onePeriodFinished = true;
             }
-        } else if (fabs(angToTurn * alpha) < 0.5) {
-            if (t % Period == AllTime && isNimWalkStarted) {
-                onePeriodFinished = true;
-                isNimWalkStarted = false;
-//                cout << "setting one period finished " << endl;
-            }
+        } else if (t % Period == AllTime && isNimWalkStarted) {
+            onePeriodFinished = true;
+            isNimWalkStarted = false;
         } else {
             onePeriodFinished = false;
         }
-
     } else {
         onePeriodFinished = false;
     }
 
-    //    cout <<  "And The angle of the turn :" << angleToTurn << " will embrace the world's in gray "<< endl;
     double alpha = Rad2Deg(angleToGo);
     double angDiff = min(360 - fabs(alpha - angToGo), fabs(alpha - angToGo));
     if (angDiff > 45 && !walkMethodChange) {
@@ -135,7 +125,6 @@ string Skill::GeneralWalk(int& t, double angToTurn, double angToGo, double A)
 
     if (walkMethodChange) {
         if (onePeriodFinished && speed < max(45.0 * 0.8 / angDiff, 0.25)) {
-
             angleToGo = Deg2Rad(angToGo);
             angleToTurn = Deg2Rad(angToTurn);
             walkMethodChange = false;
@@ -216,7 +205,7 @@ string Skill::GeneralWalk(int& t, double angToTurn, double angToGo, double A)
 
     t++;
 
-//    cout << "--------------" << endl;
+    //    cout << "--------------" << endl;
     if (solvedl != 0 || solvedr != 0)
         return "";
     return moveJoints(JLLeg, JRLeg, 0.2);

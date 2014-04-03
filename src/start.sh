@@ -1,4 +1,5 @@
 #!/bin/bash
+export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$PWD"
 red='\e[0;31m'
 RED='\e[1;31m'
 blue='\e[0;34m'

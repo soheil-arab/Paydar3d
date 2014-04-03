@@ -58,7 +58,7 @@ set(robotoos_SRCS
 #link_directories(${BOOST_LIBRARYDIR})
 
 
-set(CMAKE_CXX_FLAGS "-std=c++11 -O3 -pthread -pg -g -I/usr/include/eigen3 -lorocos-kdl")
+set(CMAKE_CXX_FLAGS "-std=c++11 -O3 -pthread -I/usr/include/eigen3 -lorocos-kdl")
 
 include_directories(${SPARK_INCLUDE_DIR}  )
 

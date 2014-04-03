@@ -1160,6 +1160,22 @@ Circle::Circle( )
     setCircle( VecPosition(-1000.0,-1000.0), 0);
 }
 
+
+Circle::Circle (VecPosition A, VecPosition B, VecPosition C) {
+
+    Line AB = Line::makeLineFromTwoPoints(A, B);
+    Line BC = Line::makeLineFromTwoPoints(B, C);
+    Line l1 = AB.getTangentLine((A+B)/2.0);
+    Line l2 = BC.getTangentLine((B+C)/2.0);
+
+    VecPosition center = l1.getIntersection(l2);
+    double diameter = center.getDistanceTo(A);
+
+    setCircle(center, diameter);
+}
+
+
+
 /*! This method prints the circle information to the specified output stream
 	in the following format: "c: (c_x,c_y), r: rad" where (c_x,c_y) denotes
 	the center of the circle and rad the radius.
