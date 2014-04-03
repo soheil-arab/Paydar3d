@@ -16,9 +16,12 @@
 string Decide::Attack()
 {
     static int aaa = 0 ;
+
 //    cout << WM->getMyPos() << endl;
+//    cout << "---=-=-=-=-" << endl;
 //    cout << WM->getBallPos() << endl;
-////   cout << WM->getBallPos() << endl;
+//   cout << WM->getBallPos() << endl;
+
 
     static int ttt = 0;
     static double deg = 0;
@@ -37,10 +40,13 @@ string Decide::Attack()
     stringstream ss("");
     myPos = WM->getMyPos();
     ballPos = WM->getBallPos();
+
+    static int iii = 0;
+    RVDraw::instance()->drawVector3f(salt::Vector3f(myPos.x(),myPos.y(),myPos.z()),RED,iii++,3);
 //    cout << myPos << "  " << ballPos << endl;
     static int K = 0 ;
-    RVDraw::instance()->drawVector3f(salt::Vector3f(-myPos.x(),-myPos.y(),myPos.z()),RED,K++,3);
-    RVDraw::instance()->drawVector3f(salt::Vector3f(-ballPos.x(),-ballPos.y(),ballPos.z()),RED,K++,3);
+//    RVDraw::instance()->drawEigen::Vector3f(Eigen::Vector3f(-myPos.x(),-myPos.y(),myPos.z()),RED,K++,3);
+//    RVDraw::instance()->drawEigen::Vector3f(Eigen::Vector3f(-ballPos.x(),-ballPos.y(),ballPos.z()),RED,K++,3);
     VecPosition me(myPos.x(), myPos.y());
     VecPosition ball(ballPos.x(), ballPos.y());
     VecPosition goal(15, 0);
@@ -104,7 +110,7 @@ string Decide::Attack()
     /////////////////////////////////////////////////////////////
     int closest = parseBallPos();
     static int jjj = 0;
-    //    RVDraw::instance()->drawVector3f(myPos,RED,jjj++);
+    //    RVDraw::instance()->drawEigen::Vector3f(myPos,RED,jjj++);
     //    cout << myPos << endl;
 
     if (!ACT->isDone()) {
@@ -192,14 +198,14 @@ string Decide::Attack()
         //        RVDraw::instance()->drawLine(
         //            me, VecPosition::givePosition(me, WM->getMyAngle(), 1), BLUE, 10);
         //        RVDraw::instance()->drawAnnotation(
-        //                    temp.str(), salt::Vector3f(myPos.x(), myPos.y(), myPos.z() + 0.2),
+        //                    temp.str(), Eigen::Vector3f(myPos.x(), myPos.y(), myPos.z() + 0.2),
         //            BLACK, 11);
 
         //        cout << me << "  " << ball << endl;
         VecPosition behindPos = /*ball*/ VecPosition::givePosition(ball, (VecPosition(15, 0) - ball).getDirection(), -0.2);
-        double angToGoToBehindPos = WM->getMyAngleTo(salt::Vector3f(behindPos.getX(), behindPos.getY(), 0));
+        double angToGoToBehindPos = WM->getMyAngleTo(Eigen::Vector3f(behindPos.getX(), behindPos.getY(), 0));
         double angToTurnToBehindPos = WM->getMyAngle() - (VecPosition(15, 0) - behindPos).getDirection();
-        double angToGoToBall = WM->getMyAngleTo(salt::Vector3f(ball.getX(), ball.getY(), 0));
+        double angToGoToBall = WM->getMyAngleTo(Eigen::Vector3f(ball.getX(), ball.getY(), 0));
         double angToTurnToBall = WM->getMyAngle() - (VecPosition(15, 0) - ball).getDirection();
 
         //        if (shouldClear(x, y, s)) {
@@ -235,7 +241,7 @@ string Decide::Attack()
             poss = attackpositioning();
 
         if (me.getDistanceTo(poss) > 0.2) {
-            double angToGoPoss = WM->getMyAngleTo(salt::Vector3f(poss.getX(), poss.getY(), 0));
+            double angToGoPoss = WM->getMyAngleTo(Eigen::Vector3f(poss.getX(), poss.getY(), 0));
             double angToTurnToPoss = WM->getMyAngle() - (ball - poss).getDirection();
             return SK->GeneralWalk(libT, angToTurnToPoss, angToGoPoss, 0.01);
         }else if (fabs(WM->getMyAngleTo(WM->getBallPos())) > 15 && shouldPlay2()) {

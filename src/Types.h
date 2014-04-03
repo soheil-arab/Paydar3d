@@ -2,6 +2,7 @@
 #define TYPES
 #include "salt.h"
 #include "Geom.h"
+#include <eigen3/Eigen/Core>
 #include <algorithm>
 using namespace salt;
 enum SideT
@@ -22,8 +23,8 @@ enum LogT
 
 struct FootRes
 {
-  Vector3f c;
-  Vector3f f;
+  Eigen::Vector3f c;
+  Eigen::Vector3f f;
 };
 
 struct Polar
@@ -65,11 +66,11 @@ struct RelPlayerInfo
 
 struct GloPlayerInfo
 {
-  Vector3f head;
-  Vector3f lfoot;
-  Vector3f rfoot;
-  Vector3f llowerarm;
-  Vector3f rlowerarm;
+  Eigen::Vector3f head;
+  Eigen::Vector3f lfoot;
+  Eigen::Vector3f rfoot;
+  Eigen::Vector3f llowerarm;
+  Eigen::Vector3f rlowerarm;
 };
 
 enum PlayMode

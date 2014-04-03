@@ -25,10 +25,13 @@ connection::connection()
 
 void connection::connect_to(const char *ip, int port)
 {
+    struct hostent *hostp;
+    hostp = gethostbyname(ip);
+
 	sockaddr_in server;
 	server.sin_family = PF_INET;
 	server.sin_port = htons(port);
-	server.sin_addr.s_addr = inet_addr(ip);
+    memcpy(&server.sin_addr, hostp->h_addr, sizeof(server.sin_addr));
 	bzero(&(server.sin_zero), 8);
     if ( (socket_descriptor = socket(PF_INET, SOCK_STREAM, 0)) ==-1 )
     {

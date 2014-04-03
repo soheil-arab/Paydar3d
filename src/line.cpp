@@ -2,11 +2,11 @@
 #include "Geom.h"
 #include "rvdraw.h"
 #include <string>
-
+#include <eigen3/Eigen/Core>
 using namespace std;
 
 //
-line::line(Vector3f p1,Vector3f p2,double time)
+line::line(Eigen::Vector3f p1,Eigen::Vector3f p2,double time)
 {
 //    begin=PolarToCartecian(p1);
 //    end=PolarToCartecian(p2);
@@ -16,7 +16,7 @@ line::line(Vector3f p1,Vector3f p2,double time)
 
 }
 
-line::line(Vector3f p1,Vector3f p2)
+line::line(Eigen::Vector3f p1,Eigen::Vector3f p2)
 {
 //    begin=PolarToCartecian(p1);
 //    end=PolarToCartecian(p2);
@@ -39,17 +39,17 @@ line line::line_PolarToCartesian()
 
 double line::getLength()
 {
-    return (end - begin).Length();
+    return (end - begin).norm();
 }
 
 
 
-Vector3f line::getBegin()
+Eigen::Vector3f line::getBegin()
 {
     return begin;
 }
 
-Vector3f line::getEnd()
+Eigen::Vector3f line::getEnd()
 {
     return end;
 }

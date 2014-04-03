@@ -87,7 +87,7 @@ void Parser::parseLines(string &msg)
         double x1,y1,z1,x2,y2,z2;
         edame>>temp>>temp>>x1>>y1>>z1>>temp>>x2>>y2>>z2;
         //wm_lock->lock();
-        WM->setSeenLines(line (Vector3f(x1,y1,z1),Vector3f(x2,y2,z2),WM->serverTime));
+        WM->setSeenLines(line (Eigen::Vector3f(x1,y1,z1),Eigen::Vector3f(x2,y2,z2),WM->serverTime));
         //wm_lock->unlock();
         pos=msg.find(" L",pos+1);
     }
@@ -95,20 +95,34 @@ void Parser::parseLines(string &msg)
 
 void Parser::parseSide(string &msg)
 {
+    static bool set = false;
     int pos = msg.find(" left");
     if (pos != string::npos)
     {
         //wm_lock->lock();
         WM->setTeamSide(Left);
         //wm_lock->unlock();
+        if ( !set )
+        {
+            WM->initDimentions();
+            WM->initFlags();
+            set = true;
+        }
     }
 
     pos = msg.find(" right");
     if (pos != string::npos)
     {
+
         //wm_lock->lock();
         WM->setTeamSide(Right);
         //wm_lock->unlock();
+        if ( !set )
+        {
+            WM->initDimentions();
+            WM->initFlags();
+            set = true;
+        }
     }
 }
 
@@ -186,7 +200,7 @@ void Parser::parseSense(string &msg)
         edame >> temp >> x >> y >> z ;
         //wm_lock->lock();
         WM->setSense(true);
-        WM->sensedPos = Vector3f(x,y,z);
+        WM->sensedPos = Eigen::Vector3f(x,y,z);
         //wm_lock->unlock();
     }
 
@@ -427,7 +441,7 @@ void Parser::parseGyroAndAccell(string &msg)
     int pos = msg.find("GYR");
     if (pos != string::npos)
     {
-        Vector3f gyr;
+        Eigen::Vector3f gyr;
         stringstream edame(msg.substr(pos));
         edame >> temp >> temp >> temp >> temp >> gyr.x() >> gyr.y() >> gyr.z();
         //wm_lock->lock();
@@ -443,7 +457,7 @@ void Parser::parseGyroAndAccell(string &msg)
     pos = msg.find("ACC");
     if (pos != string::npos)
     {
-        Vector3f acc;
+        Eigen::Vector3f acc;
         stringstream edame(msg.substr(pos));
         edame >> temp >> temp >> temp >> temp >> acc.x() >> acc.y() >> acc.z();
         //wm_lock->lock();

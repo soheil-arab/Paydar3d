@@ -10,6 +10,7 @@
 #include "Math.h"
 #include "Logger.h"
 #include "line.h"
+#include <eigen3/Eigen/Core>
 
 using namespace std;
 class WorldModel
@@ -19,9 +20,9 @@ public:
   ~WorldModel();
 
   void kalman_filter();
-  Vector3f general_rotation(Vector3f,Vector3f,double);
-  void setSpeed(Vector3f);
-  Vector3f getSpeed();
+  Eigen::Vector3f general_rotation(Eigen::Vector3f,Eigen::Vector3f,double);
+  void setSpeed(Eigen::Vector3f);
+  Eigen::Vector3f getSpeed();
 
 
   void setFlagPos(string, Polar);
@@ -29,12 +30,12 @@ public:
   void setBallAng(double);
   void setTime(double);
   void setServerTime(double);
-  void setGyro(Vector3f);
+  void setGyro(Eigen::Vector3f);
   void setJointAngle(string, double);
   void setOurPlayerPos(int, Polar);
   void setOppPlayerPos(int, Polar);
-  void setOurPos(int, Vector3f);
-  void setOppPos(int, Vector3f);
+  void setOurPos(int, Eigen::Vector3f);
+  void setOppPos(int, Eigen::Vector3f);
   void setOurName(string);
   void setOppName(string);
   void setTeamSide(SideT);
@@ -42,23 +43,23 @@ public:
   void setFootPress(string, FootRes);
   void setMyNum(int);
   void setLastMsg(string, double);
-  unordered_map<string,Vector3f> getLastFlagSeen();
-  void setGyroPos(Vector3f pos);
+  unordered_map<string,Eigen::Vector3f> getLastFlagSeen();
+  void setGyroPos(Eigen::Vector3f pos);
 
-  void setMyPos(Vector3f);
-  void setBallPos(Vector3f);
+  void setMyPos(Eigen::Vector3f);
+  void setBallPos(Eigen::Vector3f);
   void setMyAngle(double);
   void setMyPhi(double);
-  void setBallVel(Vector3f vel);
+  void setBallVel(Eigen::Vector3f vel);
   void initFlags();
   void initDimentions();
   void Localize();
   void setSense ( bool b );
   void setOurPlayerPartPos ( int num , string part , Polar pos );
   void setOppPlayerPartPos ( int num , string part , Polar pos );
-  void setACC ( Vector3f pos );
+  void setACC ( Eigen::Vector3f pos );
   vector<line> getLastSeenLines();
-  unordered_map<string,Vector3f> getFlagGlobal();
+  unordered_map<string,Eigen::Vector3f> getFlagGlobal();
 
 
 
@@ -69,30 +70,30 @@ public:
   double   getBallAng();
   double   getMyAngleToGoal();
   double   getMyAngleToBall();
-  double   getMyAngleTo(Vector3f p);
+  double   getMyAngleTo(Eigen::Vector3f p);
   double   getTime();
   double   getServerTime();
   double   getJointAngle(string);
   double   getLastJointAngle(string);
   int      getMyNum();
   Polar    getBallPolarPos();
-  Vector3f getOurPos(int);
-  Vector3f getOurPos(int,string part);
-  Vector3f getOppPos(int);
-  Vector3f getOppPos(int , string part);
+  Eigen::Vector3f getOurPos(int);
+  Eigen::Vector3f getOurPos(int,string part);
+  Eigen::Vector3f getOppPos(int);
+  Eigen::Vector3f getOppPos(int , string part);
   double   getFlagLastSeen(string name);
   double   getBallLastSeen();
   FootRes  getFootPress(string);
-  Vector3f getACC ();
-  Vector3f getGyro();
-  Vector3f getBallPos();
-  Vector3f getMyPos();
-  Vector3f getMyPos(string part);
-  Vector3f getBallVel();
-  Vector3f translate(Vector3f);
-  Vector3f translate(Vector3f,Matrix T);
-  Vector3f translate(Vector3f,Vector3f);
-  Vector3f gyroPos;
+  Eigen::Vector3f getACC ();
+  Eigen::Vector3f getGyro();
+  Eigen::Vector3f getBallPos();
+  Eigen::Vector3f getMyPos();
+  Eigen::Vector3f getMyPos(string part);
+  Eigen::Vector3f getBallVel();
+  Eigen::Vector3f translate(Eigen::Vector3f);
+  Eigen::Vector3f translate(Eigen::Vector3f,Eigen::Matrix3f T);
+  Eigen::Vector3f translate(Eigen::Vector3f,Eigen::Vector3f);
+  Eigen::Vector3f gyroPos;
   int      getNrOfUs();
   int      getNrOfThem();
   bool     getSense();
@@ -127,7 +128,7 @@ public:
 
   vector<line> lines_we_see;
 
-  Vector3f  sensedPos;
+  Eigen::Vector3f  sensedPos;
   double myOrien;
   int getOurPlayerCount() { return our.size()-2; }
   double getFieldLength(){ return length; }
@@ -137,15 +138,15 @@ public:
   void clearBodyRotate ();
   void setSeenLines(line);
   double    serverTime, Time;
-  unordered_map<string,Vector3f> getFlag();
+  unordered_map<string,Eigen::Vector3f> getFlag();
   void resetLastSeenLines();
 
 
 
 
   //duplicated
-  Vector3f  ACC;
-  Vector3f mylastPos;
+  Eigen::Vector3f  ACC;
+  Eigen::Vector3f mylastPos;
   bool      canSeeFlags;
   int       num;
   double    myZ;
@@ -160,32 +161,32 @@ public:
   string    lastHear;
   string    names[22];
   Polar     ballPolar;
-  Vector3f  gyro;
-  Vector3f  ballPos;
-  Vector3f  ballVel;
-  Vector3f  ball;
+  Eigen::Vector3f  gyro;
+  Eigen::Vector3f  ballPos;
+  Eigen::Vector3f  ballVel;
+  Eigen::Vector3f  ball;
   FootRes lf,rf;
   unordered_map<string, Polar> flagPolar;
-  unordered_map<string, Vector3f> flag;
+  unordered_map<string, Eigen::Vector3f> flag;
   unordered_map<string, double> flagLastSeen;
-  unordered_map<string, Vector3f> flagGlobal;
+  unordered_map<string, Eigen::Vector3f> flagGlobal;
   unordered_map<string, double> joint;
   unordered_map<string, double> lastJoint;
   unordered_map<int, Polar> mates, opps;
 
-  Matrix    R;
+  Eigen::Matrix3f     R;
   double    width, length, goalWidth;
   unordered_map<int, RelPlayerInfo> ourRel;
   unordered_map<int, RelPlayerInfo> theirRel;
   unordered_map<int, GloPlayerInfo> our;
   unordered_map<int, GloPlayerInfo> their;
   bool      Localed;
-  Matrix bodyRotate;
-  Matrix headRotate;
-  Matrix headR ;
-  Vector3f speed;
+  Eigen::Matrix3f bodyRotate;
+  Eigen::Matrix3f headRotate;
+  Eigen::Matrix3f headR ;
+  Eigen::Vector3f speed;
 
-    //  Vector3f localize_with_lines(unordered_map<line,double> ,unordered_map<string,Polar> );
+    //  Eigen::Vector3f localize_with_lines(unordered_map<line,double> ,unordered_map<string,Polar> );
 
 
 

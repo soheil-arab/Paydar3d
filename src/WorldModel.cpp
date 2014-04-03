@@ -10,7 +10,9 @@
 #include <cstdlib>
 #include <algorithm>
 #include "Geom.h"
+#include <Eigen/Geometry>
 #include "rvdraw.h"
+
 
 WorldModel::WorldModel()
     : joint(50)
@@ -26,7 +28,7 @@ WorldModel::WorldModel()
     myOrien = 0;
 
     bodyRotate.Identity();
-    speed = Vector3f(0, 0, 0);
+    speed = Eigen::Vector3f(0, 0, 0);
 
     headR.Identity();
     /// set Joints Name
@@ -68,7 +70,7 @@ WorldModel::~WorldModel()
 {
 }
 
-unordered_map<string, Vector3f> WorldModel::getFlagGlobal()
+unordered_map<string, Eigen::Vector3f> WorldModel::getFlagGlobal()
 {
     return flagGlobal;
 }
@@ -78,7 +80,7 @@ void WorldModel::resetLastSeenLines()
     lines_we_see.clear();
 }
 
-void WorldModel::setGyroPos(Vector3f pos)
+void WorldModel::setGyroPos(Eigen::Vector3f pos)
 {
     gyroPos = pos;
 }
@@ -89,7 +91,7 @@ vector<line> WorldModel::getLastSeenLines()
     for(int i=0;i<lines_we_see.size();i++)
     {
         if(lines_we_see[i].time_we_saw_it==serverTime)
-            lastSeenLines.insert(lastSeenLines.end(),lines_we_see[i]);
+            lastSeenLines.push_back(lines_we_see[i]);
     }
 
     return lastSeenLines;
@@ -105,7 +107,7 @@ void WorldModel::setSeenLines(line l)
 
 ///
 
-unordered_map<string, Vector3f> WorldModel::getFlag()
+unordered_map<string, Eigen::Vector3f> WorldModel::getFlag()
 {
     return flag;
 }
@@ -133,8 +135,8 @@ double WorldModel::getBallLastSeen()
 
 bool WorldModel::isServerBeamed()
 {
-    static Vector3f lastPos=getMyPos();
-    static Vector3f lastGyroPos=gyroPos;
+    static Eigen::Vector3f lastPos=getMyPos();
+    static Eigen::Vector3f lastGyroPos=gyroPos;
 
     for (unordered_map<string, Polar>::iterator i = flagPolar.begin(); i != flagPolar.end(); i++)
     {
@@ -142,11 +144,11 @@ bool WorldModel::isServerBeamed()
         {
             continue;
         }
-        if(fabs((i->second.dist)-(lastPos-flagGlobal[i->first]).Length())>1){
+        if(fabs((i->second.dist)-(lastPos-flagGlobal[i->first]).norm())>1){
             lastPos=getMyPos();
             return true;
         }
-        if(fabs((i->second.dist)-(lastGyroPos-flagGlobal[i->first]).Length())>1){
+        if(fabs((i->second.dist)-(lastGyroPos-flagGlobal[i->first]).norm())>1){
             lastGyroPos=gyroPos;
             return true;
         }
@@ -162,28 +164,27 @@ bool WorldModel::isServerBeamed()
 
 //this function will rotate an orirentation around an axis with specified angle, the angle should be in radian
 
-Vector3f WorldModel::general_rotation(Vector3f initial, Vector3f axis, double angle)
+Eigen::Vector3f WorldModel::general_rotation(Eigen::Vector3f initial, Eigen::Vector3f axis, double angle)
 {
     //    cout<<"angle: "<<angle<<endl;
     //    cout<<"axis: "<<axis<<endl;
-    Vector3f normaled_axis(axis.x() / axis.Length(), axis.y() / axis.Length(), axis.z() / axis.Length());
+    Eigen::Vector3f normaled_axis = axis.normalized();
     double ux = normaled_axis.x();
     double uy = normaled_axis.y();
     double uz = normaled_axis.z();
-    Matrix Rotation(cos(angle) + ux * ux * (1 - cos(angle)), ux * uy * (1 - cos(angle)) - uz * sin(angle), ux * uz * (1 - cos(angle)) + uy * sin(angle), 0,
-                    ux * uy * (1 - cos(angle)) + uz * sin(angle), cos(angle) + uy * uy * (1 - cos(angle)), uy * uz * (1 - cos(angle)) - ux * sin(angle), 0,
-                    ux * uz * (1 - cos(angle)) - uy * sin(angle), uy * uz * (1 - cos(angle)) + ux * sin(angle), cos(angle) + uz * uz * (1 - cos(angle)), 0,
-                    0, 0, 0, 1);
-    Vector3f rotated = Rotation.Transform(initial);
-    //    cout<<"rotated: "<<rotated<<endl;
+    Eigen::Matrix3f Rotation;
+    Rotation << cos(angle) + ux * ux * (1 - cos(angle)), ux * uy * (1 - cos(angle)) - uz * sin(angle), ux * uz * (1 - cos(angle)) + uy * sin(angle),
+                 ux * uy * (1 - cos(angle)) + uz * sin(angle), cos(angle) + uy * uy * (1 - cos(angle)), uy * uz * (1 - cos(angle)) - ux * sin(angle),
+                 ux * uz * (1 - cos(angle)) - uy * sin(angle), uy * uz * (1 - cos(angle)) + ux * sin(angle), cos(angle) + uz * uz * (1 - cos(angle));
+
+    Eigen::Vector3f rotated = Rotation*initial;
+//    Eigen::Vector3f rotated;
     return rotated;
 }
 
 void WorldModel::brinBeMA()
 {
     //    isServerBeamed();
-    initDimentions();
-    initFlags();
     //    kalman_filter();
 
     //    cout<<(int)(getACC().x()*10000)/(float)10000<<" "<<(int)(getACC().y()*10000)/(float)10000<<" "<<(int)(getACC().z()*10000)/(float)10000<<endl;
@@ -201,26 +202,28 @@ void WorldModel::brinBeMA()
     //    cout << (getJointAngle("he2")) << endl;
     //    cout << "===" << endl;
 
-    Vector3f rightGyro(gyro.y(), -gyro.x(), gyro.z());
-    Vector3f newGyro = bodyRotate.Rotate(rightGyro);
+    Eigen::Vector3f rightGyro(gyro.y(), -gyro.x(), gyro.z());
+    Eigen::Vector3f newGyro = bodyRotate*rightGyro;
 
-    double theta = Deg2Rad(newGyro.Length() * 0.02);
 
-    if (newGyro.Length() > 0.2)
-        newGyro = newGyro / newGyro.Length();
 
-    Vector3f x = bodyRotate.Transform(Vector3f(1, 0, 0));
-    Vector3f y = bodyRotate.Transform(Vector3f(0, 1, 0));
-    Vector3f z = bodyRotate.Transform(Vector3f(0, 0, 1));
+    double theta = Deg2Rad(newGyro.norm() * 0.02);
 
-    Vector3f newx = x * cos(theta) + (newGyro.Cross(x)) * sin(theta) + newGyro * (newGyro.Dot(x)) * (1 - cos(theta));
-    Vector3f newy = y * cos(theta) + (newGyro.Cross(y)) * sin(theta) + newGyro * (newGyro.Dot(y)) * (1 - cos(theta));
-    Vector3f newz = newx.Cross(newy);
+    if (newGyro.norm() > 0.2)
+        newGyro = newGyro / newGyro.norm();
 
-    bodyRotate.Set(newx.x(), newy.x(), newz.x(), 0,
-                   newx.y(), newy.y(), newz.y(), 0,
-                   newx.z(), newy.z(), newz.z(), 0,
-                   0, 0, 0, 1);
+    Eigen::Vector3f x = bodyRotate.col(0);
+    Eigen::Vector3f y = bodyRotate.col(1);
+    Eigen::Vector3f z = bodyRotate.col(2);
+
+    Eigen::Vector3f newx = x * cos(theta) + (newGyro.cross(x)) * sin(theta) + newGyro * (newGyro.dot(x)) * (1 - cos(theta));
+    Eigen::Vector3f newy = y * cos(theta) + (newGyro.cross(y)) * sin(theta) + newGyro * (newGyro.dot(y)) * (1 - cos(theta));
+    Eigen::Vector3f newz = newx.cross(newy);
+
+    bodyRotate << newx.x(), newy.x(), newz.x(),
+                   newx.y(), newy.y(), newz.y(),
+                   newx.z(), newy.z(), newz.z();
+
 
     setMyAngle(atan2Deg(newx.y(), newx.x()));
     //    cout << atan2Deg(newx.y(),newx.x()) << endl;
@@ -229,18 +232,17 @@ void WorldModel::brinBeMA()
     //        RVDraw::instance()->drawLine(sensedPos,sensedPos+newy,GREEN,25);
     //        RVDraw::instance()->drawLine(sensedPos,sensedPos+newz,GREEN,26);
 
-    Vector3f x_after_he1_rotation = general_rotation(newx, newz, Deg2Rad(getJointAngle("he1")));
-    Vector3f y_after_he1_rotation = general_rotation(newy, newz, Deg2Rad(getJointAngle("he1")));
-    Vector3f z_after_he1_rotation = general_rotation(newz, newz, Deg2Rad(getJointAngle("he1")));
+    Eigen::Vector3f x_after_he1_rotation = general_rotation(newx, newz, Deg2Rad(getJointAngle("he1")));
+    Eigen::Vector3f y_after_he1_rotation = general_rotation(newy, newz, Deg2Rad(getJointAngle("he1")));
+    Eigen::Vector3f z_after_he1_rotation = general_rotation(newz, newz, Deg2Rad(getJointAngle("he1")));
 
-    Vector3f x_after_he2_rotation = general_rotation(x_after_he1_rotation, y_after_he1_rotation, -Deg2Rad(getJointAngle("he2")));
-    Vector3f y_after_he2_rotation = general_rotation(y_after_he1_rotation, y_after_he1_rotation, -Deg2Rad(getJointAngle("he2")));
-    Vector3f z_after_he2_rotation = general_rotation(z_after_he1_rotation, y_after_he1_rotation, -Deg2Rad(getJointAngle("he2")));
+    Eigen::Vector3f x_after_he2_rotation = general_rotation(x_after_he1_rotation, y_after_he1_rotation, -Deg2Rad(getJointAngle("he2")));
+    Eigen::Vector3f y_after_he2_rotation = general_rotation(y_after_he1_rotation, y_after_he1_rotation, -Deg2Rad(getJointAngle("he2")));
+    Eigen::Vector3f z_after_he2_rotation = general_rotation(z_after_he1_rotation, y_after_he1_rotation, -Deg2Rad(getJointAngle("he2")));
 
-    headRotate.Set(x_after_he2_rotation.x(), y_after_he2_rotation.x(), z_after_he2_rotation.x(), 0,
-                   x_after_he2_rotation.y(), y_after_he2_rotation.y(), z_after_he2_rotation.y(), 0,
-                   x_after_he2_rotation.z(), y_after_he2_rotation.z(), z_after_he2_rotation.z(), 0,
-                   0, 0, 0, 1);
+    headRotate << x_after_he2_rotation.x(), y_after_he2_rotation.x(), z_after_he2_rotation.x(),
+                   x_after_he2_rotation.y(), y_after_he2_rotation.y(), z_after_he2_rotation.y(),
+                   x_after_he2_rotation.z(), y_after_he2_rotation.z(), z_after_he2_rotation.z();
 
     //    cout<<"he1: "<<(getJointAngle("he1"))<<endl;
     //    cout<<"we : "<<Rad2Deg(acos(newx.Dot(x_after_he1_rotation)))<<endl;
@@ -254,15 +256,15 @@ void WorldModel::brinBeMA()
 
     int numberOfFlags = 0;
 
-    Vector3f myPos(0, 0, 0);
+    Eigen::Vector3f myPos(0, 0, 0);
 
-    for (unordered_map<string, Vector3f>::iterator i = flag.begin(); i != flag.end(); i++) {
-        cout << serverTime << "  " << flagLastSeen[i->first] << endl;
+    for (unordered_map<string, Eigen::Vector3f>::iterator i = flag.begin(); i != flag.end(); i++) {
+//        cout << serverTime << "  " << flagLastSeen[i->first] << endl;
         if (flagLastSeen[i->first] != serverTime) {
             continue;
         }
 
-        Vector3f poss = flagGlobal[i->first] - headRotate.Rotate(i->second);
+        Eigen::Vector3f poss = flagGlobal[i->first] - headRotate*i->second;
         //        RVDraw::instance()->drawLine(sensedPos,sensedPos+headRotate.Rotate(i->second),GREEN,numberOfFlags);
 
         myPos += poss;
@@ -296,39 +298,39 @@ void WorldModel::brinBeMA()
 
         setMyPos(myPos);
         //        setMyAngle(Rad2Deg(gArcTan(newx.y()/newx.x())));
-        //        RVDraw::instance()->drawVector3f(myPos,GREEN,posN);
+        //        RVDraw::instance()->drawEigen::Vector3f(myPos,GREEN,posN);
         if (ballLastSeen == serverTime) /// if See Ball In This Cycle Set Its Pos !
         {
-            Vector3f ballPos = myPos + headRotate.Rotate(ball);
-            //            RVDraw::instance()->drawVector3f(ballPos,RED,++posN);
+            Eigen::Vector3f ballPos = myPos + headRotate*ball;
+            //            RVDraw::instance()->drawEigen::Vector3f(ballPos,RED,++posN);
             setBallVel(ballPos - getBallPos());
             setBallPos(ballPos);
             if (ballPos.z() <= 0) {
                 //                cout<<"goh shod "<<serverTime<<endl;
-                ballPos.Set(Vector3f(ballPos.x(), ballPos.y(), 0.042));
+                ballPos << (Eigen::Vector3f(ballPos.x(), ballPos.y(), 0.042));
             }
             //            else
             //                cout<<"oooo "<<endl;
         }
 
-        //        RVDraw::instance()->drawVector3f(getMyPos(),GREEN,5);
-        //        RVDraw::instance()->drawVector3f(getBallPos(),GREEN,7);
+        //        RVDraw::instance()->drawEigen::Vector3f(getMyPos(),GREEN,5);
+        //        RVDraw::instance()->drawEigen::Vector3f(getBallPos(),GREEN,7);
         for (unordered_map<int, RelPlayerInfo>::iterator i = ourRel.begin(); i != ourRel.end(); i++) {
             if (i->first != getMyNum()) {
-                our[i->first].head = myPos + headRotate.Rotate(PolarToCartecian(i->second.head));
+                our[i->first].head = myPos + headRotate*PolarToCartecian(i->second.head);
             }
-            our[i->first].lfoot = myPos + headRotate.Rotate(PolarToCartecian(i->second.lfoot));
-            our[i->first].rfoot = myPos + headRotate.Rotate(PolarToCartecian(i->second.rfoot));
-            our[i->first].rlowerarm = myPos + headRotate.Rotate(PolarToCartecian(i->second.rlowerarm));
-            our[i->first].llowerarm = myPos + headRotate.Rotate(PolarToCartecian(i->second.llowerarm));
+            our[i->first].lfoot = myPos + headRotate*PolarToCartecian(i->second.lfoot);
+            our[i->first].rfoot = myPos + headRotate*PolarToCartecian(i->second.rfoot);
+            our[i->first].rlowerarm = myPos + headRotate*PolarToCartecian(i->second.rlowerarm);
+            our[i->first].llowerarm = myPos + headRotate*PolarToCartecian(i->second.llowerarm);
         }
 
         for (unordered_map<int, RelPlayerInfo>::iterator i = theirRel.begin(); i != theirRel.end(); i++) {
-            their[i->first].head = myPos + headRotate.Rotate(PolarToCartecian(i->second.head));
-            their[i->first].lfoot = myPos + headRotate.Rotate(PolarToCartecian(i->second.lfoot));
-            their[i->first].rfoot = myPos + headRotate.Rotate(PolarToCartecian(i->second.rfoot));
-            their[i->first].rlowerarm = myPos + headRotate.Rotate(PolarToCartecian(i->second.rlowerarm));
-            their[i->first].llowerarm = myPos + headRotate.Rotate(PolarToCartecian(i->second.llowerarm));
+            their[i->first].head = myPos + headRotate*PolarToCartecian(i->second.head);
+            their[i->first].lfoot = myPos + headRotate*PolarToCartecian(i->second.lfoot);
+            their[i->first].rfoot = myPos + headRotate*PolarToCartecian(i->second.rfoot);
+            their[i->first].rlowerarm = myPos + headRotate*PolarToCartecian(i->second.rlowerarm);
+            their[i->first].llowerarm = myPos + headRotate*PolarToCartecian(i->second.llowerarm);
         }
     }
 
@@ -350,136 +352,136 @@ void WorldModel::brinBeMA()
 
 void WorldModel::kalman_filter()
 {
-    static Vector3f pos(-0.19, 0, 0);
-    static Vector3f speed(0, 0, 0);
+//    static Eigen::Vector3f pos(-0.19, 0, 0);
+//    static Eigen::Vector3f speed(0, 0, 0);
 
-    if (getACC().Length() > 9.809) {
-        static Matrix state(getMyPos().x(), getMyPos().y(), getMyPos().z(), 0,
-                            0, 0, 0, 0,
-                            0, 0, 0, 0,
-                            0, 0, 0, 0);
+//    if (getACC().norm() > 9.809) {
+//        static Eigen::Matrix3f state(getMyPos().x(), getMyPos().y(), getMyPos().z(), 0,
+//                            0, 0, 0, 0,
+//                            0, 0, 0, 0,
+//                            0, 0, 0, 0);
 
-        Vector3f Real_Acc(0, 0, -9.81);
-        Vector3f rightACC(getACC().y(), getACC().x(), -getACC().z());
-        Vector3f shetab = bodyRotate.Rotate(getACC());
-        Vector3f mofid = shetab - Real_Acc;
-        //        cout << getACC()<< " server" << endl;
-        //        cout<<"niro "<<getFootPress("lf").f<<"and "<<getFootPress("rf").f<<endl;
-        //                cout<<"vazn "<<shetab.Length()*4.6071<<endl;
+//        Eigen::Vector3f Real_Acc(0, 0, -9.81);
+//        Eigen::Vector3f rightACC(getACC().y(), getACC().x(), -getACC().z());
+//        Eigen::Vector3f shetab = getACC()*bodyRotate;
+//        Eigen::Vector3f mofid = shetab - Real_Acc;
+//        //        cout << getACC()<< " server" << endl;
+//        //        cout<<"niro "<<getFootPress("lf").f<<"and "<<getFootPress("rf").f<<endl;
+//        //                cout<<"vazn "<<shetab.norm()*4.6071<<endl;
 
-        //4.6071:mass
+//        //4.6071:mass
 
-        pos = pos + 0.0002 * mofid + 0.02 * speed;
-        speed = speed + 0.02 * mofid;
+//        pos = pos + 0.0002 * mofid + 0.02 * speed;
+//        speed = speed + 0.02 * mofid;
 
-        Matrix F(1, 0.02, 0, 0,
-                 0, 1, 0, 0,
-                 0, 0, 0, 0,
-                 0, 0, 0, 0);
+//        Eigen::Matrix3f F(1, 0.02, 0, 0,
+//                 0, 1, 0, 0,
+//                 0, 0, 0, 0,
+//                 0, 0, 0, 0);
 
-        Matrix priori_state_estimate(0, 0, 0, 0,
-                                     0, 0, 0, 0,
-                                     0, 0, 0, 0,
-                                     0, 0, 0, 0);
+//        Eigen::Matrix3f priori_state_estimate(0, 0, 0, 0,
+//                                     0, 0, 0, 0,
+//                                     0, 0, 0, 0,
+//                                     0, 0, 0, 0);
 
-        Matrix G(0.0002, 0, 0, 0,
-                 0.02, 0, 0, 0,
-                 0, 0, 0, 0,
-                 0, 0, 0, 0);
+//        Eigen::Matrix3f G(0.0002, 0, 0, 0,
+//                 0.02, 0, 0, 0,
+//                 0, 0, 0, 0,
+//                 0, 0, 0, 0);
 
-        Matrix ACC((int)((mofid.z()) * 10000) / (float)10000, (int)(mofid.y() * 10000) / (float)10000, (int)(-mofid.x() * 10000) / (float)10000, 0,
-                   0, 0, 0, 0,
-                   0, 0, 0, 0,
-                   0, 0, 0, 0);
+//        Eigen::Matrix3f ACC((int)((mofid.z()) * 10000) / (float)10000, (int)(mofid.y() * 10000) / (float)10000, (int)(-mofid.x() * 10000) / (float)10000, 0,
+//                   0, 0, 0, 0,
+//                   0, 0, 0, 0,
+//                   0, 0, 0, 0);
 
-        static Matrix cov(0, 0, 0, 0,
-                          0, 0, 0, 0,
-                          0, 0, 0, 0,
-                          0, 0, 0, 0);
+//        static Eigen::Matrix3f cov(0, 0, 0, 0,
+//                          0, 0, 0, 0,
+//                          0, 0, 0, 0,
+//                          0, 0, 0, 0);
 
-        Matrix predicted_cov(0, 0, 0, 0,
-                             0, 0, 0, 0,
-                             0, 0, 0, 0,
-                             0, 0, 0, 0);
+//        Eigen::Matrix3f predicted_cov(0, 0, 0, 0,
+//                             0, 0, 0, 0,
+//                             0, 0, 0, 0,
+//                             0, 0, 0, 0);
 
-        Matrix H(1, 0, 0, 0,
-                 0, 0, 0, 0,
-                 0, 0, 0, 0,
-                 0, 0, 0, 0);
+//        Eigen::Matrix3f H(1, 0, 0, 0,
+//                 0, 0, 0, 0,
+//                 0, 0, 0, 0,
+//                 0, 0, 0, 0);
 
-        //i'm not sure about this covariance!!
-        Matrix cov_of_acc(0.0004, 0, 0, 0,
-                          0, 0.0004, 0, 0,
-                          0, 0, 0, 0.0004,
-                          0, 0, 0, 0);
+//        //i'm not sure about this covariance!!
+//        Eigen::Matrix3f cov_of_acc(0.0004, 0, 0, 0,
+//                          0, 0.0004, 0, 0,
+//                          0, 0, 0, 0.0004,
+//                          0, 0, 0, 0);
 
-        Matrix position_by_censors(getMyPos().x(), getMyPos().y(), getMyPos().z(), 0,
-                                   0, 0, 0, 0,
-                                   0, 0, 0, 0,
-                                   0, 0, 0, 0);
+//        Eigen::Matrix3f position_by_censors(getMyPos().x(), getMyPos().y(), getMyPos().z(), 0,
+//                                   0, 0, 0, 0,
+//                                   0, 0, 0, 0,
+//                                   0, 0, 0, 0);
 
-        //i'm not sure about this covriance!
-        Matrix cov_of_position_by_censors(0.01, 0, 0, 0,
-                                          0, 0.01, 0, 0,
-                                          0, 0, 0.01, 0,
-                                          0, 0, 0, 0);
+//        //i'm not sure about this covriance!
+//        Eigen::Matrix3f cov_of_position_by_censors(0.01, 0, 0, 0,
+//                                          0, 0.01, 0, 0,
+//                                          0, 0, 0.01, 0,
+//                                          0, 0, 0, 0);
 
-        Matrix I;
-        I.Identity();
+//        Eigen::Matrix3f I;
+//        I.Identity();
 
-        Matrix domain_of_error(0, 0, 0, 0,
-                               0, 0, 0, 0,
-                               0, 0, 0, 0,
-                               0, 0, 0, 0);
+//        Eigen::Matrix3f domain_of_error(0, 0, 0, 0,
+//                               0, 0, 0, 0,
+//                               0, 0, 0, 0,
+//                               0, 0, 0, 0);
 
-        domain_of_error = position_by_censors - H * priori_state_estimate;
+//        domain_of_error = position_by_censors - H * priori_state_estimate;
 
-        Matrix S(0, 0, 0, 0,
-                 0, 0, 0, 0,
-                 0, 0, 0, 0,
-                 0, 0, 0, 0);
+//        Eigen::Matrix3f S(0, 0, 0, 0,
+//                 0, 0, 0, 0,
+//                 0, 0, 0, 0,
+//                 0, 0, 0, 0);
 
-        Matrix K(0, 0, 0, 0,
-                 0, 0, 0, 0,
-                 0, 0, 0, 0,
-                 0, 0, 0, 0);
+//        Eigen::Matrix3f K(0, 0, 0, 0,
+//                 0, 0, 0, 0,
+//                 0, 0, 0, 0,
+//                 0, 0, 0, 0);
 
-        Matrix H_C = H;
-        H_C.InvertRotationMatrix();
-        Matrix S_C = S;
-        S_C.InvertRotationMatrix();
-        Matrix F_C = F;
-        F_C.InvertRotationMatrix();
-        Matrix G_C = F;
-        G_C.InvertRotationMatrix();
+//        Eigen::Matrix3f H_C = H;
+//        H_C.InvertRotationEigen::Matrix3f();
+//        Eigen::Matrix3f S_C = S;
+//        S_C.InvertRotationEigen::Matrix3f();
+//        Eigen::Matrix3f F_C = F;
+//        F_C.InvertRotationEigen::Matrix3f();
+//        Eigen::Matrix3f G_C = F;
+//        G_C.InvertRotationEigen::Matrix3f();
 
-        priori_state_estimate = F * state + G * ACC;
+//        priori_state_estimate = F * state + G * ACC;
 
-        predicted_cov = F * cov * (F_C) + G * G_C * cov_of_acc;
+//        predicted_cov = F * cov * (F_C) + G * G_C * cov_of_acc;
 
-        S = H * predicted_cov * H_C + cov_of_position_by_censors;
+//        S = H * predicted_cov * H_C + cov_of_position_by_censors;
 
-        K = predicted_cov * H * S_C;
+//        K = predicted_cov * H * S_C;
 
-        state = priori_state_estimate + K * H;
+//        state = priori_state_estimate + K * H;
 
-        cov = (I - K * H) * predicted_cov;
+//        cov = (I - K * H) * predicted_cov;
 
-        //        RVDraw::instance()->drawVector3f(Vector3f(state.Transform(Vector3f(1,0,0)).x(),state.Transform(Vector3f(0,1,0)).x(),state.Transform(Vector3f(0,0,1)).x()),RED,10);
+        //        RVDraw::instance()->drawEigen::Vector3f(Eigen::Vector3f(state.Transform(Eigen::Vector3f(1,0,0)).x(),state.Transform(Eigen::Vector3f(0,1,0)).x(),state.Transform(Eigen::Vector3f(0,0,1)).x()),RED,10);
 
-        //        RVDraw::instance()->drawVector3f(pos,RED,10);
-    }
+        //        RVDraw::instance()->drawEigen::Vector3f(pos,RED,10);
+//    }
 }
 
 //
 //void WorldModel::kiiri()
 //{
-//    static Vector3f posss=myPos;
-//    static Vector3f speed(0,0,0);
-//    posss=posss+0.0002*(Vector3f(ACC.x()*bodyRotate.Transform(Vector3f(1,0,0))))+
-//            0.02*(Vector3f(speed.x()*bodyRotate.Transform(Vector3f(1,0,0))));
-//    speed=0.02*(Vector3f(ACC.x()*bodyRotate.Transform(Vector3f(1,0,0))));
-//     RVDraw::instance()->drawVector3f(posss,RED,10);
+//    static Eigen::Vector3f posss=myPos;
+//    static Eigen::Vector3f speed(0,0,0);
+//    posss=posss+0.0002*(Eigen::Vector3f(ACC.x()*bodyRotate.Transform(Eigen::Vector3f(1,0,0))))+
+//            0.02*(Eigen::Vector3f(speed.x()*bodyRotate.Transform(Eigen::Vector3f(1,0,0))));
+//    speed=0.02*(Eigen::Vector3f(ACC.x()*bodyRotate.Transform(Eigen::Vector3f(1,0,0))));
+//     RVDraw::instance()->drawEigen::Vector3f(posss,RED,10);
 //}
 
 void WorldModel::Localize()
@@ -491,241 +493,241 @@ void WorldModel::Localize()
 void WorldModel::getPosbyTwoFlag()
 {
 
-    initDimentions();
-    initFlags();
-    Localed = false;
-    Vector3f pos;
-    int co = 0;
-    Vector3f sum(0, 0, 0);
+//    initDimentions();
+//    initFlags();
+//    Localed = false;
+//    Eigen::Vector3f pos;
+//    int co = 0;
+//    Eigen::Vector3f sum(0, 0, 0);
 
-    for (unordered_map<string, Polar>::iterator i = flagPolar.begin(); i != flagPolar.end(); i++) {
-        if (flagLastSeen[i->first] != serverTime) {
-            continue;
-        }
-        for (unordered_map<string, Polar>::iterator j = flagPolar.begin(); j != flagPolar.end(); j++) {
-            if (flagLastSeen[j->first] != serverTime) {
-                continue;
-            }
-            if (i->first == j->first) {
-                continue;
-            }
-            if (i->first[2] != j->first[2]) {
-                continue;
-            }
+//    for (unordered_map<string, Polar>::iterator i = flagPolar.begin(); i != flagPolar.end(); i++) {
+//        if (flagLastSeen[i->first] != serverTime) {
+//            continue;
+//        }
+//        for (unordered_map<string, Polar>::iterator j = flagPolar.begin(); j != flagPolar.end(); j++) {
+//            if (flagLastSeen[j->first] != serverTime) {
+//                continue;
+//            }
+//            if (i->first == j->first) {
+//                continue;
+//            }
+//            if (i->first[2] != j->first[2]) {
+//                continue;
+//            }
 
-            if (i->first[0] == 'G' && j->first[0] == 'F' && i->first[1] == j->first[1]) {
-                co++;
-                Localed = true;
-                double fz = ZFromLeft();
+//            if (i->first[0] == 'G' && j->first[0] == 'F' && i->first[1] == j->first[1]) {
+//                co++;
+//                Localed = true;
+//                double fz = ZFromLeft();
 
-                double h1 = 0;
-                double h2 = 0.8;
-                double a = i->second.dist;
-                double b = j->second.dist;
-                double d = fabs(flagGlobal[i->first].y() - flagGlobal[j->first].y());
+//                double h1 = 0;
+//                double h2 = 0.8;
+//                double a = i->second.dist;
+//                double b = j->second.dist;
+//                double d = fabs(flagGlobal[i->first].y() - flagGlobal[j->first].y());
 
-                double fy = (d * d + b * b - a * a + (h2 - h1) * (h1 + h2 - 2 * fz)) / (2 * d);
-                double fx = sqrt(b * b - (h1 - fz) * (h1 - fz) - fy * fy);
+//                double fy = (d * d + b * b - a * a + (h2 - h1) * (h1 + h2 - 2 * fz)) / (2 * d);
+//                double fx = sqrt(b * b - (h1 - fz) * (h1 - fz) - fy * fy);
 
-                if (j->first[2] == 'L' && getTeamSide() == Left) {
-                    fx *= -1;
-                }
-                if (j->first[2] == 'R' && getTeamSide() == Right) {
-                    fx *= -1;
-                }
-                if (getTeamSide() == Right) {
-                    fy *= -1;
-                }
-                if (j->first[1] == '2') {
-                    fy *= -1;
-                }
+//                if (j->first[2] == 'L' && getTeamSide() == Left) {
+//                    fx *= -1;
+//                }
+//                if (j->first[2] == 'R' && getTeamSide() == Right) {
+//                    fx *= -1;
+//                }
+//                if (getTeamSide() == Right) {
+//                    fy *= -1;
+//                }
+//                if (j->first[1] == '2') {
+//                    fy *= -1;
+//                }
 
-                pos = flagGlobal[j->first] - Vector3f(fx, fy, -fz);
+//                pos = flagGlobal[j->first] - Eigen::Vector3f(fx, fy, -fz);
 
-                sum += pos;
+//                sum += pos;
 
-                double theta = VecPosition::normalizeAngle(CartecianToPolar(flagGlobal[j->first] - pos).theta - j->second.theta);
-                double phi = VecPosition::normalizeAngle(CartecianToPolar(flagGlobal[j->first] - pos).phi - j->second.phi);
+//                double theta = VecPosition::normalizeAngle(CartecianToPolar(flagGlobal[j->first] - pos).theta - j->second.theta);
+//                double phi = VecPosition::normalizeAngle(CartecianToPolar(flagGlobal[j->first] - pos).phi - j->second.phi);
 
-                setMyAngle(theta - getJointAngle("he1"));
-                setMyPhi(phi - getJointAngle("he2"));
+//                setMyAngle(theta - getJointAngle("he1"));
+//                setMyPhi(phi - getJointAngle("he2"));
 
-                Matrix x;
+//                Eigen::Matrix3f x;
 
-                Vector3f I, J, K;
+//                Eigen::Vector3f I, J, K;
 
-                x.RotationY(Deg2Rad(phi));
-                x.RotateZ(Deg2Rad(-theta));
+//                x.RotationY(Deg2Rad(phi));
+//                x.RotateZ(Deg2Rad(-theta));
 
-                I = x.Rotate(Vector3f(1, 0, 0));
-                J = x.Rotate(Vector3f(0, 1, 0));
-                K = x.Rotate(Vector3f(0, 0, 1));
+//                I = x.Rotate(Eigen::Vector3f(1, 0, 0));
+//                J = x.Rotate(Eigen::Vector3f(0, 1, 0));
+//                K = x.Rotate(Eigen::Vector3f(0, 0, 1));
 
-                R.Set(I.x(), I.y(), I.z(), 0,
-                      J.x(), J.y(), J.z(), 0,
-                      K.x(), K.y(), K.z(), 0,
-                      0, 0, 0, 1);
-            }
-            if (i->first[0] == 'G' && j->first[0] == 'G' && i->first[1] == '1' && j->first[1] == '2') {
-                co++;
-                Localed = true;
-                double fz = ZFromLeft();
+//                R.Set(I.x(), I.y(), I.z(), 0,
+//                      J.x(), J.y(), J.z(), 0,
+//                      K.x(), K.y(), K.z(), 0,
+//                      0, 0, 0, 1);
+//            }
+//            if (i->first[0] == 'G' && j->first[0] == 'G' && i->first[1] == '1' && j->first[1] == '2') {
+//                co++;
+//                Localed = true;
+//                double fz = ZFromLeft();
 
-                double h1 = 0.8;
-                double h2 = 0.8;
-                double a = i->second.dist;
-                double b = j->second.dist;
-                double d = fabs(flagGlobal[i->first].y() - flagGlobal[j->first].y());
+//                double h1 = 0.8;
+//                double h2 = 0.8;
+//                double a = i->second.dist;
+//                double b = j->second.dist;
+//                double d = fabs(flagGlobal[i->first].y() - flagGlobal[j->first].y());
 
-                double fy = (d * d + b * b - a * a + (h2 - h1) * (h1 + h2 - 2 * fz)) / (2 * d);
-                double fx = sqrt(b * b - (h1 - fz) * (h1 - fz) - fy * fy);
+//                double fy = (d * d + b * b - a * a + (h2 - h1) * (h1 + h2 - 2 * fz)) / (2 * d);
+//                double fx = sqrt(b * b - (h1 - fz) * (h1 - fz) - fy * fy);
 
-                if (i->first[2] == 'L' && getTeamSide() == Left) {
-                    fx *= -1;
-                }
+//                if (i->first[2] == 'L' && getTeamSide() == Left) {
+//                    fx *= -1;
+//                }
 
-                if (i->first[2] == 'R' && getTeamSide() == Right) {
-                    fx *= -1;
-                }
-                if (getTeamSide() == Right) {
-                    fy *= -1;
-                }
-                if (j->first[1] == '2') {
-                    fy *= -1;
-                }
+//                if (i->first[2] == 'R' && getTeamSide() == Right) {
+//                    fx *= -1;
+//                }
+//                if (getTeamSide() == Right) {
+//                    fy *= -1;
+//                }
+//                if (j->first[1] == '2') {
+//                    fy *= -1;
+//                }
 
-                pos = flagGlobal[j->first] - Vector3f(fx, fy, 0.8 - fz);
+//                pos = flagGlobal[j->first] - Eigen::Vector3f(fx, fy, 0.8 - fz);
 
-                sum += pos;
+//                sum += pos;
 
-                double theta = VecPosition::normalizeAngle(CartecianToPolar(flagGlobal[i->first] - pos).theta - i->second.theta);
-                double phi = VecPosition::normalizeAngle(CartecianToPolar(flagGlobal[i->first] - pos).phi - i->second.phi);
+//                double theta = VecPosition::normalizeAngle(CartecianToPolar(flagGlobal[i->first] - pos).theta - i->second.theta);
+//                double phi = VecPosition::normalizeAngle(CartecianToPolar(flagGlobal[i->first] - pos).phi - i->second.phi);
 
-                setMyAngle(theta - getJointAngle("he1"));
-                setMyPhi(phi - getJointAngle("he2"));
+//                setMyAngle(theta - getJointAngle("he1"));
+//                setMyPhi(phi - getJointAngle("he2"));
 
-                Matrix x;
+//                Eigen::Matrix3f x;
 
-                Vector3f I, J, K;
+//                Eigen::Vector3f I, J, K;
 
-                x.RotationY(Deg2Rad(phi));
-                x.RotateZ(Deg2Rad(-theta));
+//                x.RotationY(Deg2Rad(phi));
+//                x.RotateZ(Deg2Rad(-theta));
 
-                I = x.Rotate(Vector3f(1, 0, 0));
-                J = x.Rotate(Vector3f(0, 1, 0));
-                K = x.Rotate(Vector3f(0, 0, 1));
+//                I = x.Rotate(Eigen::Vector3f(1, 0, 0));
+//                J = x.Rotate(Eigen::Vector3f(0, 1, 0));
+//                K = x.Rotate(Eigen::Vector3f(0, 0, 1));
 
-                R.Set(I.x(), I.y(), I.z(), 0,
-                      J.x(), J.y(), J.z(), 0,
-                      K.x(), K.y(), K.z(), 0,
-                      0, 0, 0, 1);
-            }
-            if (i->first[0] == 'F' && j->first[0] == 'F' && i->first[1] == '1' && j->first[1] == '2') {
-                co++;
-                Localed = true;
-                double fz = ZFromLeft();
+//                R.Set(I.x(), I.y(), I.z(), 0,
+//                      J.x(), J.y(), J.z(), 0,
+//                      K.x(), K.y(), K.z(), 0,
+//                      0, 0, 0, 1);
+//            }
+//            if (i->first[0] == 'F' && j->first[0] == 'F' && i->first[1] == '1' && j->first[1] == '2') {
+//                co++;
+//                Localed = true;
+//                double fz = ZFromLeft();
 
-                double h1 = 0;
-                double h2 = 0;
-                double a = i->second.dist;
-                double b = j->second.dist;
-                double d = fabs(flagGlobal[i->first].y() - flagGlobal[j->first].y());
+//                double h1 = 0;
+//                double h2 = 0;
+//                double a = i->second.dist;
+//                double b = j->second.dist;
+//                double d = fabs(flagGlobal[i->first].y() - flagGlobal[j->first].y());
 
-                double fy = (d * d + b * b - a * a + (h2 - h1) * (h1 + h2 - 2 * fz)) / (2 * d);
-                double fx = sqrt(b * b - (h1 - fz) * (h1 - fz) - fy * fy);
+//                double fy = (d * d + b * b - a * a + (h2 - h1) * (h1 + h2 - 2 * fz)) / (2 * d);
+//                double fx = sqrt(b * b - (h1 - fz) * (h1 - fz) - fy * fy);
 
-                if (i->first[2] == 'L' && getTeamSide() == Left) {
-                    fx *= -1;
-                }
+//                if (i->first[2] == 'L' && getTeamSide() == Left) {
+//                    fx *= -1;
+//                }
 
-                if (i->first[2] == 'R' && getTeamSide() == Right) {
-                    fx *= -1;
-                }
-                if (getTeamSide() == Right) {
-                    fy *= -1;
-                }
-                if (j->first[1] == '2') {
-                    fy *= -1;
-                }
+//                if (i->first[2] == 'R' && getTeamSide() == Right) {
+//                    fx *= -1;
+//                }
+//                if (getTeamSide() == Right) {
+//                    fy *= -1;
+//                }
+//                if (j->first[1] == '2') {
+//                    fy *= -1;
+//                }
 
-                pos = flagGlobal[j->first] - Vector3f(fx, fy, -fz);
+//                pos = flagGlobal[j->first] - Eigen::Vector3f(fx, fy, -fz);
 
-                sum += pos;
+//                sum += pos;
 
-                double theta = VecPosition::normalizeAngle(CartecianToPolar(flagGlobal[i->first] - pos).theta - i->second.theta);
-                double phi = VecPosition::normalizeAngle(CartecianToPolar(flagGlobal[i->first] - pos).phi - i->second.phi);
+//                double theta = VecPosition::normalizeAngle(CartecianToPolar(flagGlobal[i->first] - pos).theta - i->second.theta);
+//                double phi = VecPosition::normalizeAngle(CartecianToPolar(flagGlobal[i->first] - pos).phi - i->second.phi);
 
-                setMyAngle(theta - getJointAngle("he1"));
-                setMyPhi(phi - getJointAngle("he2"));
+//                setMyAngle(theta - getJointAngle("he1"));
+//                setMyPhi(phi - getJointAngle("he2"));
 
-                Matrix x;
+//                Eigen::Matrix3f x;
 
-                Vector3f I, J, K;
+//                Eigen::Vector3f I, J, K;
 
-                x.RotationY(Deg2Rad(phi));
-                x.RotateZ(Deg2Rad(-theta));
+//                x.RotationY(Deg2Rad(phi));
+//                x.RotateZ(Deg2Rad(-theta));
 
-                I = x.Rotate(Vector3f(1, 0, 0));
-                J = x.Rotate(Vector3f(0, 1, 0));
-                K = x.Rotate(Vector3f(0, 0, 1));
+//                I = x.Rotate(Eigen::Vector3f(1, 0, 0));
+//                J = x.Rotate(Eigen::Vector3f(0, 1, 0));
+//                K = x.Rotate(Eigen::Vector3f(0, 0, 1));
 
-                R.Set(I.x(), I.y(), I.z(), 0,
-                      J.x(), J.y(), J.z(), 0,
-                      K.x(), K.y(), K.z(), 0,
-                      0, 0, 0, 1);
-            }
-        }
-    }
-    if (Localed) /// if At Least Seen 3 Flags Or More
-    {
-        pos = sum / co;
-        int pppp = 14;
-        //        RVDraw::instance()->drawLine(pos,pos2,BLACK,pppp++);
-        //        RVDraw::instance()->drawLine(Vector3f(0,0,0),pos,BLACK,pppp++);
-        setMyPos(pos); /// set My Pos
+//                R.Set(I.x(), I.y(), I.z(), 0,
+//                      J.x(), J.y(), J.z(), 0,
+//                      K.x(), K.y(), K.z(), 0,
+//                      0, 0, 0, 1);
+//            }
+//        }
+//    }
+//    if (Localed) /// if At Least Seen 3 Flags Or More
+//    {
+//        pos = sum / co;
+//        int pppp = 14;
+//        //        RVDraw::instance()->drawLine(pos,pos2,BLACK,pppp++);
+//        //        RVDraw::instance()->drawLine(Eigen::Vector3f(0,0,0),pos,BLACK,pppp++);
+//        setMyPos(pos); /// set My Pos
 
-        if (ballLastSeen == serverTime) /// if See Ball In This Cycle Set Its Pos !
-        {
-            Vector3f temp = translate(ball);
-            setBallVel(temp - getBallPos()); /// set Velocity of Ball
-            setBallPos(temp); /// set Ball Pos
-            //            RVDraw::instance()->drawVector3f(temp,BLUE,pppp++);
-            setBallAng(gRadToDeg(atan2(getBallVel().y(), getBallVel().x())));
-        }
+//        if (ballLastSeen == serverTime) /// if See Ball In This Cycle Set Its Pos !
+//        {
+//            Eigen::Vector3f temp = translate(ball);
+//            setBallVel(temp - getBallPos()); /// set Velocity of Ball
+//            setBallPos(temp); /// set Ball Pos
+//            //            RVDraw::instance()->drawEigen::Vector3f(temp,BLUE,pppp++);
+//            setBallAng(gRadToDeg(atan2(getBallVel().y(), getBallVel().x())));
+//        }
 
-        ///~  Calculate Players Diffrent Body Pos
+//        ///~  Calculate Players Diffrent Body Pos
 
-        for (unordered_map<int, RelPlayerInfo>::iterator i = ourRel.begin(); i != ourRel.end(); i++) {
-            if (i->first != getMyNum()) {
-                our[i->first].head = translate(PolarToCartecian(i->second.head));
-            }
-            our[i->first].lfoot = translate(PolarToCartecian(i->second.lfoot));
-            our[i->first].rfoot = translate(PolarToCartecian(i->second.rfoot));
-            our[i->first].rlowerarm = translate(PolarToCartecian(i->second.rlowerarm));
-            our[i->first].llowerarm = translate(PolarToCartecian(i->second.llowerarm));
-        }
+//        for (unordered_map<int, RelPlayerInfo>::iterator i = ourRel.begin(); i != ourRel.end(); i++) {
+//            if (i->first != getMyNum()) {
+//                our[i->first].head = translate(PolarToCartecian(i->second.head));
+//            }
+//            our[i->first].lfoot = translate(PolarToCartecian(i->second.lfoot));
+//            our[i->first].rfoot = translate(PolarToCartecian(i->second.rfoot));
+//            our[i->first].rlowerarm = translate(PolarToCartecian(i->second.rlowerarm));
+//            our[i->first].llowerarm = translate(PolarToCartecian(i->second.llowerarm));
+//        }
 
-        for (unordered_map<int, RelPlayerInfo>::iterator i = theirRel.begin(); i != theirRel.end(); i++) {
-            their[i->first].head = translate(PolarToCartecian(i->second.head));
-            their[i->first].lfoot = translate(PolarToCartecian(i->second.lfoot));
-            their[i->first].rfoot = translate(PolarToCartecian(i->second.rfoot));
-            their[i->first].rlowerarm = translate(PolarToCartecian(i->second.rlowerarm));
-            their[i->first].llowerarm = translate(PolarToCartecian(i->second.llowerarm));
-        }
-    }
+//        for (unordered_map<int, RelPlayerInfo>::iterator i = theirRel.begin(); i != theirRel.end(); i++) {
+//            their[i->first].head = translate(PolarToCartecian(i->second.head));
+//            their[i->first].lfoot = translate(PolarToCartecian(i->second.lfoot));
+//            their[i->first].rfoot = translate(PolarToCartecian(i->second.rfoot));
+//            their[i->first].rlowerarm = translate(PolarToCartecian(i->second.rlowerarm));
+//            their[i->first].llowerarm = translate(PolarToCartecian(i->second.llowerarm));
+//        }
+//    }
 
-    static int ppp = 0;
-    RVDraw::instance()->drawVector3f(pos, RED, ppp++);
+//    static int ppp = 0;
+//    RVDraw::instance()->drawEigen::Vector3f(pos, RED, ppp++);
 }
 
 //this function will set the speed which is an approximation of the exact speed
 
-void WorldModel::setSpeed(Vector3f this_cycle_speed)
+void WorldModel::setSpeed(Eigen::Vector3f this_cycle_speed)
 {
     speed = (this_cycle_speed * 3 + getSpeed()) / 4;
 }
 
-Vector3f WorldModel::getSpeed()
+Eigen::Vector3f WorldModel::getSpeed()
 {
     return speed;
 }
@@ -736,9 +738,9 @@ Vector3f WorldModel::getSpeed()
 //    initDimentions();
 //    initFlags();
 //    Localed=false;
-//    Vector3f pos ;
+//    Eigen::Vector3f pos ;
 //    int co = 0 ;
-//    Vector3f sum (0,0,0);
+//    Eigen::Vector3f sum (0,0,0);
 
 //    for (unordered_map<string, Polar>::iterator i = flagPolar.begin(); i != flagPolar.end(); i++)
 //    {
@@ -793,7 +795,7 @@ Vector3f WorldModel::getSpeed()
 //                    fy *= -1 ;
 //                }
 
-//                pos = flagGlobal [j->first] - Vector3f ( fx, fy , -fz );
+//                pos = flagGlobal [j->first] - Eigen::Vector3f ( fx, fy , -fz );
 
 //                sum += pos;
 
@@ -803,16 +805,16 @@ Vector3f WorldModel::getSpeed()
 //                setMyAngle ( theta - getJointAngle ("he1") ) ;
 //                setMyPhi   ( phi   - getJointAngle ("he2") ) ;
 
-//                Matrix x ;
+//                Eigen::Matrix3f x ;
 
-//                Vector3f I , J , K ;
+//                Eigen::Vector3f I , J , K ;
 
 //                x.RotationY (  Deg2Rad ( phi )  ) ;
 //                x.RotateZ ( Deg2Rad ( -theta ) ) ;
 
-//                I = x.Rotate ( Vector3f ( 1 , 0 , 0 ) ) ;
-//                J = x.Rotate ( Vector3f ( 0 , 1 , 0 ) ) ;
-//                K = x.Rotate ( Vector3f ( 0 , 0 , 1 ) ) ;
+//                I = x.Rotate ( Eigen::Vector3f ( 1 , 0 , 0 ) ) ;
+//                J = x.Rotate ( Eigen::Vector3f ( 0 , 1 , 0 ) ) ;
+//                K = x.Rotate ( Eigen::Vector3f ( 0 , 0 , 1 ) ) ;
 
 //                R.Set ( I.x() , I.y() , I.z() , 0 ,
 //                        J.x() , J.y() , J.z() , 0 ,
@@ -852,7 +854,7 @@ Vector3f WorldModel::getSpeed()
 //                    fy *= -1 ;
 //                }
 
-//                pos = flagGlobal [j->first] - Vector3f ( fx, fy , 0.8 - fz );
+//                pos = flagGlobal [j->first] - Eigen::Vector3f ( fx, fy , 0.8 - fz );
 
 //                sum+=pos;
 
@@ -862,16 +864,16 @@ Vector3f WorldModel::getSpeed()
 //                setMyAngle ( theta - getJointAngle ("he1") ) ;
 //                setMyPhi   ( phi   - getJointAngle ("he2") ) ;
 
-//                Matrix x ;
+//                Eigen::Matrix3f x ;
 
-//                Vector3f I , J , K ;
+//                Eigen::Vector3f I , J , K ;
 
 //                x.RotationY (  Deg2Rad ( phi )  ) ;
 //                x.RotateZ ( Deg2Rad ( -theta ) ) ;
 
-//                I = x.Rotate ( Vector3f ( 1 , 0 , 0 ) ) ;
-//                J = x.Rotate ( Vector3f ( 0 , 1 , 0 ) ) ;
-//                K = x.Rotate ( Vector3f ( 0 , 0 , 1 ) ) ;
+//                I = x.Rotate ( Eigen::Vector3f ( 1 , 0 , 0 ) ) ;
+//                J = x.Rotate ( Eigen::Vector3f ( 0 , 1 , 0 ) ) ;
+//                K = x.Rotate ( Eigen::Vector3f ( 0 , 0 , 1 ) ) ;
 
 //                R.Set ( I.x() , I.y() , I.z() , 0 ,
 //                        J.x() , J.y() , J.z() , 0 ,
@@ -911,7 +913,7 @@ Vector3f WorldModel::getSpeed()
 //                    fy *= -1 ;
 //                }
 
-//                pos = flagGlobal [j->first] - Vector3f ( fx, fy , - fz );
+//                pos = flagGlobal [j->first] - Eigen::Vector3f ( fx, fy , - fz );
 
 //                sum+=pos;
 
@@ -921,16 +923,16 @@ Vector3f WorldModel::getSpeed()
 //                setMyAngle ( theta - getJointAngle ("he1") ) ;
 //                setMyPhi   ( phi   - getJointAngle ("he2") ) ;
 
-//                Matrix x ;
+//                Eigen::Matrix3f x ;
 
-//                Vector3f I , J , K ;
+//                Eigen::Vector3f I , J , K ;
 
 //                x.RotationY (  Deg2Rad ( phi )  ) ;
 //                x.RotateZ ( Deg2Rad ( -theta ) ) ;
 
-//                I = x.Rotate ( Vector3f ( 1 , 0 , 0 ) ) ;
-//                J = x.Rotate ( Vector3f ( 0 , 1 , 0 ) ) ;
-//                K = x.Rotate ( Vector3f ( 0 , 0 , 1 ) ) ;
+//                I = x.Rotate ( Eigen::Vector3f ( 1 , 0 , 0 ) ) ;
+//                J = x.Rotate ( Eigen::Vector3f ( 0 , 1 , 0 ) ) ;
+//                K = x.Rotate ( Eigen::Vector3f ( 0 , 0 , 1 ) ) ;
 
 //                R.Set ( I.x() , I.y() , I.z() , 0 ,
 //                        J.x() , J.y() , J.z() , 0 ,
@@ -945,15 +947,15 @@ Vector3f WorldModel::getSpeed()
 //        pos = sum/co;
 //        int pppp=14;
 //        //        RVDraw::instance()->drawLine(pos,pos2,BLACK,pppp++);
-//        RVDraw::instance()->drawLine(Vector3f(0,0,0),pos,BLACK,pppp++);
+//        RVDraw::instance()->drawLine(Eigen::Vector3f(0,0,0),pos,BLACK,pppp++);
 //        setMyPos( pos );        	          /// set My Pos
 
 //        if ( ballLastSeen == serverTime )          /// if See Ball In This Cycle Set Its Pos !
 //        {
-//            Vector3f temp = translate ( ball );
+//            Eigen::Vector3f temp = translate ( ball );
 //            setBallVel ( temp - getBallPos() ) ;  /// set Velocity of Ball
 //            setBallPos ( temp );                  /// set Ball Pos
-//            RVDraw::instance()->drawVector3f(temp,BLUE,pppp++);
+//            RVDraw::instance()->drawEigen::Vector3f(temp,BLUE,pppp++);
 //            setBallAng(gRadToDeg(atan2(getBallVel().y(), getBallVel().x())));
 //        }
 
@@ -1039,7 +1041,7 @@ void WorldModel::setMyNum(int number)
     num = number;
 }
 
-void WorldModel::setACC(Vector3f pos)
+void WorldModel::setACC(Eigen::Vector3f pos)
 {
     if (gIsNan(pos.x())) {
         pos.x() = 0;
@@ -1062,7 +1064,7 @@ void WorldModel::setBallPolarPos(Polar pos)
     ballPolar = pos;
 }
 
-void WorldModel::setBallPos(Vector3f pos)
+void WorldModel::setBallPos(Eigen::Vector3f pos)
 {
     ballPos = pos;
 }
@@ -1077,7 +1079,7 @@ void WorldModel::setServerTime(double t)
     serverTime = t;
 }
 
-void WorldModel::setGyro(Vector3f g)
+void WorldModel::setGyro(Eigen::Vector3f g)
 {
     gyro = g;
 }
@@ -1145,12 +1147,12 @@ void WorldModel::setOppPlayerPartPos(int num, string part, Polar pos)
     }
 }
 
-void WorldModel::setOurPos(int num, Vector3f pos)
+void WorldModel::setOurPos(int num, Eigen::Vector3f pos)
 {
     our[num].head = pos;
 }
 
-void WorldModel::setOppPos(int num, Vector3f pos)
+void WorldModel::setOppPos(int num, Eigen::Vector3f pos)
 {
     our[num].head = pos;
 }
@@ -1190,7 +1192,7 @@ void WorldModel::setFootPress(string side, FootRes fp)
         rf = fp;
 }
 
-void WorldModel::setMyPos(Vector3f pos)
+void WorldModel::setMyPos(Eigen::Vector3f pos)
 {
     our[getMyNum()].head = pos;
 }
@@ -1205,7 +1207,7 @@ void WorldModel::setMyPhi(double angle)
     myPhi = angle;
 }
 
-void WorldModel::setBallVel(Vector3f vel)
+void WorldModel::setBallVel(Eigen::Vector3f vel)
 {
     ballVel = vel;
 }
@@ -1220,7 +1222,7 @@ int WorldModel::getNrOfThem()
     return theirRel.size();
 }
 
-Vector3f WorldModel::getBallVel()
+Eigen::Vector3f WorldModel::getBallVel()
 {
     return ballVel;
 }
@@ -1251,7 +1253,7 @@ double WorldModel::getServerTime()
 }
 /// Return The Gyroscope Status
 
-Vector3f WorldModel::getGyro()
+Eigen::Vector3f WorldModel::getGyro()
 {
     return gyro;
 }
@@ -1313,12 +1315,12 @@ string WorldModel::getLastMsg()
 }
 ////
 
-Vector3f WorldModel::getMyPos()
+Eigen::Vector3f WorldModel::getMyPos()
 {
     return our[getMyNum()].head;
 }
 
-Vector3f WorldModel::getMyPos(string part)
+Eigen::Vector3f WorldModel::getMyPos(string part)
 {
     if (part == "head") {
         return our[getMyNum()].head;
@@ -1335,15 +1337,15 @@ Vector3f WorldModel::getMyPos(string part)
     if (part == "llowerarm") {
         return our[getMyNum()].llowerarm;
     }
-    return Vector3f(0, 0, 0);
+    return Eigen::Vector3f(0, 0, 0);
 }
 
-Vector3f WorldModel::getOurPos(int i)
+Eigen::Vector3f WorldModel::getOurPos(int i)
 {
     return our[i].head;
 }
 
-Vector3f WorldModel::getOurPos(int i, string part)
+Eigen::Vector3f WorldModel::getOurPos(int i, string part)
 {
     if (part == "head") {
         return our[i].head;
@@ -1360,15 +1362,15 @@ Vector3f WorldModel::getOurPos(int i, string part)
     if (part == "llowerarm") {
         return our[i].llowerarm;
     }
-    return Vector3f(0, 0, 0);
+    return Eigen::Vector3f(0, 0, 0);
 }
 
-Vector3f WorldModel::getOppPos(int i)
+Eigen::Vector3f WorldModel::getOppPos(int i)
 {
     return their[i].head;
 }
 
-Vector3f WorldModel::getOppPos(int i, string part)
+Eigen::Vector3f WorldModel::getOppPos(int i, string part)
 {
     if (part == "head") {
         return their[i].head;
@@ -1385,11 +1387,11 @@ Vector3f WorldModel::getOppPos(int i, string part)
     if (part == "llowerarm") {
         return their[i].llowerarm;
     }
-    return Vector3f(0, 0, 0);
+    return Eigen::Vector3f(0, 0, 0);
 }
 ////
 
-Vector3f WorldModel::getBallPos()
+Eigen::Vector3f WorldModel::getBallPos()
 {
     return ballPos;
 }
@@ -1403,13 +1405,13 @@ double WorldModel::getMyAngleToBall()
 
 double WorldModel::getMyAngleToGoal()
 {
-    return getMyAngleTo(Vector3f(length / 2.0, 0, 0));
+    return getMyAngleTo(Eigen::Vector3f(length / 2.0, 0, 0));
 }
 /// return Agent Angle To Pos
 
-double WorldModel::getMyAngleTo(Vector3f p)
+double WorldModel::getMyAngleTo(Eigen::Vector3f p)
 {
-    Vector3f pos = p - getMyPos();
+    Eigen::Vector3f pos = p - getMyPos();
     VecPosition diff(pos.x(), pos.y());
     return VecPosition::normalizeAngle(diff.getDirection() - getMyAngle());
 }
@@ -1452,26 +1454,26 @@ string WorldModel::str2str(string s)
     return s;
 }
 
-/// Convert a Rel Position To Global By Matrix R (Rotation Matrix)
+/// Convert a Rel Position To Global By Eigen::Matrix3f R (Rotation Eigen::Matrix3f)
 
-Vector3f WorldModel::translate(Vector3f Pos)
+Eigen::Vector3f WorldModel::translate(Eigen::Vector3f Pos)
 {
-    return (getMyPos() + R.Rotate(Pos));
+    return (getMyPos() + R*Pos);
 }
 
-Vector3f WorldModel::translate(Vector3f Pos, Matrix T)
+Eigen::Vector3f WorldModel::translate(Eigen::Vector3f Pos, Eigen::Matrix3f T)
 {
-    return (getMyPos() - T.Rotate(Pos));
+    return (getMyPos() - T*Pos);
 }
 
-Vector3f WorldModel::translate(Vector3f Pos, Vector3f parent)
+Eigen::Vector3f WorldModel::translate(Eigen::Vector3f Pos, Eigen::Vector3f parent)
 {
-    return (parent - R.Rotate(Pos));
+    return (parent - R*Pos);
 }
 
 ///~Acceleration Sensor
 
-Vector3f WorldModel::getACC()
+Eigen::Vector3f WorldModel::getACC()
 {
     return ACC;
 }
@@ -1481,7 +1483,7 @@ Vector3f WorldModel::getACC()
 
 bool WorldModel::isFeltDown()
 {
-    Vector3f acc = getACC();
+    Eigen::Vector3f acc = getACC();
     if (acc.x() < -9) {
         return true;
     }
@@ -1501,8 +1503,8 @@ bool WorldModel::isFeltDown()
 
 SideT WorldModel::feltType()
 {
-    /// calculating Pos Of Right , Front , back , Left By R Rotation Matrix
-    Vector3f acc = getACC();
+    /// calculating Pos Of Right , Front , back , Left By R Rotation Eigen::Matrix3f
+    Eigen::Vector3f acc = getACC();
     if (acc.x() < -9) {
         return Right;
     }
@@ -1525,7 +1527,7 @@ int WorldModel::getClosestsOppToBall()
     double min = 999999;
     int num = -1;
     for (unordered_map<int, GloPlayerInfo>::iterator i = their.begin(); i != their.end(); i++) {
-        double dist = (i->second.head - getBallPos()).Length();
+        double dist = (i->second.head - getBallPos()).norm();
         if (dist < min) {
             min = dist;
             num = i->first;
@@ -1569,7 +1571,7 @@ double WorldModel::getOurMinDist()
     double min = 999999;
 
     for (unordered_map<int, GloPlayerInfo>::iterator i = our.begin(); i != our.end(); i++) {
-        double dist = (i->second.head - getBallPos()).Length();
+        double dist = (i->second.head - getBallPos()).norm();
         if (dist < min) {
             min = dist;
         }
@@ -1589,7 +1591,7 @@ double WorldModel::getOppMinDist()
 {
     double min = 999999;
     for (unordered_map<int, GloPlayerInfo>::iterator i = their.begin(); i != their.end(); i++) {
-        double dist = (i->second.head - getBallPos()).Length();
+        double dist = (i->second.head - getBallPos()).norm();
         if (dist < min) {
             min = dist;
         }
@@ -1602,7 +1604,7 @@ bool WorldModel::amIClosestToBall()
 {
     for (unordered_map<int, GloPlayerInfo>::iterator i = our.begin(); i != our.end(); i++) {
         if (i->first != 1 || i->first != getMyNum())
-            if ((getMyPos() - getBallPos()).Length() > (i->second.head - getBallPos()).Length()) {
+            if ((getMyPos() - getBallPos()).norm() > (i->second.head - getBallPos()).norm()) {
                 return false;
             }
     }
@@ -1611,9 +1613,9 @@ bool WorldModel::amIClosestToBall()
 
 bool WorldModel::shouldDive(SideT& side)
 {
-    Vector3f ball = getBallPos();
-    Vector3f vel = getBallVel();
-    if (vel.Length() > 0.02) {
+    Eigen::Vector3f ball = getBallPos();
+    Eigen::Vector3f vel = getBallVel();
+    if (vel.norm() > 0.02) {
         ball += (vel * 50);
         vel *= 0.96;
     }
@@ -1665,7 +1667,7 @@ string WorldModel::uniquee(string x)
 int WorldModel::getNrOfFlag()
 {
     int x = 0;
-    for (unordered_map<string, Vector3f>::iterator it = flag.begin(); it != flag.end(); it++)
+    for (unordered_map<string, Eigen::Vector3f>::iterator it = flag.begin(); it != flag.end(); it++)
         if (fabs(flagLastSeen[it->first] - serverTime) <= 0.06) {
             x++;
         }
@@ -1712,7 +1714,7 @@ int WorldModel::isOppInCircle(Circle c, VecPosition& p1, VecPosition& p2)
 {
     int t = 0;
     for (unordered_map<int, GloPlayerInfo>::iterator i = their.begin(); i != their.end(); i++) {
-        Vector3f p = i->second.head;
+        Eigen::Vector3f p = i->second.head;
         VecPosition pos(p.x(), p.y());
         if (c.isInside(pos)) {
             t++;

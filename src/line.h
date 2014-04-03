@@ -6,15 +6,15 @@
 #include "cmath"
 #include "Math.h"
 #include "math.h"
-
+#include <eigen3/Eigen/Core>
 using namespace std;
 class line{
     public:
         line(){};
-        line(Vector3f,Vector3f,double);
-        line(Vector3f p1,Vector3f p2);
-        Vector3f getBegin();
-        Vector3f getEnd();
+        line(Eigen::Vector3f,Eigen::Vector3f,double);
+        line(Eigen::Vector3f p1,Eigen::Vector3f p2);
+        Eigen::Vector3f getBegin();
+        Eigen::Vector3f getEnd();
         string toString();
         line line_PolarToCartesian();
         double getLength();
@@ -22,8 +22,8 @@ class line{
 
 
 
-        Vector3f begin;
-        Vector3f end;
+        Eigen::Vector3f begin;
+        Eigen::Vector3f end;
         double time_we_saw_it;
 };
 

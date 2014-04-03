@@ -129,8 +129,8 @@ int main(int argc, char* argv[])
             parseTime = (end->tv_nsec - start->tv_nsec) / 1000000000.0;
 
             clock_gettime(CLOCK_REALTIME, start); // Works on Linux
-            WM->Localize();
-//            localize->erfanKiriestLocalize();
+//            WM->Localize();
+            localize->erfanKiriestLocalize();
 //            localize->test();
             clock_gettime(CLOCK_REALTIME, end); // Works on Linux
             localizeTime = (end->tv_nsec - start->tv_nsec) / 1000000000.0 ;

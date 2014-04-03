@@ -889,9 +889,9 @@ string Skill::shootL(bool& canshoot, bool& done, double& tFinal)
     } else if ((me.getDistanceTo(ball) > 0.17 && id < 18) || (WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Right)) {
         ne = false;
     }
-    //    if(fabs(WM->getMyAngleTo(salt::Vector3f(9,0,0)))>5 && sw && !(WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Right) && me.getX()>-1)
+    //    if(fabs(WM->getMyAngleTo(Eigen::Vector3f(9,0,0)))>5 && sw && !(WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Right) && me.getX()>-1)
     //    {
-    //        if(WM->getMyAngleTo(salt::Vector3f(9,0,0))>0)
+    //        if(WM->getMyAngleTo(Eigen::Vector3f(9,0,0))>0)
     //        {
     //            return finalAction("turnL",tFinal);
     //        }
@@ -1447,7 +1447,7 @@ string Skill::shootL2(bool& done)
         rLegFKSolver.JntToCart(jointpositionsr, rHipStanding);
     }
 
-    salt::Vector3f ball = WM->getBallPos();
+    Eigen::Vector3f ball = WM->getBallPos();
     //    ball.z() = 0.04*(1-0.707106781);
 
     //    cout << "Ball Pos: " << ball << endl;
@@ -1578,7 +1578,7 @@ string Skill::shootR2(bool& done)
         rLegFKSolver.JntToCart(jointpositionsr, rHipStanding);
     }
 
-    salt::Vector3f ball = WM->getBallPos();
+    Eigen::Vector3f ball = WM->getBallPos();
     //    ball.z() = 0.04*(1-0.707106781);
 
     //    cout << "Ball Pos: " << ball << endl;
@@ -1654,11 +1654,11 @@ string Skill::shootR2(bool& done)
         //        lLegFKSolver.JntToCart( jointpositionsl ,lAnkleStanding );
         //        rLegFKSolver.JntToCart( jointpositionsr , rHipStanding );
         //        double ttt = double(t-1-t4)/double(t5-1-t4);
-        //        cout << "pos.push_back(salt::Vector3f(" << rHipStanding.p.x() << "," << rHipStanding.p.y() << "," << rHipStanding.p.z() << "));" << endl;
+        //        cout << "pos.push_back(Eigen::Vector3f(" << rHipStanding.p.x() << "," << rHipStanding.p.y() << "," << rHipStanding.p.z() << "));" << endl;
         //        cout << lAnkleStanding.p.x() << "," << lAnkleStanding.p.y() << "," << lAnkleStanding.p.z() << ";" << endl;
         //        double roll, pitch, yaw;
         //        rHipStanding.M.GetRPY(roll,pitch,yaw);
-        //        cout << "trn.push_back(salt::Vector3f("  << roll <<  "," << pitch << "," << yaw <<"));"<<  endl;
+        //        cout << "trn.push_back(Eigen::Vector3f("  << roll <<  "," << pitch << "," << yaw <<"));"<<  endl;
 
         return ss.str();
 
@@ -1695,11 +1695,11 @@ string Skill::shootR2(bool& done)
         //        x22 = 0.017288024126302504824850747186016 - 0.51219222369278300669127921032252*sqrt(- 0.628524467312*y2*y2 + 0.077934318568*y2 + 0.013290952817) - 0.06868497719720220119730054210425*y2;
 
         //        cout << rHipStanding.p << endl;
-        //        salt::Vector3f start =  salt::Vector3f(-1.25496,-0.389516 ,-0.333869);
-        //        salt::Vector3f end =  salt::Vector3f(0.864065,-0.273051,0.265589);
-        //        salt::Vector3f tr = start*(1-tt) + end*tt;
-        //        salt::Vector3f tr = salt::Vector3f((0.350110*tt*tt*tt)+(0.466737*tt*tt)+(1.510568*tt)+(-1.477457), (-0.898292*tt*tt*tt)+(0.714302*tt*tt)+(0.371692*tt)+(-0.455817), (-0.215220*tt*tt*tt)+(0.908404*tt*tt)+(-0.075519*tt)+(-0.343416));
-        //        salt::Vector3f tr = trn[(int)(tt*30)];
+        //        Eigen::Vector3f start =  Eigen::Vector3f(-1.25496,-0.389516 ,-0.333869);
+        //        Eigen::Vector3f end =  Eigen::Vector3f(0.864065,-0.273051,0.265589);
+        //        Eigen::Vector3f tr = start*(1-tt) + end*tt;
+        //        Eigen::Vector3f tr = Eigen::Vector3f((0.350110*tt*tt*tt)+(0.466737*tt*tt)+(1.510568*tt)+(-1.477457), (-0.898292*tt*tt*tt)+(0.714302*tt*tt)+(0.371692*tt)+(-0.455817), (-0.215220*tt*tt*tt)+(0.908404*tt*tt)+(-0.075519*tt)+(-0.343416));
+        //        Eigen::Vector3f tr = trn[(int)(tt*30)];
         //        cout << tr << endl;
         //        cout << "RPY: "  << roll <<  " " << pitch << " " << yaw << endl;
         //        cout << "MIN: " << tr << endl;
@@ -1838,7 +1838,7 @@ string Skill::shootR2(bool& done)
         //        KDL::Frame lfrm (  lLegRot , KDL::Vector( lAnkleStanding.p.x() ,lAnkleStanding.p.y(),lAnkleStanding.p.z())  );
 
         //        cout << "[" << x21 << "," << x22 << "]" << "," << y2 << "[" <<  z21 << "," << z22 << "]" << endl;
-        //        salt::Vector3f p = pos[(int)(tt*30)];
+        //        Eigen::Vector3f p = pos[(int)(tt*30)];
         //        cout << p << endl;
         //        KDL::Frame rfrm1( rHipRot, KDL::Vector( x21 ,y2,z21 ));
         //        KDL::Frame rfrm1( rHipRot, KDL::Vector(p.x(),p.y(),p.z()));
