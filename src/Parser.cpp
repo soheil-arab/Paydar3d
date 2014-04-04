@@ -162,8 +162,9 @@ void Parser::parseHearMessage(string &msg)
     {
         stringstream edame(msg.substr(pos));
         string msg1;
-        edame >> temp >> time >> temp >> msg1 ;
-
+        edame >> temp >> temp >> time >> temp >> msg1 ;
+//        cout << msg1 << endl;
+//        cout << msg1 << " " << msg1.size() << endl;
         if (msg1.size() ==3 && msg1[0]==msg1[1] && msg1[1] == msg1[2]){
             msg1=msg1.substr(0,1);
             //wm_lock->lock();
@@ -177,7 +178,7 @@ void Parser::parseHearMessage(string &msg)
             {
                 stringstream edame(msg.substr(pos));
                 edame >> temp >> time >> temp >> msg1 ;
-
+//                cout << msg1 << " " << msg1.size() << endl;
                 if (msg1.size() == 3 && msg1[0]==msg1[1] && msg1[1] == msg1[2]){
                     msg1=msg1.substr(0,1);
                     //wm_lock->lock();

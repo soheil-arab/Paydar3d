@@ -498,8 +498,11 @@ string Skill::beam(double x, double y, double ang)
 
 string Skill::sayBallPos()
 {
+    int num = WM->getClosestOurToBall();
+    Eigen::Vector3f m = WM->getOurPos(num) ;
+    RVDraw::instance()->drawVector3f(salt::Vector3f(m.x(),m.y(),m.z()),BLUE,7878,3);
     stringstream ss;
-    ss << "(say " << WM->getClosestOurToBall() << WM->getClosestOurToBall() << WM->getClosestOurToBall() << ")";
+    ss << "(say " << (char)(num + 60) << (char)(num + 60) << (char)(num + 60)  << ")";
     return ss.str();
 }
 
@@ -514,10 +517,7 @@ string Skill::whereBeam(bool& stand, double& stan)
     if (WM->getMyNum() == 9) {
         if (WM->getTeamSide() == Left) {
             if (WM->getPlayMode() == PM_BeforeKickOff || WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Right) {
-                if (WM->getServerTime() < 20)
                     ss << beam(-0.19, 0.0, 0);
-                else
-                    ss << beam(-0.22, 0.0, 0);
             } else {
                 ss << beam(-1.6, 0.0, 0);
             }
@@ -543,21 +543,21 @@ string Skill::whereBeam(bool& stand, double& stan)
             }
         }
     } else if (WM->getMyNum() == 3) {
-        ss << beam(-13, -4, 0);
+        ss << beam(-13, -1.5, 0);
     } else if (WM->getMyNum() == 2) {
         ss << beam(-13, 0, 0);
     } else if (WM->getMyNum() == 4) {
-        ss << beam(-13, 4, 0);
+        ss << beam(-13, 1.5, 0);
     } else if (WM->getMyNum() == 5) {
         ss << beam(-11, -1, 0);
     } else if (WM->getMyNum() == 6) {
         ss << beam(-11, 1, 0);
     } else if (WM->getMyNum() == 7) {
-        ss << beam(-7, -1, 0);
+        ss << beam(-7, 0, 0);
     } else if (WM->getMyNum() == 10) {
-        ss << beam(-3, 5, 0);
+        ss << beam(-4, 1.5, 0);
     } else if (WM->getMyNum() == 11) {
-        ss << beam(-3, -5, 0);
+        ss << beam(-4, -1.5, 0);
     } else if (WM->getMyNum() == 1) {
         ss << beam(-14.5, 0, 0);
     }
@@ -773,7 +773,7 @@ string Skill::shootR(bool& canshoot, bool& done, double& tFinal)
         id = 0;
     }
 
-    if (WM->isFeltDown() || t > 1.76 || (me.getDistanceTo(ball) > 0.25 && id < 35)) {
+    if (  WM->isFeltDown() || t > 1.76  ) {
         t = 0;
         done = true;
         sw = true;
@@ -876,7 +876,7 @@ string Skill::shootL(bool& canshoot, bool& done, double& tFinal)
     if (t > 1.7 || me.getDistanceTo(ball) > 0.4) {
         id = 0;
     }
-    if (WM->isFeltDown() || t > 1.7 || (me.getDistanceTo(ball) > 0.25 && id < 30)) {
+    if (WM->isFeltDown() || t > 1.7 ) {
         t = 0;
         done = true;
         sw = true;
@@ -1268,16 +1268,16 @@ string Skill::finalAction(string type, double& t, double maxV)
         }
     }
 
-    double A1 = 15, A2 = 30, fi = 0, B1 = -90 + A1, B2 = A2;
-    static double TT, ww, ta = 0;
-    static int Tint = 55;
-    TT = Tint * 0.02;
-    ww = (2 * M_PI) / TT;
-    ss << moveJoint("lae1", B1 + A1 * sin(ww * ta + fi) - WM->getJointAngle("lae1"))
-       << moveJoint("rae1", B1 + -1 * A1 * sin(ww * ta + fi) - WM->getJointAngle("rae1"))
-       << moveJoint("lae4", -1 * B2 + -1 * A2 * sin(ww * ta + fi) - WM->getJointAngle("lae4"))
-       << moveJoint("rae4", B2 + -1 * A2 * sin(ww * ta + fi) - WM->getJointAngle("rae4"));
-    ta += .02;
+//    double A1 = 15, A2 = 30, fi = 0, B1 = -90 + A1, B2 = A2;
+//    static double TT, ww, ta = 0;
+//    static int Tint = 55;
+//    TT = Tint * 0.02;
+//    ww = (2 * M_PI) / TT;
+//    ss << moveJoint("lae1", B1 + A1 * sin(ww * ta + fi) - WM->getJointAngle("lae1"))
+//       << moveJoint("rae1", B1 + -1 * A1 * sin(ww * ta + fi) - WM->getJointAngle("rae1"))
+//       << moveJoint("lae4", -1 * B2 + -1 * A2 * sin(ww * ta + fi) - WM->getJointAngle("lae4"))
+//       << moveJoint("rae4", B2 + -1 * A2 * sin(ww * ta + fi) - WM->getJointAngle("rae4"));
+//    ta += .02;
 
     return ss.str();
 }

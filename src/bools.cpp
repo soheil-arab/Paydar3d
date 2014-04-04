@@ -73,29 +73,30 @@ bool Decide::shouldClear(double& dx, double& dy, SideT& side)
     Rect O_P_A(VecPosition(-15, 1.1), VecPosition(-13.2, -1.1));
     VecPosition p1, p2;
 
-    //    if ( me.getX() >  2)
-    //    {
-    //        return false;
-    //    }
+    if (startShoot())
+    {
+        side = Right;
+        return true;
+    }
     if (WM->getMyAngleToBall() < 0)
         side = Right;
     else
         side = Left;
 
-    if (fabs(myAngle) < 70 && me.getDistanceTo(ball) < 0.16 && me.getDistanceTo(ball) > 0.10 && fabs(WM->getMyAngleToBall()) < 20 && con && ball.getX() < 13
-        && !WM->isOppInCircle(Circle(ball, 2.5), p1, p2) && !shback() && fabs(WM->getMyAngleToGoal()) < 30) {
+    if (fabs(myAngle) < 70 && me.getDistanceTo(ball) < 0.16 && me.getDistanceTo(ball) > 0.10 &&
+            fabs(WM->getMyAngleToBall()) < 20 && con && ball.getX() < 13
+        && !WM->isOppInCircle(Circle(ball, 1), p1, p2) && !shback() && fabs(WM->getMyAngleToGoal()) < 30) {
         return true;
     }
-    if (startShoot())
-        return true;
+
     return false;
 }
 
 bool Decide::startShoot()
 {
-    if (WM->getMyNum() == 9 && WM->getTeamSide() == Left && (WM->getPlayMode() == PM_BeforeKickOff || WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Left) && WM->getMyPos().x() < -0.15)
+    if (WM->getMyNum() == 9 && WM->getTeamSide() == Left && (WM->getPlayMode() == PM_BeforeKickOff || WM->getPlayMode() == PM_KickOff_Left || WM->getPlayMode() == PM_Goal_Left) )
         return true;
-    if (WM->getMyNum() == 9 && WM->getTeamSide() == Right && (WM->getPlayMode() == PM_BeforeKickOff || WM->getPlayMode() == PM_KickOff_Right || WM->getPlayMode() == PM_Goal_Right) && WM->getMyPos().x() < -0.15)
+    if (WM->getMyNum() == 9 && WM->getTeamSide() == Right && (WM->getPlayMode() == PM_BeforeKickOff || WM->getPlayMode() == PM_KickOff_Right || WM->getPlayMode() == PM_Goal_Right) )
         return true;
     return false;
 }
@@ -141,7 +142,7 @@ bool Decide::shouldPlay()
 bool Decide::canBeam()
 {
     PlayMode pm = WM->getPlayMode();
-    if (pm == PM_BeforeKickOff || pm == PM_Goal_Left || pm == PM_Goal_Right) {
+    if (pm == PM_BeforeKickOff || pm == PM_Goal_Left || pm == PM_Goal_Right || pm == PM_KickOff_Left || pm == PM_KickOff_Right ) {
         return true;
     }
     return false;
@@ -341,11 +342,10 @@ int Decide::parseBallPos()
 {
     string str = WM->getLastMsg();
     //    cout << "AS " << str << endl;
-    if (atoi(str.c_str()) == 0) {
-        //cout<<"hello\n ";
+    if ( (int)str[0] == 0 ) {
         return WM->getClosestOurToBall();
     }
-    return  atoi(str.c_str());
+    return (int)str[0] - 60;
 }
 
 bool Decide::shSide(string& side)
@@ -714,8 +714,8 @@ VecPosition Decide::defendpositioning()
     VecPosition CornerL(-WM->getFieldLength() / 2.0, -WM->getFieldWidth() / 2.0);
     VecPosition CornerR(-WM->getFieldLength() / 2.0, WM->getFieldWidth() / 2.0);
 
-    VecPosition NimCornerL(-WM->getFieldLength() / 2.0, -(1.05 + 6.45*(ball.getX() + 15)/30));
-    VecPosition NimCornerR(-WM->getFieldLength() / 2.0, (1.05 + 6.45*(ball.getX() + 15)/30));
+    VecPosition NimCornerL(-WM->getFieldLength() / 2.0, -(1.05 + 3*(ball.getX() + 15)/30));
+    VecPosition NimCornerR(-WM->getFieldLength() / 2.0, (1.05 + 3*(ball.getX() + 15)/30));
 
 
     Circle littleCircle(CornerL, CornerR, VecPosition((ball.getX()-15)/2.0, 0) );
@@ -807,16 +807,16 @@ VecPosition Decide::middlepositioning()
     ballPos = WM->getBallPos();
 
     VecPosition ball(ballPos.x(), ballPos.y());
-    VecPosition posgoal(WM->getFieldLength() / 2, 0);
+//    VecPosition posgoal(WM->getFieldLength() / 2, 0);
 
-    VecPosition CornerL(WM->getFieldLength() / 2.0, -WM->getFieldWidth() / 2.0);
-    VecPosition CornerR(WM->getFieldLength() / 2.0, WM->getFieldWidth() / 2.0);
+//    VecPosition CornerL(WM->getFieldLength() / 2.0, -WM->getFieldWidth() / 2.0);
+//    VecPosition CornerR(WM->getFieldLength() / 2.0, WM->getFieldWidth() / 2.0);
 
-    VecPosition NimCornerL(WM->getFieldLength() / 2.0, -(1.05 + 6.45*(ball.getX() + 15 + 10)/30));
-    VecPosition NimCornerR(WM->getFieldLength() / 2.0, (1.05 + 6.45*(ball.getX() + 15 + 10)/30));
+//    VecPosition NimCornerL(WM->getFieldLength() / 2.0, -(1.05 + 6.45*(ball.getX() + 15 + 10)/30));
+//    VecPosition NimCornerR(WM->getFieldLength() / 2.0, (1.05 + 6.45*(ball.getX() + 15 + 10)/30));
 
 
-    Circle littleCircle(CornerL, CornerR, VecPosition(max(ball.getX()-4, -WM->getFieldLength()/3.0) , 0) );
+//    Circle littleCircle(CornerL, CornerR, VecPosition(max(ball.getX()-4, -WM->getFieldLength()/3.0) , 0) );
 //    Circle bigCircle(CornerL, CornerR, VecPosition(max(ball.getX()-3, 0), 0));
 
 //    VecPosition tir1 = (posgoal + VecPosition(0, 1.05));
@@ -825,12 +825,12 @@ VecPosition Decide::middlepositioning()
 
 //    Line lineBallTir1 = Line::makeLineFromTwoPoints(tir1, ball);
 //    Line lineBallTir2 = Line::makeLineFromTwoPoints(tir2, ball);
-    Line LineBallCor1 = Line::makeLineFromTwoPoints(NimCornerL, ball);
-    Line LineBallCor2 = Line::makeLineFromTwoPoints(NimCornerR, ball);
-    Line lineBallgoal = Line::makeLineFromTwoPoints(posgoal, ball);
+//    Line LineBallCor1 = Line::makeLineFromTwoPoints(NimCornerL, ball);
+//    Line LineBallCor2 = Line::makeLineFromTwoPoints(NimCornerR, ball);
+//    Line lineBallgoal = Line::makeLineFromTwoPoints(posgoal, ball);
 
-    VecPosition pos11, pos12, pos32;
-    VecPosition pos21, pos22, pos31;
+//    VecPosition pos11, pos12, pos32;
+//    VecPosition pos21, pos22, pos31;
 
 //    lineBallTir1.getCircleIntersectionPoints(bigCircle, &pos11, &pos12);
 //    lineBallTir2.getCircleIntersectionPoints(bigCircle, &pos21, &pos22);
@@ -866,37 +866,41 @@ VecPosition Decide::middlepositioning()
 //        return finalPosBig2;
 //    }
 
-    LineBallCor1.getCircleIntersectionPoints(littleCircle, &pos11, &pos12);
-    LineBallCor2.getCircleIntersectionPoints(littleCircle, &pos21, &pos22);
-    lineBallgoal.getCircleIntersectionPoints(littleCircle, &pos31, &pos32);
+//    LineBallCor1.getCircleIntersectionPoints(littleCircle, &pos11, &pos12);
+//    LineBallCor2.getCircleIntersectionPoints(littleCircle, &pos21, &pos22);
+//    lineBallgoal.getCircleIntersectionPoints(littleCircle, &pos31, &pos32);
 
-    VecPosition finalPosLit1, finalPosLit2, finalPosLit3;
+//    VecPosition finalPosLit1, finalPosLit2, finalPosLit3;
 
-    if (pos11.getX() < pos12.getX()) {
-        finalPosLit1 = pos11;
-    } else {
-        finalPosLit1 = pos12;
-    }
+//    if (pos11.getX() < pos12.getX()) {
+//        finalPosLit1 = pos11;
+//    } else {
+//        finalPosLit1 = pos12;
+//    }
 
-    if (pos21.getX() < pos22.getX()) {
-        finalPosLit2 = pos21;
-    } else {
-        finalPosLit2 = pos22;
-    }
+//    if (pos21.getX() < pos22.getX()) {
+//        finalPosLit2 = pos21;
+//    } else {
+//        finalPosLit2 = pos22;
+//    }
 
-    if (pos31.getX() < pos32.getX()) {
-        finalPosLit3 = pos31;
-    } else {
-        finalPosLit3 = pos32;
-    }
+//    if (pos31.getX() < pos32.getX()) {
+//        finalPosLit3 = pos31;
+//    } else {
+//        finalPosLit3 = pos32;
+//    }
 
-    if (WM->getMyNum() == 10) {
-        return finalPosLit1;
-    } else if (WM->getMyNum() == 11) {
-        return finalPosLit2;
-    } else if (WM->getMyNum() == 7) {
-        return finalPosLit3;
-    }
+//    if (WM->getMyNum() == 10) {
+//        return finalPosLit1;
+//    } else if (WM->getMyNum() == 11) {
+//        return finalPosLit2;
+//    } else if (WM->getMyNum() == 7) {
+//        return finalPosLit3;
+//    }
+
+
+
+
 
 }
 

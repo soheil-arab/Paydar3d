@@ -1543,21 +1543,64 @@ int WorldModel::getClosestOurToBall()
     int num = 0;
     VecPosition ball(getBallPos().x(), getBallPos().y());
     for (unordered_map<int, GloPlayerInfo>::iterator i = our.begin(); i != our.end(); i++) {
-//        if (i->first == 10 || i->first == 11) {
-//            continue;
-//        }
+        if ( i->first == 1 )
+        {
+            continue;
+        }
         VecPosition pl(i->second.head.x(), i->second.head.y());
         double dist = pl.getDistanceTo(ball);
         double headZ = i->second.head.z();
         score = -dist;
 
         if (headZ < 0.3) {
-            score -= 1.5;
+            score -= 2.5;
             score -= fabs(pl.getY() - ball.getY());
+            if (pl.getX() > (ball.getX())) {
+                score -= 10;
+            }
         }
-        if (pl.getX() > (ball.getX())) {
-            score -= 1.5;
+        score -= 1.5*fabs(pl.getY() - ball.getY());
+
+        if (pl.getX() > ball.getX()) {
+            score -= 3;
         }
+
+        if (score > max) {
+            max = score;
+            num = i->first;
+        }
+    }
+    return num;
+}
+int WorldModel::getClosestTo(int numBer)
+{
+    double score = 0;
+    double max = -99999;
+    int num = 0;
+    VecPosition ball(getOurPos(numBer,"head").x(), getOurPos(numBer,"head").y());
+    for (unordered_map<int, GloPlayerInfo>::iterator i = our.begin(); i != our.end(); i++) {
+        if ( i->first == 1 || i->first == numBer  )
+        {
+            continue;
+        }
+        VecPosition pl(i->second.head.x(), i->second.head.y());
+        double dist = pl.getDistanceTo(ball);
+        double headZ = i->second.head.z();
+        score = -dist;
+
+        if (headZ < 0.3) {
+            score -= 2.5;
+            score -= fabs(pl.getY() - ball.getY());
+            if (pl.getX() > (ball.getX())) {
+                score -= 10;
+            }
+        }
+        score -= 1.5*fabs(pl.getY() - ball.getY());
+
+        if (pl.getX() > ball.getX()) {
+            score -= 3;
+        }
+
         if (score > max) {
             max = score;
             num = i->first;
@@ -1615,16 +1658,16 @@ bool WorldModel::shouldDive(SideT& side)
 {
     Eigen::Vector3f ball = getBallPos();
     Eigen::Vector3f vel = getBallVel();
-    if (vel.norm() > 0.02)  {
-        ball += (vel * 25);
+    while (vel.norm() > 0.02)  {
+        ball += vel ;
         vel *= 0.96;
     }
-    if (ball.y() > 0) {
+    if ((ball-getMyPos()).y() > 0) {
         side = Left;
     } else {
         side = Right;
     }
-    if (ball.x() < -14 && fabs(ball.y()) < 1.1) {
+    if (ball.x() < -14.4 && fabs(ball.y()) < 1.1) {
         return true;
     }
     return false;

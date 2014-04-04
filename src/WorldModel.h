@@ -58,6 +58,7 @@ public:
   void setOurPlayerPartPos ( int num , string part , Polar pos );
   void setOppPlayerPartPos ( int num , string part , Polar pos );
   void setACC ( Eigen::Vector3f pos );
+  int getClosestTo(int i);
   vector<line> getLastSeenLines();
   unordered_map<string,Eigen::Vector3f> getFlagGlobal();
 
